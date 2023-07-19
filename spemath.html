@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<link rel="stylesheet" type="text/css" href="assets/game/assets/pageorder.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Spé maths</title>
+	<script type="text/javascript">
+		let chargement=0;
+	</script>
+</head>
+<!-- Oui tout est en Français, flemme de faire les traductions en Anglais + ratio + golem + koubeh + tg + ça arriveras quand j'aurais décidé que ça arrivera xD -->
+<body style="background-color: black;">
+	<main>
+		<h1>Spé Maths</h1>
+		<div class="quicknav">
+			<p>Navigation rapide :</p>
+			<table>
+				<tr>
+					<td>
+						<a href="#Description">
+							<span>Description</span>
+						</a>
+					</td>
+					<td>
+						<a href="#CommentJouer">
+							<span>Comment jouer</span>
+						</a>
+					</td>
+					<td>
+						<a href="#NDLR">
+							<span>Note de l'auteur</span>
+						</a>
+					</td>
+					<td>
+						<a href="#retour">
+							<span>Laisser un avis</span>
+						</a>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="game">
+			<canvas id="canvas1"></canvas>
+			<div class="btn-game-box">
+				<button class="btn-game-off" id="zoomin" onclick="zoomin()" title="Agrandir la fenêtre de jeu">+</button>
+				<button class="btn-game-off" id="zoomout" onclick="zoomout()" title="Retrécir la fenêtre de jeu">-</button>
+				<button class="btn-game-disable" disabled>lock</button>
+				<button class="btn-game-disable" disabled title="Afficher les contrôles en mode portable">phone</button>
+				<button class="btn-game-off" onclick="lock(this)" title="Vérrouiller la fenêtre de jeu">full</button>
+				<div class="btn-game-menu"></div>
+			</div>
+		</div>
+		<script type="text/javascript" src="assets/js/scriptpage.js"></script>
+		<script src="assets/game/assets/game.js"></script>
+		<script>
+			const zoommax=4;
+			const zoommin=1;
+		</script>
+		<article class="desc-game" id="Description">
+			<h2>Description</h2>
+			<p>Marre de se taper des sales notes en calcul mental à l'école ? 
+				<br>- Est-ce qu'ils en font même ? 
+				<br>- Ah ouai attend je reformule...</p>
+			<p>Marre de puer en Mathématique ? J'ai la solution ! Venez vous entrainer quand vous voulez en calcul mental avec ce jeu!
+				<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7 (t'as la ref? ;D ) </p>
+			<p>Créez vos programmes d'entrainement personnel et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre reccord ?</p>
+			<br>
+			<i>Le titre du jeu n'est pas définitif.</i>
+		</article>
+		<article class="desc-game" id="CommentJouer">
+			<h2>Comment jouer ?</h2>
+			<p>Avant de commencer, il est important de vérrouiller la fenêtre de jeu en appuyant sur le bouton "full" indiqué sur l'image en dessous afin d'éviter que la page ne bouge pendant que vous jouez.</p>
+			<img src="assets/img/tuto1.png">
+
+			<h3>Les commandes</h3>
+			<img src="assets/img/controles.png">
+			<p>Précision : la touche <b>Q</b> permet d'alterner entre une entrée <i>positif</i> et <i>négatif</i> pendant l'opération en cours. Il repasse automatiquement en positif à la prochaine opération !</p>
+
+			<h3>Créer son programme d'entraînement</h3>
+			<img src="assets/img/tuto2.png">
+			<ul>
+				<li><h4>1. Choisir ses modes</h4><span>Dans cette première section vous allez pouvoir choisir les différentes opérations que vous souhaitez avoir dans votre entraînement. Vous devez en sélectionner au moins 1 pour passer à l'étape suivante.</span></li>
+				<li><h4>2. Format</h4><span>Dans cette deuxième section, vous allez définir le nombre de chiffre qui composeront les calculs qui apparaitront pendant votre session de jeu.</span></li>
+				<li><h4>3. Difficulté</h4><span>Ici, vous choisirez la difficulté de l'entrainement qui jouera grandement sur le <b>temps maximum</b> qui vous sera donner pour effectuer vos opérations.</span></li>
+			</ul>
+
+			<h3>Ecran de jeu</h3>
+			<img src="assets/img/tuto3.png">
+			<ul>
+				<li>
+					<h4>1. Mode</h4>
+					<span>Cette section indique le programme d'entraînement que vous avez choisie pour la session.</span>
+				</li>
+				<li>
+					<h4>2. Temps</h4>
+					<span>Ceci est votre barre de temps, pour chaque bonne réponse que vous donnez, cette barre et ce compteur s'incrémente pour vous laisser plus de temps pour la prochaine opération. Une mauvaise réponse vous fera diminuer ce compteur.<br><b>Attention</b> à la barre rouge de l'autre côté de la barre, c'est la jauge d'affaiblissement : Elle ronge votre temps maximum pour chaque opération réalisé réduisant votre cumul de temps possible. Attention à ne pas trop trainer pour réaliser des opérations.</span>
+				</li>
+				<li>
+					<h4>3. Score</h4>
+					<span>Ici s'affiche votre score total de la partie. Plus vous répondez correctement et rapidement à une opération et plus vous gagnerez de points. D'autre bonus vous permettrons d'incrémenter ce score plus rapidement.</span>
+				</li>
+				<li>
+					<h4>4. Combo</h4>
+					<span>Ce combo indique le nombre de bonne réponse consécutives que vous avez réalisé. Plus votre combo est élevé et plus vous gagnerez de points bonus. Evidement, la moindre faute dans un calcul et le combo repart à 0.</span>
+				</li>
+				<li>
+					<h4>5. Opération</h4>
+					<span>C'est le coeur du jeu. c'est ici que s'affichera vos opérations à effectuer pour gagner un maximum de score, le fond des opérations vous indique rapidement de quel type d'opération il s'agit, il est un bon indicateur au premier regard, faites-y attention.</span>
+				</li>
+				<li>
+					<h4>6. Saisie</h4>
+					<span>Votre saisie pour cette opération. Lorsque vous taperez des chiffres, ils s'afficheront ici.</span>
+				</li>
+				<li>
+					<h4>7. Rappel des Commandes</h4>
+					<span>Vous trouverez dans ce coin un petit rappel des commandes de bases.</span>
+				</li>
+			</ul>
+			<br>
+			<p>Voilà vous avez toute les clés en main pour jouer à ce jeu. En espérant qu'il vous plaira et que vous vous amuserez dessus !</p>
+		</article>
+		<article class="desc-game" id="NDLR">
+			<h2>Note de l'auteur</h2>
+			<p>Je ne pensais pas du tout créer un jeu éducatif en si peu de temps. Bien évidement, il y a beaucoup d'amélioration à faire, d'options à ajouter, de mécanique à intégrer, bruitages et musiques, etc.
+				<br>Mais c'est déjà un bon début, je pense que ça aidera beaucoup de gens à s'entrainer en s'amusant à faire des Mathématiques.
+			</p>
+			<p>Yenseng - 19/07/2023</p>
+		</article>
+		<article class="desc-game" id="retour">
+			<h2>Laisser un avis</h2>
+			<p>Bon vu qu'il ne s'agit que d'une simple page GitHub dans le but de présenter le projet (et que j'ai eu la flemme de faire un quelconque formulaire) vous pouvez toujours me laisser votre avis sur mon <b>Discord</b> dans la section <a class="discord-room" href="https://discord.gg/v6Nu9URDNH" target="_blank"> #Retour-test </a> </p>
+			<p>Sinon vous pouvez toujours me suivre sur :</p>
+			<a href="https://twitter.com/Yenseng3" target="_blank" class="twitter">Twitter : @yenseng3</a>
+			<a href="https://www.youtube.com/channel/UCZDcdxTOk54EYf5yQXkz46w" target="_blank" class="youtube">Youtube : Yenseng</a>
+			<a href="https://discord.gg/v2D4QccZEc" target="_blank" class="discord">Discord </a>
+		</article>
+
+		<div class="quicknav">
+			<p>Navigation rapide :</p>
+			<table>
+				<tr>
+					<td>
+						<a href="#Description">
+							<span>Description</span>
+						</a>
+					</td>
+					<td>
+						<a href="#CommentJouer">
+							<span>Comment jouer</span>
+						</a>
+					</td>
+					<td>
+						<a href="#NDLR">
+							<span>Note de l'auteur</span>
+						</a>
+					</td>
+					<td>
+						<a href="#retour">
+							<span>Laisser un avis</span>
+						</a>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</main>
+	
+</body>
+</html>
+
