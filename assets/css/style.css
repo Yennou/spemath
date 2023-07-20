@@ -87,9 +87,9 @@ nav>ul>li:hover {
 .nav-isactive{
 	overflow: hidden;
 }
-
 .quicknav {
-	display: table;
+	display: flex;
+	flex-flow: column nowrap;
 	margin: 0 0 0 3rem;
 	border: solid 2px rgba(200,200,200,0.1);
 	text-align: left;
@@ -97,16 +97,19 @@ nav>ul>li:hover {
 	color: rgb(200,200,200);
 	padding: 0.4rem 0.4rem 0 0.4rem;
 }
-.quicknav td {
-	border: solid 2px rgba(200,200,200,0.8);
-	padding: 0.3rem;
-}
-.quicknav td:hover {
-	border: solid 2px rgba(250,250,250,0.9);
-	padding: 0.3rem;
+.quicknav div {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
 }
 .quicknav a {
+	border: solid 2px rgba(200,200,200,0.8);
+	padding: 0.3rem;
 	color: rgb(200,200,200);
+}
+.quicknav a:hover {
+	border: solid 2px rgba(250,250,250,0.9);
+	padding: 0.3rem;
 }
 .quicknav p {
 	margin: 0.1rem;
@@ -395,11 +398,20 @@ footer ul li a {
 	justify-content: center;
 	border : white solid 1px;
 	margin: auto;
-	bottom: -66px;
+	bottom: -140px;
+	/*bottom: -66px;*/
 	transition: bottom 0.3s;
 }
 .btn-game-box div{
 	display: none;
+}
+.btn-game-box button{
+	font-size: 26px;
+	border: 1px solid rgb(220,220,220);
+	border-radius: 1.15rem; 
+	width: 6rem;
+	height: 2.3rem;
+	margin: 1rem;
 }
 .btn-game-box-fs div{
 	display: block;
@@ -412,7 +424,7 @@ footer ul li a {
 	padding:16px 0 0 19px;
 	font-size: 24px;
 	font-weight: bolder;
-	bottom: 64px;
+	bottom: 140px;
 	width: 50px;
 	height: 50px;
 	border: white solid 1px;
@@ -423,47 +435,26 @@ footer ul li a {
 	background-color: rgba(255, 255, 255, 0.3);
 }
 .btn-game-off {
-	background-color: rgba(0,0,0,0.5); 
-	border: 1px solid rgb(220,220,220);
-	border-radius: 1rem; 
+	background-color: rgba(0,0,0,0.5);
 	transition-duration: 0.2s;
-	width: 5rem;
-	height: 2rem;
-	margin: 1rem;
 	color: rgb(230,230,230);
 }
 .btn-game-on {
-	background-color: rgba(0,150,0,0.7); 
-	border: 1px solid rgb(255,255,255);
-	border-radius: 1rem; 
+	background-color: rgba(0,150,0,0.7);
 	transition-duration: 0.2s;
-	width: 5rem;
-	height: 2rem;
-	margin: 1rem;
 	color: rgb(255,255,255);
 }
 .btn-game-disable {
-	background-color: rgba(0,0,0,0.1); 
-	border: 1px solid rgb(150,150,150);
-	border-radius: 1rem;
-	width: 5rem;
-	height: 2rem;
-	margin: 1rem;
+	background-color: rgba(0,0,0,0.1);
 	color: rgb(150,150,150);
 }
 .btn-game-off:hover {
-	background-color: rgba(100,100,100,0.6); 
-	border: 1px solid rgb(255,255,255);
+	background-color: rgba(100,100,100,0.6);
 	color: rgb(255,255,255);
 }
 .btn-game-on:hover {
-	background-color: rgba(150,0,0,0.7); 
-	border: 1px solid rgb(255,255,255);
-	border-radius: 1rem; 
+	background-color: rgba(150,0,0,0.7);
 	transition-duration: 0.2s;
-	width: 5rem;
-	height: 2rem;
-	margin: 1rem;
 	color: rgb(255,255,255);
 }
 .game-lock {
@@ -478,8 +469,28 @@ footer ul li a {
 	background-color: rgba(0,0,0,0.85);
 	overflow: hidden;
 }
-
-
+.btn-game-controler-box {
+	display: none;
+	margin-top: 1rem;
+	flex-flow: column nowrap;
+	justify-content: center;
+}
+.btn-game-controler-row {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+}
+.btn-game-controler-box button {
+	font-size: 26px;
+	border: 1px solid rgb(220,220,220);
+	background-color: rgba(0,0,0,0.85);
+	border-radius: 0.3rem; 
+	width: 20%;
+	height: 5rem;
+	margin: 0.3rem;
+	color: white;
+}
+/* ----------- aRRANGEMENT ARTICLES ---------- */
 .armoire{
 	display: flex;
 	flex-flow: column;
@@ -525,7 +536,7 @@ footer ul li a {
 .desc-game img{
 	width: 100%;
 }
-
+/* ----------- AUTRES ---------- */
 .discord-room {
 	background-color: rgb(61, 66, 112);
 	color: rgb(201,203,247);
@@ -539,30 +550,72 @@ footer ul li a {
 	color: white;
 }
 .twitter {
+	display: inline-block;
 	background-color: rgb(29, 155, 240);
 	font-weight: bold;
+	margin: 0.5rem 0.1rem;
 	padding: 0.5rem 2.5rem;
 	border-radius: 1rem;
 	font-size: 20px;
 	color: white;
 }
 .youtube {
+	display: inline-block;
 	background-color: rgb(255, 0, 0);
 	font-weight: bold;
+	margin: 0.5rem 0.1rem;
 	padding: 0.5rem 2.5rem;
 	border-radius: 1rem;
 	font-size: 20px;
 	color: white;
 }
 .discord {
+	display: inline-block;
 	background-color: rgb(88, 101, 242);
 	font-weight: bold;
+	margin: 0.5rem 0.1rem;
 	padding: 0.5rem 2.5rem;
 	border-radius: 1rem;
 	font-size: 20px;
 	color: white;
 }
 
+@media (min-width: 562px){
+	.btn-game-box-fs {
+		position: absolute;
+		justify-content: center;
+		border : white solid 1px;
+		margin: auto;
+		bottom: -66px;
+		transition: bottom 0.3s;
+	}
+	.btn-game-menu {
+		position: absolute;
+		padding:16px 0 0 19px;
+		font-size: 24px;
+		font-weight: bolder;
+		bottom: 64px;
+		width: 50px;
+		height: 50px;
+		border: white solid 1px;
+		border-radius: 50% 50% 0 0;
+		background-color: rgba(0, 0, 0, 0.5);
+	}
+	.btn-game-box-fs-active {
+		bottom: 0px;
+	}
+	.btn-game-menu-active {
+		background-color: rgba(255, 255, 255, 0.3);
+	}
+	.btn-game-box button{
+		font-size: 22px;
+		border: 1px solid rgb(220,220,220);
+		border-radius: 1rem; 
+		width: 5rem;
+		height: 2rem;
+		margin: 1rem;
+	}
+}
 @media (min-width: 576px){
 	h1 {
 		font-size: 40px;

@@ -17,43 +17,44 @@
 		<h1>Spé Maths</h1>
 		<div class="quicknav">
 			<p>Navigation rapide :</p>
-			<table>
-				<tr>
-					<td>
-						<a href="#Description">
-							<span>Description</span>
-						</a>
-					</td>
-					<td>
-						<a href="#CommentJouer">
-							<span>Comment jouer</span>
-						</a>
-					</td>
-					<td>
-						<a href="#NDLR">
-							<span>Note de l'auteur</span>
-						</a>
-					</td>
-					<td>
-						<a href="#retour">
-							<span>Laisser un avis</span>
-						</a>
-					</td>
-					<td>
-						<a href="#changelog">
-							<span>Changelog</span>
-						</a>
-					</td>
-				</tr>
-			</table>
+			<div>
+				<a href="#Description">Description</a>
+				<a href="#CommentJouer">Comment jouer</a>
+				<a href="#NDLR">Note du créateur</a>
+				<a href="#retour">Laisser un avis</a>
+				<a href="#changelog">Chagelog</a>
+			</div>
 		</div>
 		<div id="game">
 			<canvas id="canvas1"></canvas>
+			<div class="btn-game-controler-box" id="controler">
+				<div class="btn-game-controler-row">
+					<button onclick="inputPlayerPhone(7)"> 7 </button>
+					<button onclick="inputPlayerPhone(8)"> 8 </button>
+					<button onclick="inputPlayerPhone(9)"> 9 </button>
+					<button onclick="inputPlayerPhone('Retour')"><- </button>
+				</div>
+				<div class="btn-game-controler-row">
+					<button onclick="inputPlayerPhone(4)"> 4 </button>
+					<button onclick="inputPlayerPhone(5)"> 5 </button>
+					<button onclick="inputPlayerPhone(6)"> 6 </button>
+					<button onclick="inputPlayerPhone('Negat')">(-)</button>
+				</div>
+				<div class="btn-game-controler-row">
+					<button onclick="inputPlayerPhone(1)"> 1 </button>
+					<button onclick="inputPlayerPhone(2)"> 2 </button>
+					<button onclick="inputPlayerPhone(3)"> 3 </button>
+					<button onclick="inputPlayerPhone('Enter')"> = </button>
+				</div>
+				<div class="btn-game-controler-row">
+					<button onclick="inputPlayerPhone(0)"> 0 </button>
+				</div>
+			</div>
 			<div class="btn-game-box">
 				<button class="btn-game-off" id="zoomin" onclick="zoomin()" title="Agrandir la fenêtre de jeu">+</button>
 				<button class="btn-game-off" id="zoomout" onclick="zoomout()" title="Retrécir la fenêtre de jeu">-</button>
 				<button class="btn-game-disable" disabled>lock</button>
-				<button class="btn-game-disable" disabled title="Afficher les contrôles en mode portable">phone</button>
+				<button class="btn-game-off" onclick="phone(this)" title="Afficher les contrôles en mode portable">phone</button>
 				<button class="btn-game-off" onclick="lock(this)" title="Vérrouiller la fenêtre de jeu">full</button>
 				<div class="btn-game-menu">!</div>
 			</div>
@@ -136,13 +137,22 @@
 			<h2>Laisser un avis</h2>
 			<p>Bon vu qu'il ne s'agit que d'une simple page GitHub dans le but de présenter le projet (et que j'ai eu la flemme de faire un quelconque formulaire) vous pouvez toujours me laisser votre avis sur mon <b>Discord</b> dans la section <a class="discord-room" href="https://discord.gg/v6Nu9URDNH" target="_blank"> #Retour-test </a> </p>
 			<p>Sinon vous pouvez toujours me suivre sur :</p>
-			<a href="https://twitter.com/Yenseng3" target="_blank" class="twitter">Twitter : @yenseng3</a>
+			<!-- <a href="https://twitter.com/Yenseng3" target="_blank" class="twitter">Twitter : @yenseng3</a>
 			<a href="https://www.youtube.com/channel/UCZDcdxTOk54EYf5yQXkz46w" target="_blank" class="youtube">Youtube : Yenseng</a>
+			<a href="https://discord.gg/v2D4QccZEc" target="_blank" class="discord">Discord </a> -->
+			<a href="https://twitter.com/Yenseng3" target="_blank" class="twitter">Twitter</a>
+			<a href="https://www.youtube.com/channel/UCZDcdxTOk54EYf5yQXkz46w" target="_blank" class="youtube">Youtube</a>
 			<a href="https://discord.gg/v2D4QccZEc" target="_blank" class="discord">Discord </a>
 		</article>
 
 		<article class="desc-game" id="changelog">
 			<h2>Changelog</h2>
+			<h3>BETA 1.1 - 20/07/2023</h3>
+			<ul>
+				<li><h4>COMPATIBILITE Smartphone et Tablette</h4> Appuyez sur le bouton <b>[phone]</b> dans le menu sous le jeu.</li>
+				<li>Correction de l'espacement des textes et de l'opacité de l'écran de fin de partie pour que ce soit plus lisible.</li>
+				<li>Ajustement du CSS.</li>
+			</ul>
 			<h3>BETA 1.0.1 - 20/07/2023</h3>
 			<ul>
 				<li>Ajout de la touche "Shift" pour mettre le signe ( - ).</li>
@@ -156,35 +166,13 @@
 
 		<div class="quicknav">
 			<p>Navigation rapide :</p>
-			<table>
-				<tr>
-					<td>
-						<a href="#Description">
-							<span>Description</span>
-						</a>
-					</td>
-					<td>
-						<a href="#CommentJouer">
-							<span>Comment jouer</span>
-						</a>
-					</td>
-					<td>
-						<a href="#NDLR">
-							<span>Note de l'auteur</span>
-						</a>
-					</td>
-					<td>
-						<a href="#retour">
-							<span>Laisser un avis</span>
-						</a>
-					</td>
-					<td>
-						<a href="#changelog">
-							<span>Changelog</span>
-						</a>
-					</td>
-				</tr>
-			</table>
+			<div>
+				<a href="#Description">Description</a>
+				<a href="#CommentJouer">Comment jouer</a>
+				<a href="#NDLR">Note du créateur</a>
+				<a href="#retour">Laisser un avis</a>
+				<a href="#changelog">Chagelog</a>
+			</div>
 		</div>
 		<hr>
 	</main>

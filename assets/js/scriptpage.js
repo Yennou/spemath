@@ -39,7 +39,7 @@ function zoomin() {
 		document.getElementById("zoomout").classList.toggle("btn-game-off");
 		document.getElementById("zoomout").removeAttribute("disabled");
 	}
-	zoom+=0.5;
+	zoom+=0.25;
 	var target=document.getElementById("canvas1")
 	var width=target.width;
 	var height=target.height;
@@ -61,7 +61,7 @@ function zoomout() {
 		document.getElementById("zoomin").classList.toggle("btn-game-off");
 		document.getElementById("zoomin").removeAttribute("disabled");
 	}
-	zoom-=0.5;
+	zoom-=0.25;
 	var target=document.getElementById("canvas1")
 	var width=target.width;
 	var height=target.height;	
@@ -99,4 +99,17 @@ function lock(btn) {
 			fullscreen=false;
 		}
 	});
+}
+function phone(btn) {
+	btn.classList.toggle('btn-game-on')
+	let controler=document.getElementById("controler");
+
+	if (game.inputType=="phone") {
+		game.inputType="keyboard";
+		controler.style.display="none";
+	}
+	else {
+		game.inputType="phone";
+		controler.style.display="flex";
+	}
 }

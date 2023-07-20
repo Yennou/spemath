@@ -25,94 +25,97 @@ const key = {		//contrôles
 window.addEventListener('keydown', function(event){
 	keypressed = event.key;
 	//console.log(keypressed)
-	if (key.cooldown==0) {
-		switch (keypressed) {
-			case "q":
-			case "Q":
-				key.q=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			case "d":
-			case "D":
-			case"Backspace":
-				key.d=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			case "ArrowUp": 
-				key.up=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			case "ArrowDown": 
-				key.down=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			case "ArrowLeft": 
-				key.left=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			case "ArrowRight": 
-				key.right=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			case " ":
-			case "Enter":
-				key.space=true;
-				key.cooldown=key.cooldownmax;
-				break;
-			default:
-				break;
-		}
-		if (game.mainevent=="play") {
+	if (game.inputType=="keyboard") {
+		if (key.cooldown==0) {
 			switch (keypressed) {
-			case"&":
-			case"1":
-				input=input*10+1;
-				break;
-			case"é":
-			case"2":
-				input=input*10+2;
-				break;
-			case"\"":
-			case"3":
-				input=input*10+3;
-				break;
-			case"'":
-			case"4":
-				input=input*10+4;
-				break;
-			case"(":
-			case"5":
-				input=input*10+5;
-				break;
-			case"-":
-			case"6":
-				input=input*10+6;
-				break;
-			case"è":
-			case"7":
-				input=input*10+7;
-				break;
-			case"_":
-			case"8":
-				input=input*10+8;
-				break;
-			case"ç":
-			case"9":
-				input=input*10+9;
-				break;
-			case"à":
-			case"0":
-				input=input*10+0;
-				break;
-			case "d":
-			case "D":
-			case"Backspace":
-				input=Math.floor(input/10);
-				break;
-			case "q":
-			case "Q":
-				game.battle.negat ? game.battle.negat=false:game.battle.negat=true;
-				break;
+				case "q":
+				case "Q":
+					key.q=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				case "d":
+				case "D":
+				case"Backspace":
+					key.d=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				case "ArrowUp": 
+					key.up=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				case "ArrowDown": 
+					key.down=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				case "ArrowLeft": 
+					key.left=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				case "ArrowRight": 
+					key.right=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				case " ":
+				case "Enter":
+					key.space=true;
+					key.cooldown=key.cooldownmax;
+					break;
+				default:
+					break;
+			}
+			if (game.mainevent=="play") {
+				switch (keypressed) {
+				case"&":
+				case"1":
+					input=input*10+1;
+					break;
+				case"é":
+				case"2":
+					input=input*10+2;
+					break;
+				case"\"":
+				case"3":
+					input=input*10+3;
+					break;
+				case"'":
+				case"4":
+					input=input*10+4;
+					break;
+				case"(":
+				case"5":
+					input=input*10+5;
+					break;
+				case"-":
+				case"6":
+					input=input*10+6;
+					break;
+				case"è":
+				case"7":
+					input=input*10+7;
+					break;
+				case"_":
+				case"8":
+					input=input*10+8;
+					break;
+				case"ç":
+				case"9":
+					input=input*10+9;
+					break;
+				case"à":
+				case"0":
+					input=input*10+0;
+					break;
+				case "d":
+				case "D":
+				case"Backspace":
+					input=Math.floor(input/10);
+					break;
+				case "q":
+				case "Q":
+				case "Shift":
+					game.battle.negat ? game.battle.negat=false:game.battle.negat=true;
+					break;
+				}
 			}
 		}
 	}
@@ -149,13 +152,127 @@ window.addEventListener('keyup', function(event){
 			break;
 	}
 });
+canvas.addEventListener('mousedown', function(event){
+	if (game.inputType=="phone") {
+		canvasPosition = canvas.getBoundingClientRect();
+		mouse.x=Math.floor(event.x-canvasPosition.left);
+		mouse.y=Math.floor(event.y-canvasPosition.top);
+		//console.log(mouse.x+" / "+mouse.y)
+		switch(game.screen){
+		case "title":
+			switch(game.mainevent){
+			case "mainmenu":
+				setmenu(4,"lr",0.065,0.43,0.23,0);
+				game.screen="hub";
+				game.event="first"
+			default:
+				break;
+			}
+			break;
+		case "hub":
+			switch(game.event){
+			case "first":
+				if (mouse.x >= Cw*0.1 && mouse.y >= Ch*0.2 && mouse.x <= Cw*0.1+100 && mouse.y <= Ch*0.2+125) {
+					game.battle.add ? game.battle.add=false: game.battle.add=true;
+					game.battle.add ? game.battle.symbnum++ : game.battle.symbnum--;
+					key.space=false;
+				}
+				if (mouse.x >= Cw*0.33 && mouse.y >= Ch*0.2 && mouse.x <= Cw*0.33+100 && mouse.y <= Ch*0.2+125) {
+					game.battle.sub ? game.battle.sub=false: game.battle.sub=true;
+					game.battle.sub ? game.battle.symbnum++ : game.battle.symbnum--;
+					key.space=false;
+				}
+				if (mouse.x >= Cw*0.56 && mouse.y >= Ch*0.2 && mouse.x <= Cw*0.56+100 && mouse.y <= Ch*0.2+125) {
+					game.battle.mult ? game.battle.mult=false: game.battle.mult=true;
+					game.battle.mult ? game.battle.symbnum++ : game.battle.symbnum--;
+					key.space=false;
+				}
+				if (mouse.x >= Cw*0.79 && mouse.y >= Ch*0.2 && mouse.x <= Cw*0.79+100 && mouse.y <= Ch*0.2+125) {
+					if (game.battle.symbnum>0) {
+						setmenu(3,"lr",0.3,0.56,0,0);
+						game.event="second"
+					}
+				}
+				break;
+			case "second":
+				if (mouse.x >= Cw*0.34 && mouse.y >= Ch*0.54 && mouse.x <= Cw*0.34+60 && mouse.y <= Ch*0.54+40) {
+					game.menu.target==1 ? game.menu.target=3:game.menu.target--;
+				}
+				if (mouse.x >= Cw*0.57 && mouse.y >= Ch*0.54 && mouse.x <= Cw*0.57+60 && mouse.y <= Ch*0.54+40) {
+					game.menu.target==3 ? game.menu.target=1:game.menu.target++;
+				}
+				if (mouse.x >= Cw*0.1 && mouse.y >= Ch*0.53 && mouse.x <= Cw*0.1+120 && mouse.y <= Ch*0.53+50) {
+					setmenu(4,"lr",0.065,0.43,0.23,0);
+					game.event="first";
+				}
+				if (mouse.x >= Cw*0.72 && mouse.y >= Ch*0.53 && mouse.x <= Cw*0.72+120 && mouse.y <= Ch*0.53+50) {
+					setmenu(4,"lr",0.3,0.71,0,0);
+					game.event="third";
+				}
+				break;
+			case "third":
+				if (mouse.x >= Cw*0.32 && mouse.y >= Ch*0.69 && mouse.x <= Cw*0.32+80 && mouse.y <= Ch*0.69+40) {
+					game.menu.target==1 ? game.menu.target=4:game.menu.target--;
+				}
+				if (mouse.x >= Cw*0.59 && mouse.y >= Ch*0.69 && mouse.x <= Cw*0.59+80 && mouse.y <= Ch*0.69+40) {
+					game.menu.target==4 ? game.menu.target=1:game.menu.target++;
+				}
+				if (mouse.x >= Cw*0.1 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.1+120 && mouse.y <= Ch*0.68+50) {
+					setmenu(3,"lr",0.3,0.56,0,0);
+					game.event="second"
+				}
+				if (mouse.x >= Cw*0.72 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.72+120 && mouse.y <= Ch*0.68+50) {
+					mult=game.setbtl.mode;
+					multn=game.setbtl.chif;
+					multd=game.setbtl.dif;
+					game.screen="game";
+					game.mainevent="starting";
+					game.event="transition";
+					game.stats.maxtimer=(Math.floor(20*mult*multn*multd))*100;
+					game.timer=20;
+				}
+				break;
+			default:
+				break;
+			}
+			break;
+		case "game":
+			switch (game.mainevent){
+			case "gameover":
+				switch(game.event){
+				case "finpop":
+					if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.18+150 && mouse.y <= Ch*0.785+50) {
+						game.mainevent="starting";
+						game.event="transition";
+						game.timer=20;
+					}
+					if (mouse.x >= Cw*0.465 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.465+220 && mouse.y <= Ch*0.785+50) {
+						setmenu(4,"lr",0.065,0.43,0.23,0);
+						game.screen="hub";
+						game.event="first";
+					}
+					break;
+				default:
+					break;
+				}
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+});
+
 const Cw= canvas.width, Ch= canvas.height;
 const game = {
 						//tag pour l'affichage et les événements
 	screen : "loading",
 	mainevent : "mainmenu",
 	event : "",
-	inputType:"keyboard",
+	inputType:"keyboard", //keyboard, phone
 
 	option : {			//Options en jeu
 		music : 100,
@@ -285,44 +402,75 @@ function showcursor(cursortype=0){
 function inputPlayer(){
 	c.globalAlpha=game.option.inputOpacity/100;
 	c.fillStyle="white";
-	c.drawImage(inputframe,Cw*0.80,Ch*0.43,125,80)
-	c.drawImage(inputframe,Cw*0.840,Ch*0.62,100,80)
-	c.drawImage(inputframe,Cw*0.840,Ch*0.81,100,80)
-	c.font = '30px monospace';
-	c.fillText("Enter",Cw*0.9,Ch*0.54)
-	c.font = '46px monospace';
-	c.fillText("(-)",Cw*0.92,Ch*0.735)
-	c.fillText("<-",Cw*0.92,Ch*0.925)
-	if (game.inputType=="phone") {
-		c.drawImage(inputframe,Cw*0.01,Ch*0.62,100,80)
-		c.drawImage(inputframe,Cw*0.176,Ch*0.62,100,80)
-		c.drawImage(inputframe,Cw*0.342,Ch*0.62,100,80)
-		c.drawImage(inputframe,Cw*0.508,Ch*0.62,100,80)
-		c.drawImage(inputframe,Cw*0.674,Ch*0.62,100,80)
-		c.drawImage(inputframe,Cw*0.01,Ch*0.81,100,80)
-		c.drawImage(inputframe,Cw*0.176,Ch*0.81,100,80)
-		c.drawImage(inputframe,Cw*0.342,Ch*0.81,100,80)
-		c.drawImage(inputframe,Cw*0.508,Ch*0.81,100,80)
-		c.drawImage(inputframe,Cw*0.674,Ch*0.81,100,80)
-		c.font = '40px monospace';
-		c.fillText("1",Cw*0.085,Ch*0.74)
-		c.fillText("2",Cw*0.251,Ch*0.74)
-		c.fillText("3",Cw*0.417,Ch*0.74)
-		c.fillText("4",Cw*0.583,Ch*0.74)
-		c.fillText("5",Cw*0.749,Ch*0.74)
-		c.fillText("6",Cw*0.085,Ch*0.93)
-		c.fillText("7",Cw*0.251,Ch*0.93)
-		c.fillText("8",Cw*0.417,Ch*0.93)
-		c.fillText("9",Cw*0.583,Ch*0.93)
-		c.fillText("0",Cw*0.749,Ch*0.93)
-	} else {
+	if (game.inputType=="keyboard") {
+		c.drawImage(inputframe,Cw*0.80,Ch*0.43,125,80)
+		c.drawImage(inputframe,Cw*0.840,Ch*0.62,100,80)
+		c.drawImage(inputframe,Cw*0.840,Ch*0.81,100,80)
+		c.font = '30px monospace';
+		c.fillText("Enter",Cw*0.9,Ch*0.54)
+		c.font = '46px monospace';
+		c.fillText("(-)",Cw*0.92,Ch*0.74)
+		c.fillText("<-",Cw*0.92,Ch*0.93)
 		c.textAlign="start";
 		c.fillStyle="yellow";
-		c.font = '25px monospace';
+		c.font = '22px monospace';
 		c.fillText("Espace",Cw*0.81,Ch*0.48)
-		c.fillText("Q",Cw*0.85,Ch*0.675)
-		c.fillText("D",Cw*0.85,Ch*0.865)
+		c.fillText("Shift",Cw*0.85,Ch*0.67)
+		c.fillText("Retour",Cw*0.85,Ch*0.86)
 	}
+}
+function inputPlayerPhone(inputP){
+	if ((inputP>=0&&inputP<=9)&&game.mainevent=="play") input=input*10+inputP;
+	else {
+		switch (inputP){
+		case "Negat":
+			if (game.mainevent=="play") {
+				game.battle.negat ? game.battle.negat=false:game.battle.negat=true;
+			}else {
+				key.q=true;
+				key.cooldown=key.cooldownmax;
+				
+			}
+			break;
+		case"Retour":
+			if (game.mainevent=="play") {
+				input=Math.floor(input/10);
+			}else {
+				key.d=true;
+				key.cooldown=key.cooldownmax;
+				resetInput(inputP)
+			}
+			break;
+		case "Enter":
+			key.space=true;
+			key.cooldown=key.cooldownmax;
+			resetInput(inputP)
+			break;
+		default:
+			break;
+		}
+	}
+}
+function resetInput(inputName){
+	if (key.cooldown==0) {
+		switch (inputName){
+		case "Negat":
+			key.q=false;
+			break;
+		case"Retour":
+			key.d=false;
+			break;
+		case "Enter":
+			key.space=false;
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		setTimeout(resetInput,2,inputName)
+	}
+	
 }
 
 function loopAnimation() {
@@ -360,27 +508,31 @@ function loopAnimation() {
 					c.textAlign="center";
 					c.font = '50px monospace';
 					c.fillText("Spé Maths",Cw*0.5,Ch*0.35)
-					c.font = '22px monospace';
-					c.fillText("",Cw*0.5,Ch*0.4)
-					c.fillText("Commencer",Cw*0.5,Ch*0.58)
-					c.fillText("Contrôles :",Cw*0.2,Ch*0.66)
-					//c.fillText("Options",Cw*0.5,Ch*0.65)
-					//c.fillText("Record",Cw*0.5,Ch*0.72)
-					c.fillStyle="yellow";
-					c.textAlign="start";
-					c.fillText("Espace/ Entrée",Cw*0.1,Ch*0.72)
-					c.fillText("Retour/ D",Cw*0.1,Ch*0.78)
-					c.fillText("Q",Cw*0.1,Ch*0.84)
-					c.fillText("1,2,3,4,5,6,7,8,9,0",Cw*0.1,Ch*0.90)
-					c.fillText("Touche directionnel",Cw*0.1,Ch*0.96)
-					c.fillStyle="white";
-					c.fillText("- Valider/ Suivant",Cw*0.5,Ch*0.72)
-					c.fillText("- Retour/ Supprimer",Cw*0.5,Ch*0.78)
-					c.fillText("- Symbole négatif (-)",Cw*0.5,Ch*0.84)
-					c.fillText("- Saisir chiffre",Cw*0.5,Ch*0.90)
-					c.fillText("- Se déplacer",Cw*0.5,Ch*0.96)
-					//movemenu()
-					showcursor()
+					if (game.inputType=="keyboard") {
+						c.font = '22px monospace';
+						c.fillText("Commencer",Cw*0.5,Ch*0.58)
+						//c.fillText("Options",Cw*0.5,Ch*0.65)
+						//c.fillText("Record",Cw*0.5,Ch*0.72)
+						c.fillText("Contrôles :",Cw*0.2,Ch*0.66)
+						c.fillStyle="yellow";
+						c.textAlign="start";
+						c.fillText("Espace/ Entrée",Cw*0.1,Ch*0.72)
+						c.fillText("Retour/ D",Cw*0.1,Ch*0.78)
+						c.fillText("Shift/ Q",Cw*0.1,Ch*0.84)
+						c.fillText("1,2,3,4,5,6,7,8,9,0",Cw*0.1,Ch*0.90)
+						c.fillText("Touche directionnel",Cw*0.1,Ch*0.96)
+						c.fillStyle="white";
+						c.fillText("- Valider/ Suivant",Cw*0.5,Ch*0.72)
+						c.fillText("- Retour/ Supprimer",Cw*0.5,Ch*0.78)
+						c.fillText("- Symbole négatif (-)",Cw*0.5,Ch*0.84)
+						c.fillText("- Saisir chiffre",Cw*0.5,Ch*0.90)
+						c.fillText("- Se déplacer",Cw*0.5,Ch*0.96)
+					
+						showcursor()
+					}else {
+						c.font = '30px monospace';
+						c.fillText("Cliquez pour jouer",Cw*0.5,Ch*0.60)
+					}
 					if (key.space) {
 						if(game.menu.target==1){
 							setmenu(4,"lr",0.065,0.43,0.23,0);
@@ -422,8 +574,10 @@ function loopAnimation() {
 			game.battle.sub ? c.fillText("Actif",Cw*0.35,Ch*0.47): c.fillText("désact.",Cw*0.35,Ch*0.47);
 			game.battle.mult ? c.fillText("Actif",Cw*0.58,Ch*0.47): c.fillText("désact.",Cw*0.58,Ch*0.47);
 			c.fillText("Suiv.",Cw*0.8,Ch*0.47)
-			movemenu()
-			showcursor()
+			if (game.inputType=="keyboard") {
+				movemenu()
+				showcursor()
+			}
 			switch (game.event){
 			case "first":
 				if (key.space) {
@@ -460,8 +614,9 @@ function loopAnimation() {
 			case "second":
 				c.font = '28px monospace';
 				c.fillText("Format :",Cw*0.2,Ch*0.53)
-				c.font = '22px monospace';
+				game.inputType=="phone"? c.font = '26px monospace':c.font = '22px monospace';
 				c.textAlign="center";
+				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.2,Ch*0.6);c.fillText("Suiv.",Cw*0.8,Ch*0.6)}
 				switch (game.menu.target) {
 				case 1:
 					c.fillText("<   1 + 1   >",Cw*0.5,Ch*0.6)
@@ -492,8 +647,9 @@ function loopAnimation() {
 				c.font = '28px monospace';
 				c.fillText("Difficultée :",Cw*0.2,Ch*0.67)
 				c.fillText("Format :",Cw*0.2,Ch*0.53)
-				c.font = '22px monospace';
+				game.inputType=="phone"? c.font = '26px monospace':c.font = '22px monospace';
 				c.textAlign="center";
+				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.2,Ch*0.75);c.fillText("Suiv.",Cw*0.8,Ch*0.75)}
 				switch (game.menu.target) {
 				case 1:
 					c.fillText("< Très facile >",Cw*0.5,Ch*0.75)
@@ -547,15 +703,21 @@ function loopAnimation() {
 			multn=game.setbtl.chif;
 			multd=game.setbtl.dif;
 			c.textAlign="start";
+			c.font = '22px monospace';
 			c.fillText("Temps maximum : "+(Math.floor(20*mult*multn*multd))+" secondes",Cw*0.25,Ch*0.83)
 			c.globalAlpha=0.6;
-			c.fillText("- Valider",Cw*0.32,Ch*0.9)
-			c.fillText("- Retour",Cw*0.8,Ch*0.9)
-			c.fillText("- Déplacer",Cw*0.58,Ch*0.96)
-			c.fillStyle="yellow";
-			c.fillText("Espace/ Entrée",Cw*0.05,Ch*0.9)
-			c.fillText("D/ Rtr.Arrière",Cw*0.52,Ch*0.9)
-			c.fillText("Flèche directionnel",Cw*0.2,Ch*0.96)
+			if (game.inputType=="keyboard") {
+				c.fillText("- Valider",Cw*0.32,Ch*0.9)
+				c.fillText("- Retour",Cw*0.8,Ch*0.9)
+				c.fillText("- Déplacer",Cw*0.58,Ch*0.96)
+				c.fillStyle="yellow";
+				c.fillText("Espace/ Entrée",Cw*0.05,Ch*0.9)
+				c.fillText("D/ Rtr.Arrière",Cw*0.52,Ch*0.9)
+				c.fillText("Flèche directionnel",Cw*0.2,Ch*0.96)
+			}
+			else {
+				c.fillText("Cliquez pour faire vos choix",Cw*0.24,Ch*0.9)
+			}
 			break;
 		case "game":
 			//if (game.stats.timer>0) game.stats.timer--;
@@ -720,7 +882,7 @@ function loopAnimation() {
 					break;
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha = 0.7*(1-game.timer/50);
+					c.globalAlpha = 0.85*(1-game.timer/50);
 					c.fillRect(0,0,canvas.width,canvas.height)
 					if (game.timer==0) {
 						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
@@ -732,49 +894,41 @@ function loopAnimation() {
 					break;
 				case "finpop":
 					c.fillStyle="black";
-					c.globalAlpha = 0.7;
+					c.globalAlpha = 0.85;
 					c.fillRect(0,0,canvas.width,canvas.height)
 					c.fillStyle="white";
 					c.globalAlpha = 1-game.timer/20;
 					c.textAlign="center";
 					c.font = '38px monospace';
-					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.26)
+					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.25)
 					c.textAlign="start";
 					c.font = '36px monospace';
-					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.39)
+					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
 					c.font = '30px monospace';
-					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.47)
+					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.46)
 					c.font = '24px monospace';
 					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.54)
-					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.60)
-					c.fillText("Temps de réponse moyen : "+game.stats.avgrep+"sec",Cw*0.13,Ch*0.66)
-					c.fillText("Durée de la partie : "+game.stats.timeTot/100+"sec",Cw*0.13,Ch*0.72)
+					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
+					c.fillText("Temps de réponse moyen : "+game.stats.avgrep+"sec",Cw*0.13,Ch*0.68)
+					c.fillText("Durée de la partie : "+game.stats.timeTot/100+"sec",Cw*0.13,Ch*0.75)
 					c.fillText("Rejouer      Retour au menu",Cw*0.22,Ch*0.86)
-					movemenu()
-					showcursor()
-					if (key.space) {
-						game.stats.score = 0;
-						game.stats.clear = 0;
-						game.stats.miss = 0;
-						game.stats.combo = 0;
-						game.stats.maxcombo = 0;
-						game.stats.timer = 0;
-						game.stats.timeRep = 0;
-						game.stats.timeTot = 0;
-						game.stats.avgrep = 0;
-						game.stats.inputT = [];
-						input=0;
-						switch (game.menu.target){
-						case 1:
-							game.mainevent="starting";
-							game.event="transition";
-							game.timer=20;
-							break;
-						case 2:
-							setmenu(4,"lr",0.065,0.43,0.23,0);
-							game.screen="hub";
-							game.event="first";
-							break;
+					if (game.inputType=="keyboard") {
+						movemenu()
+						showcursor()
+						if (key.space) {
+							resetStats()
+							switch (game.menu.target){
+							case 1:
+								game.mainevent="starting";
+								game.event="transition";
+								game.timer=20;
+								break;
+							case 2:
+								setmenu(4,"lr",0.065,0.43,0.23,0);
+								game.screen="hub";
+								game.event="first";
+								break;
+							}
 						}
 					}
 				}
@@ -792,11 +946,23 @@ function loopAnimation() {
 	c.textAlign="end";
 	c.font = '12px monospace';
 	c.fillStyle = "white";
-	c.fillText("Version BETA 1.0", Cw*0.99, Ch*0.99);
+	c.fillText("Version BETA 1.1.0", Cw*0.99, Ch*0.99);
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
-
+function resetStats(){
+	game.stats.score = 0;
+	game.stats.clear = 0;
+	game.stats.miss = 0;
+	game.stats.combo = 0;
+	game.stats.maxcombo = 0;
+	game.stats.timer = 0;
+	game.stats.timeRep = 0;
+	game.stats.timeTot = 0;
+	game.stats.avgrep = 0;
+	game.stats.inputT = [];
+	input=0;
+}
 function IGTtimer(){
 	if (game.mainevent=="play") {
 		if (game.stats.timer>0) {
@@ -882,45 +1048,23 @@ function validatePuzzle() {
 	return validate
 }
 function drawPuzzle(){
-	if (game.inputType=="phone") {
-		c.font = '30px monospace';
-		switch(game.battle.symb) {
-		case "plus":
-			c.drawImage(btl_plus,Cw*0.5-75,Ch*0.38-75,150,150)
-			c.fillStyle ="black"
-			c.fillText(game.battle.num1+" + "+game.battle.num2,Cw*0.5,Ch*0.405)
-			break;
-		case "moins":
-			c.drawImage(btl_moins,Cw*0.5-75,Ch*0.38-75,150,150)
-			c.fillStyle ="black"
-			c.fillText(game.battle.num1+" - "+game.battle.num2,Cw*0.5,Ch*0.405)
-			break;
-		case "mult":
-			c.drawImage(btl_mult,Cw*0.5-75,Ch*0.38-75,150,150)
-			c.fillStyle ="black"
-			c.fillText(game.battle.num1+" x "+game.battle.num2,Cw*0.5,Ch*0.405)
-			break;
-		}
-	}
-	else {
-		c.font = '30px monospace';
-		switch(game.battle.symb) {
-		case "plus":
-			c.drawImage(btl_plus,Cw*0.5-75,Ch*0.43-75,150,150)
-			c.fillStyle ="black"
-			c.fillText(game.battle.num1+" + "+game.battle.num2,Cw*0.5,Ch*0.455)
-			break;
-		case "moins":
-			c.drawImage(btl_moins,Cw*0.5-75,Ch*0.43-75,150,150)
-			c.fillStyle ="black"
-			c.fillText(game.battle.num1+" - "+game.battle.num2,Cw*0.5,Ch*0.455)
-			break;
-		case "mult":
-			c.drawImage(btl_mult,Cw*0.5-75,Ch*0.43-75,150,150)
-			c.fillStyle ="black"
-			c.fillText(game.battle.num1+" x "+game.battle.num2,Cw*0.5,Ch*0.455)
-			break;
-		}
+	c.font = '30px monospace';
+	switch(game.battle.symb) {
+	case "plus":
+		c.drawImage(btl_plus,Cw*0.5-75,Ch*0.43-75,150,150)
+		c.fillStyle ="black"
+		c.fillText(game.battle.num1+" + "+game.battle.num2,Cw*0.5,Ch*0.455)
+		break;
+	case "moins":
+		c.drawImage(btl_moins,Cw*0.5-75,Ch*0.43-75,150,150)
+		c.fillStyle ="black"
+		c.fillText(game.battle.num1+" - "+game.battle.num2,Cw*0.5,Ch*0.455)
+		break;
+	case "mult":
+		c.drawImage(btl_mult,Cw*0.5-75,Ch*0.43-75,150,150)
+		c.fillStyle ="black"
+		c.fillText(game.battle.num1+" x "+game.battle.num2,Cw*0.5,Ch*0.455)
+		break;
 	}
 }
 
