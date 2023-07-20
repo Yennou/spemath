@@ -414,10 +414,10 @@ footer ul li a {
 }
 .btn-game-box-fs div{
 	display: block;
+	background-color: rgba(0, 0, 0, 0.9);
 }
 .btn-game-box-fs-active {
 	bottom: 0px;
-	background-color: rgba(0, 0, 0, 0.9);
 }
 .btn-game-menu {
 	position: absolute;
