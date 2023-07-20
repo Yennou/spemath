@@ -155,10 +155,10 @@ window.addEventListener('keyup', function(event){
 canvas.addEventListener('mousedown', function(event){
 	if (game.inputType=="phone") {
 		canvasPosition = canvas.getBoundingClientRect();
-		console.log(canvasPosition)
+		//console.log(canvasPosition)
 		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
 		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
-		console.log(mouse.x+" / "+mouse.y)
+		//console.log(mouse.x+" / "+mouse.y)
 		switch(game.screen){
 		case "title":
 			switch(game.mainevent){
