@@ -155,9 +155,10 @@ window.addEventListener('keyup', function(event){
 canvas.addEventListener('mousedown', function(event){
 	if (game.inputType=="phone") {
 		canvasPosition = canvas.getBoundingClientRect();
-		mouse.x=Math.floor(event.x-canvasPosition.left);
-		mouse.y=Math.floor(event.y-canvasPosition.top);
-		//console.log(mouse.x+" / "+mouse.y)
+		console.log(canvasPosition)
+		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
+		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+		console.log(mouse.x+" / "+mouse.y)
 		switch(game.screen){
 		case "title":
 			switch(game.mainevent){
@@ -934,7 +935,7 @@ function loopAnimation() {
 	c.textAlign="end";
 	c.font = '12px monospace';
 	c.fillStyle = "white";
-	c.fillText("Version BETA 1.0.2", Cw*0.99, Ch*0.99);
+	c.fillText("Version BETA 1.1.0", Cw*0.99, Ch*0.99);
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
