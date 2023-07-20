@@ -246,11 +246,13 @@ canvas.addEventListener('mousedown', function(event){
 						game.mainevent="starting";
 						game.event="transition";
 						game.timer=20;
+						resetStats()
 					}
 					if (mouse.x >= Cw*0.465 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.465+220 && mouse.y <= Ch*0.785+50) {
 						setmenu(4,"lr",0.065,0.43,0.23,0);
 						game.screen="hub";
 						game.event="first";
+						resetStats()
 					}
 					break;
 				default:
