@@ -491,6 +491,9 @@ footer ul li a {
 	margin: 0.3rem;
 	color: white;
 }
+.btn-game-controler-box button:active {
+	background-color: rgba(255,255,255,0.1);
+}
 /* ----------- aRRANGEMENT ARTICLES ---------- */
 .armoire{
 	display: flex;
