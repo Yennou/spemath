@@ -815,12 +815,8 @@ function loopAnimation() {
 				c.textAlign="center";
 				c.font = '32px monospace';
 				c.fillStyle="white";
-				if (game.inputType=="phone") {
-					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.60):c.fillText(input,Cw*0.5,Ch*0.60);
-				} else {
-					c.font = '40px monospace';
-					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
-				}
+				c.font = '40px monospace';
+				game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
 				drawPuzzle()
 				inputPlayer()
 				if (game.stats.timer<=0) {
@@ -841,23 +837,15 @@ function loopAnimation() {
 				case "calc":
 					pass =validatePuzzle()
 					pass ? c.fillStyle ="green": c.fillStyle="red";
-					if (game.inputType=="phone") {
-						game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.60):c.fillText(input,Cw*0.5,Ch*0.60);
-					} else {
-						c.font = '40px monospace';
-						game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
-					}
+					c.font = '40px monospace';
+					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
 					game.event="wait";
 					game.timer=20;
 					break;
 				case "wait":
 					pass ? c.fillStyle ="green": c.fillStyle="red";
-					if (game.inputType=="phone") {
-						c.fillText(input,Cw*0.5,Ch*0.60);
-					} else {
-						c.font = '40px monospace';
-						c.fillText(input,Cw*0.5,Ch*0.72);
-					}
+					c.font = '40px monospace';
+					c.fillText(input,Cw*0.5,Ch*0.72);
 					c.font = '26px monospace';
 					c.fillText("+ "+game.battle.score,Cw*0.8,Ch*0.23)
 					if (game.timer==0) {

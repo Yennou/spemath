@@ -398,8 +398,7 @@ footer ul li a {
 	justify-content: center;
 	border : white solid 1px;
 	margin: auto;
-	bottom: -140px;
-	/*bottom: -66px;*/
+	bottom: -208px;
 	transition: bottom 0.3s;
 }
 .btn-game-box div{
@@ -424,7 +423,7 @@ footer ul li a {
 	padding:16px 0 0 19px;
 	font-size: 24px;
 	font-weight: bolder;
-	bottom: 140px;
+	bottom: 208px;
 	width: 50px;
 	height: 50px;
 	border: white solid 1px;
@@ -432,6 +431,7 @@ footer ul li a {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 .btn-game-menu-active {
+	bottom:0px;
 	background-color: rgba(255, 255, 255, 0.3);
 }
 .btn-game-off {
@@ -521,7 +521,7 @@ footer ul li a {
 
 .desc-game {
 	display: block;
-	padding: 1rem 3rem;
+	padding: 1rem 1rem;
 }
 .desc-game h2 {
 	text-align: center;
@@ -578,6 +578,42 @@ footer ul li a {
 	border-radius: 1rem;
 	font-size: 20px;
 	color: white;
+}
+@media (min-width: 386px){
+	.btn-game-box-fs {
+		position: absolute;
+		justify-content: center;
+		border : white solid 1px;
+		margin: auto;
+		bottom: -140px;
+		transition: bottom 0.3s;
+	}
+	.btn-game-menu {
+		position: absolute;
+		padding:16px 0 0 19px;
+		font-size: 24px;
+		font-weight: bolder;
+		bottom: 140px;
+		width: 50px;
+		height: 50px;
+		border: white solid 1px;
+		border-radius: 50% 50% 0 0;
+		background-color: rgba(0, 0, 0, 0.5);
+	}
+	.btn-game-box-fs-active {
+		bottom: 0px;
+	}
+	.btn-game-menu-active {
+		background-color: rgba(255, 255, 255, 0.3);
+	}
+	.btn-game-box button{
+		font-size: 22px;
+		border: 1px solid rgb(220,220,220);
+		border-radius: 1rem; 
+		width: 5rem;
+		height: 2rem;
+		margin: 1rem;
+	}
 }
 
 @media (min-width: 562px){
@@ -751,5 +787,9 @@ footer ul li a {
 	}
 	.background-article-game {
 		width: 836px;
+	}
+	.desc-game {
+		display: block;
+		padding: 1rem 3rem;
 	}
 }
