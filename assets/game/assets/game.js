@@ -934,7 +934,7 @@ function loopAnimation() {
 	c.textAlign="end";
 	c.font = '12px monospace';
 	c.fillStyle = "white";
-	c.fillText("Version BETA 1.1.0", Cw*0.99, Ch*0.99);
+	c.fillText("Version BETA 1.0.2", Cw*0.99, Ch*0.99);
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
