@@ -349,11 +349,23 @@ const btl_plus= new Image();
 const btl_moins= new Image();
 const btl_mult= new Image();
 const inputframe= new Image();
+const icon_plus= new Image();
+const icon_moins= new Image();
+const icon_mult= new Image();
+const icon_plusON= new Image();
+const icon_moinsON= new Image();
+const icon_multON= new Image();
 
 btl_plus.src = directory+"plus.png";
 btl_moins.src = directory+"moins.png";
 btl_mult.src = directory+"mult.png";
 inputframe.src = directory+"input.png"
+icon_plus.src = directory+"icon_plus.png";
+icon_moins.src = directory+"icon_moins.png";
+icon_mult.src = directory+"icon_mult.png";
+icon_plusON.src = directory+"icon_plusON.png";
+icon_moinsON.src = directory+"icon_moinsON.png";
+icon_multON.src = directory+"icon_multON.png";
 
 //fonction d'initialisation d'un menu
 function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
@@ -406,20 +418,20 @@ function inputPlayer(){
 	c.globalAlpha=game.option.inputOpacity/100;
 	c.fillStyle="white";
 	if (game.inputType=="keyboard") {
-		c.drawImage(inputframe,Cw*0.80,Ch*0.43,125,80)
-		c.drawImage(inputframe,Cw*0.840,Ch*0.62,100,80)
-		c.drawImage(inputframe,Cw*0.840,Ch*0.81,100,80)
+		c.drawImage(inputframe,Cw*0.80,Ch*0.42,125,80)
+		c.drawImage(inputframe,Cw*0.840,Ch*0.61,100,80)
+		c.drawImage(inputframe,Cw*0.840,Ch*0.8,100,80)
 		c.font = '30px monospace';
-		c.fillText("Enter",Cw*0.9,Ch*0.54)
+		c.fillText("Enter",Cw*0.9,Ch*0.53)
 		c.font = '46px monospace';
-		c.fillText("(-)",Cw*0.92,Ch*0.74)
-		c.fillText("<-",Cw*0.92,Ch*0.93)
+		c.fillText("(-)",Cw*0.92,Ch*0.73)
+		c.fillText("<-",Cw*0.92,Ch*0.92)
 		c.textAlign="start";
 		c.fillStyle="yellow";
 		c.font = '22px monospace';
-		c.fillText("Espace",Cw*0.81,Ch*0.48)
-		c.fillText("Shift",Cw*0.85,Ch*0.67)
-		c.fillText("Retour",Cw*0.85,Ch*0.86)
+		c.fillText("Espace",Cw*0.81,Ch*0.47)
+		c.fillText("Shift",Cw*0.85,Ch*0.66)
+		c.fillText("Retour",Cw*0.85,Ch*0.85)
 	}
 }
 function inputPlayerPhone(inputP){
@@ -734,13 +746,13 @@ function loopAnimation() {
 			c.fillText("Score :",Cw*0.65,Ch*0.1)
 			c.textAlign="start";
 			c.font = '20px monospace';
-			c.fillText("mode "+game.battle.mode,Cw*0.02,Ch*0.04)
-			if(game.battle.add)  c.fillText("+",Cw*0.28,Ch*0.04);
-			if(game.battle.sub)  c.fillText("-",Cw*0.32,Ch*0.04);
-			if(game.battle.mult)  c.fillText("x",Cw*0.36,Ch*0.04);
-			if(game.battle.numopp==1)  c.fillText(">1<",Cw*0.4,Ch*0.04);
-			if(game.battle.numopp==2)  c.fillText(">12<",Cw*0.4,Ch*0.04);
-			if(game.battle.numopp==3)  c.fillText(">123<",Cw*0.4,Ch*0.04);
+			c.fillText("mode "+returnMode(),Cw*0.02,Ch*0.04)
+			if(game.battle.add)  c.fillText("+",Cw*0.3,Ch*0.04);
+			if(game.battle.sub)  c.fillText("-",Cw*0.34,Ch*0.04);
+			if(game.battle.mult)  c.fillText("x",Cw*0.38,Ch*0.04);
+			if(game.battle.numopp==1)  c.fillText(">1<",Cw*0.42,Ch*0.04);
+			if(game.battle.numopp==2)  c.fillText(">12<",Cw*0.42,Ch*0.04);
+			if(game.battle.numopp==3)  c.fillText(">123<",Cw*0.42,Ch*0.04);
 			c.font = '28px monospace';
 			c.textAlign="start";
 			if (game.stats.combo>4) c.fillText("COMBO "+game.stats.combo,Cw*0.13,Ch*0.25);
@@ -873,7 +885,7 @@ function loopAnimation() {
 					break;
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha = 0.85*(1-game.timer/50);
+					c.globalAlpha = 0.92*(1-game.timer/50);
 					c.fillRect(0,0,canvas.width,canvas.height)
 					if (game.timer==0) {
 						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
@@ -885,14 +897,22 @@ function loopAnimation() {
 					break;
 				case "finpop":
 					c.fillStyle="black";
-					c.globalAlpha = 0.85;
+					c.globalAlpha = 0.92;
 					c.fillRect(0,0,canvas.width,canvas.height)
 					c.fillStyle="white";
 					c.globalAlpha = 1-game.timer/20;
 					c.textAlign="center";
 					c.font = '38px monospace';
-					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.25)
+					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.18)
+					c.font = '30px monospace';
 					c.textAlign="start";
+					c.fillText("Mode: "+returnMode(),Cw*0.13,Ch*0.28)
+					game.battle.add? c.drawImage(icon_plusON,Cw*0.6,Ch*0.225,35,35) :c.drawImage(icon_plus,Cw*0.6,Ch*0.225,35,35) ;
+					game.battle.sub? c.drawImage(icon_moinsON,Cw*0.66,Ch*0.225,35,35) :c.drawImage(icon_moins,Cw*0.66,Ch*0.225,35,35) ;
+					game.battle.mult?  c.drawImage(icon_multON,Cw*0.72,Ch*0.225,35,35) :c.drawImage(icon_mult,Cw*0.72,Ch*0.225,35,35) ;
+					if(game.battle.numopp==1)  c.fillText(">1<",Cw*0.8,Ch*0.28);
+					if(game.battle.numopp==2)  c.fillText(">12<",Cw*0.8,Ch*0.28);
+					if(game.battle.numopp==3)  c.fillText(">123<",Cw*0.8,Ch*0.28);
 					c.font = '36px monospace';
 					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
 					c.font = '30px monospace';
@@ -933,11 +953,15 @@ function loopAnimation() {
 			errormsg("screenevent error !")
 			break;
 	}
-	c.globalAlpha=1;
-	c.textAlign="end";
+	c.globalAlpha=0.5;
+	
 	c.font = '12px monospace';
 	c.fillStyle = "white";
-	c.fillText("Version BETA 1.1.0", Cw*0.99, Ch*0.99);
+	c.textAlign="start";
+	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
+	c.textAlign="end";
+	c.fillText("Version BETA 1.1.1", Cw*0.99, Ch*0.99);
+
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
@@ -1013,7 +1037,8 @@ function validatePuzzle() {
 	if (validate) {
 		game.stats.combo++;
 		game.stats.clear++;
-		let score = 200-game.stats.timeRep/2;
+		console.log( game.stats.timeRep +" / "+(2-game.setbtl.dif+game.battle.numopp+game.battle.symbnum)+" / "+(game.stats.timeRep/(2-game.setbtl.dif+game.battle.numopp+game.battle.symbnum))+" = "+(200-game.stats.timeRep/(2-game.setbtl.dif+game.battle.numopp+game.battle.symbnum)))
+		let score = 200-game.stats.timeRep/(2-game.setbtl.dif+game.battle.numopp+game.battle.symbnum);
 		if (score<50) score=50;
 		score = Math.floor(score*checkCombo(game.stats.combo))
 		game.stats.score+= score;
@@ -1029,8 +1054,8 @@ function validatePuzzle() {
 		if (game.stats.timer>game.stats.maxtimer-game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1)))) game.stats.timer=Math.floor(game.stats.maxtimer-game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))));
 	} else {
 		game.stats.miss++;
-		let malustime = Math.floor(100+100*game.stats.clear/100);
-		if (malustime>300) {malustime=300}
+		let malustime = Math.floor(200+100*game.stats.clear/100);
+		if (malustime>500) {malustime=500}
 		game.stats.timer-=malustime;
 		if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 		game.stats.combo=0;
@@ -1055,6 +1080,22 @@ function drawPuzzle(){
 		c.drawImage(btl_mult,Cw*0.5-75,Ch*0.43-75,150,150)
 		c.fillStyle ="black"
 		c.fillText(game.battle.num1+" x "+game.battle.num2,Cw*0.5,Ch*0.455)
+		break;
+	}
+}
+function returnMode(){
+	switch (game.battle.mode){
+	case "very-easy":
+		return "Très facile";
+		break;
+	case "easy":
+		return "Facile";
+		break;
+	case "normal":
+		return "Normal";
+		break;
+	case "hard":
+		return "Difficile";
 		break;
 	}
 }
