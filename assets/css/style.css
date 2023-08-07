@@ -494,6 +494,9 @@ footer ul li a {
 .btn-game-controler-box button:active {
 	background-color: rgba(255,255,255,0.1);
 }
+.btn-game-controller-ghost {
+	opacity: 0;
+}
 /* ----------- ARRANGEMENT ARTICLES ---------- */
 .armoire{
 	display: flex;

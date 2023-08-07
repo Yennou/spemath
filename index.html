@@ -48,6 +48,9 @@
 				</div>
 				<div class="btn-game-controler-row">
 					<button onclick="inputPlayerPhone(0)"> 0 </button>
+					<button class="btn-game-controller-ghost" disabled>   </button>
+					<button class="btn-game-controller-ghost" disabled>   </button>
+					<button class="btn-game-controller-ghost" disabled>   </button>
 				</div>
 			</div>
 			<div class="btn-game-box">
@@ -69,7 +72,7 @@
 		<article class="desc-game" id="Description">
 			<h2>Description</h2>
 			<p>Marre de se taper des sales notes en Mathématique ? J'ai la solution ! Venez vous entrainer quand vous voulez en calcul mental avec ce jeu !
-				<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7 ?</p>
+				<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7...</p>
 			<p>Créez vos programmes d'entrainement personnel et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre record ?</p>
 			<br>
 			<i>Le titre du jeu n'est pas définitif.</i>
@@ -144,6 +147,15 @@
 
 		<article class="desc-game" id="changelog">
 			<h2>Changelog</h2>
+			<h3>BETA 1.2 - 07/08/2023</h3>
+			<ul>
+				<li><h4>NOUVEAU MODE : mode vies !</h4> Vous devrez enchainer les bonnes réponses sans vous tromper mais attention, une erreur peut vous coûter la partie entière. Les dégâts que vous subissez sont égaux à <b>la différence entre votre résultat et le résultat attendu</b>. Si le chrono tombe à 0, vous subirez également des dégâts <b>proportionnellement à la difficulté</b> choisie mais ne mettra pas fin à votre partie <i>(sauf si vous n'avez plus de vies)</i>.
+				<br>Attention à ne pas perdre le fil car <b>les résultats se cumulent entre eux !</b><br>Bon jeu, bonne chance et n'hésitez pas à nous faire part de vos retours sur le discord dans le salon <a class="discord-room" href="https://discord.gg/v6Nu9URDNH" target="_blank"> #Retour-test </a> !</li>
+				<li><h4>Nouveau menu principal</h4> Il est temps d'ajouter un peu de vie à ce jeu en y ajoutant des icons et autres menu de personnalisation. Vous avez maintenant accès à un <b>écran des options</b> pour modifier l'affichage de certains éléments en jeu. N'hésitez pas à nous donner des idées d'options à ajouter !</li>
+				<li><h4>Equilibrage des opérations</h4> Dans le mode temps, il était possible de tomber sur des opérations vraiment trop simple pour les modes de difficultés élevé. Ceux-ci ont été modifié pour que les opérations collent mieux avec la difficulté choisie et le nombre d'opération sélectionné dans le menu.</li>
+				<li>Ajout d'un ombrage sur les opérations pour augmenter leurs visibilités lorsqu'elles sortent du cadre à cause du grand nombre de caractère qui le compose.</li>
+				<li>Ajustement du CSS pour la version téléphone</li>
+			</ul>
 			<h3>BETA 1.1.1 - 26/07/2023</h3>
 			<ul>
 				<li><h4>Equilibrage des points</h4> <b>Avant ce Patch</b>, il fallait réalisé une opération en <b>moins de 3 secondes</b> pour obtenir plus du minimum de point peu importe la difficulté.<br> <b>Maintenant plus la difficulté sera élevée</b> (nombre de chiffre dans l'opération, mode de difficulté, type d'opération) <b>plus vous aurez de temps pour répondre correctement</b> et obtenir plus du minimum de point.<br><br><i>Par exemple : Dans la difficulté la plus élevé, avec 3 chiffres par opération et les 3 types d'opérations, vous avez 11 secondes pour répondre correctement pour avoir plus du minimum de point.</i></li>
@@ -186,4 +198,3 @@
 	
 </body>
 </html>
-
