@@ -324,7 +324,7 @@ canvas.addEventListener('mousedown', function(event){
 					mult=game.setbtl.mode;
 					multn=game.setbtl.chif;
 					multd=game.setbtl.dif;
-					game.screen="game";
+					game.screen="game-mode1";
 					game.mainevent="starting";
 					game.event="transition";
 					game.stats.maxtimer=(Math.floor(20*mult*multn*multd))*100;
