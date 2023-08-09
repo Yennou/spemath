@@ -87,7 +87,11 @@ window.addEventListener('keydown', function(event){
 					break;
 				case"-":
 				case"6":
-					input=input*10+6;
+					if (event.keyCode==109) {
+						game.battle.negat ? game.battle.negat=false:game.battle.negat=true;
+					} else {
+						input=input*10+6;
+					}
 					break;
 				case"è":
 				case"7":
@@ -725,7 +729,7 @@ function loopAnimation() {
 						c.textAlign="start";
 						c.fillText("Espace/ Entrée",Cw*0.1,Ch*0.72)
 						c.fillText("Retour/ D",Cw*0.1,Ch*0.78)
-						c.fillText("Shift/ Q",Cw*0.1,Ch*0.84)
+						c.fillText("- / Shift/ Q",Cw*0.1,Ch*0.84)
 						c.fillText("1,2,3,4,5,6,7,8,9,0",Cw*0.1,Ch*0.90)
 						c.fillText("Touche directionnel",Cw*0.1,Ch*0.96)
 						c.fillStyle="white";
@@ -770,7 +774,7 @@ function loopAnimation() {
 			case 1:
 				c.drawImage(menu_time,Cw*0.5-75,Ch*0.25-75,150,150)
 				c.fillText("Temps",Cw*0.5,Ch*0.55)
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
 				c.fillText("Survivez le plus longtemps possible en",Cw*0.05,Ch*0.65)
@@ -782,7 +786,7 @@ function loopAnimation() {
 			case 2:
 				c.drawImage(menu_life,Cw*0.5-75,Ch*0.25-75,150,150)
 				c.fillText("Vies",Cw*0.5,Ch*0.55)
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
 				c.fillText("Gardez vos points de vies le plus élevé possible,",Cw*0.05,Ch*0.65)
@@ -794,7 +798,7 @@ function loopAnimation() {
 			case 3:
 				c.drawImage(menu_opt,Cw*0.5-75,Ch*0.25-75,150,150)
 				c.fillText("Options",Cw*0.5,Ch*0.55)
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
 				c.fillText("Règlez les options d'affichage en jeu afin",Cw*0.05,Ch*0.65)
@@ -831,7 +835,7 @@ function loopAnimation() {
 			c.textAlign="center";
 			c.font = '30px monospace';
 			c.fillText("> Options <",Cw*0.5,Ch*0.15)
-			c.font = '22px monospace';
+			game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 			c.textAlign="start";
 			c.fillText("Aperçu :",Cw*0.05,Ch*0.32)
 			c.fillText("Opacité Aide",Cw*0.1,Ch*0.5)
@@ -871,16 +875,16 @@ function loopAnimation() {
 				c.drawImage(inputframe,Cw*0.25,Ch*0.2,125,80)
 				c.drawImage(inputframe,Cw*0.45,Ch*0.2,100,80)
 				c.drawImage(inputframe,Cw*0.61,Ch*0.2,100,80)
-				c.font = '30px monospace';
+				game.inputType=="phone" ? c.font = '28px monospace': c.font = '30px monospace';
 				c.fillText("Enter",Cw*0.35,Ch*0.308)
-				c.font = '46px monospace';
+				game.inputType=="phone" ? c.font = '44px monospace': c.font = '46px monospace';
 				c.fillText("(-)",Cw*0.525,Ch*0.315)
 				c.fillText("<-",Cw*0.685,Ch*0.315)
 				c.globalAlpha=1;
-				c.font = '28px monospace';
+				c.font = '26px monospace';
 				if (game.inputType=="phone") {c.fillStyle="red";c.fillText("Ne s'affiche pas en mode téléphone !",Cw*0.5,Ch*0.43);c.fillStyle="white";}
 				c.textAlign="start";
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Opacitée de l'aide montré en jeu pour ",Cw*0.1,Ch*0.9)
 				c.fillText("rappeler les contrôles en jeu.",Cw*0.1,Ch*0.95)
 				break;
@@ -902,7 +906,7 @@ function loopAnimation() {
 				c.strokeRect(Cw*0.25,Ch*0.32,Cw*0.5,Ch*0.07)
 				c.fillStyle="white";
 				c.textAlign="start";
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Mode d'affichage pour le chrono",Cw*0.1,Ch*0.9)
 				c.fillText("lorsque le temps restant est bas.",Cw*0.1,Ch*0.95)
 				break;
@@ -921,14 +925,14 @@ function loopAnimation() {
 				c.strokeRect(Cw*0.25,Ch*0.32,Cw*0.5,Ch*0.07)
 				c.fillStyle="white";
 				c.textAlign="start";
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Mode d'affichage pour la barre ",Cw*0.1,Ch*0.9)
 				c.fillText("d'affaiblissement du temps.",Cw*0.1,Ch*0.95)
 				break;
 			case "back":
 				c.fillStyle="white";
 				c.textAlign="start";
-				c.font = '22px monospace';
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Retour au menu principal.",Cw*0.1,Ch*0.9)
 				break;
 			}
@@ -1105,6 +1109,7 @@ function loopAnimation() {
 				c.globalAlpha=0.15;
 				c.fillRect(Cw*0.01,Ch*0.02,Cw*0.285,Ch*0.1)
 				c.globalAlpha=1;
+				c.font = '20px monospace';
 				c.fillText("Retour au menu",Cw*0.02,Ch*0.08)
 			}
 			switch (game.event){
@@ -1153,9 +1158,9 @@ function loopAnimation() {
 				if (game.battle.symbnum==3) game.setbtl.mode=1.2;
 				break;
 			case "second":
-				c.font = '28px monospace';
+				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
 				c.fillText("Format :",Cw*0.2,Ch*0.53)
-				game.inputType=="phone"? c.font = '26px monospace':c.font = '22px monospace';
+				game.inputType=="phone"? c.font = '20px monospace':c.font = '22px monospace';
 				c.textAlign="center";
 				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.2,Ch*0.6);c.fillText("Suiv.",Cw*0.8,Ch*0.6)}
 				switch (game.menu.target) {
@@ -1192,10 +1197,10 @@ function loopAnimation() {
 				}
 				break;
 			case "third":
-				c.font = '28px monospace';
+				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
 				c.fillText("Difficultée :",Cw*0.2,Ch*0.67)
 				c.fillText("Format :",Cw*0.2,Ch*0.53)
-				game.inputType=="phone"? c.font = '26px monospace':c.font = '22px monospace';
+				game.inputType=="phone"? c.font = '20px monospace':c.font = '22px monospace';
 				c.textAlign="center";
 				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.2,Ch*0.75);c.fillText("Suiv.",Cw*0.8,Ch*0.75)}
 				switch (game.menu.target) {
@@ -1298,6 +1303,7 @@ function loopAnimation() {
 				c.globalAlpha=0.15;
 				c.fillRect(Cw*0.01,Ch*0.02,Cw*0.285,Ch*0.1)
 				c.globalAlpha=1;
+				c.font = '20px monospace';
 				c.fillText("Retour au menu",Cw*0.02,Ch*0.08)
 			}
 			switch (game.event){
@@ -1337,9 +1343,9 @@ function loopAnimation() {
 				}
 				break;
 			case "second":
-				c.font = '28px monospace';
+				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
 				c.fillText("Difficultée :",Cw*0.2,Ch*0.6)
-				game.inputType=="phone"? c.font = '26px monospace':c.font = '22px monospace';
+				game.inputType=="phone"? c.font = '20px monospace':c.font = '22px monospace';
 				c.textAlign="center";
 				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.2,Ch*0.67);c.fillText("Suiv.",Cw*0.8,Ch*0.67)}
 				switch (game.menu.target) {
@@ -1607,7 +1613,7 @@ function loopAnimation() {
 					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
 					c.font = '30px monospace';
 					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.46)
-					c.font = '24px monospace';
+					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.54)
 					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
 					c.fillText("Temps de réponse moyen : "+game.stats.avgrep+"sec",Cw*0.13,Ch*0.68)
@@ -1811,9 +1817,9 @@ function loopAnimation() {
 			case "play":
 				if (game.battle.dmg>0) game.battle.dmg--;
 				c.textAlign="center";
-				c.font = '32px monospace';
+				game.inputType=="phone" ? c.font = '30px monospace': c.font = '32px monospace';
 				c.fillStyle="white";
-				c.font = '40px monospace';
+				game.inputType=="phone" ? c.font = '38px monospace': c.font = '40px monospace';
 				game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
 				drawPuzzle()
 				inputPlayer()
@@ -1849,9 +1855,9 @@ function loopAnimation() {
 					break;
 				case "wait":
 					pass ? c.fillStyle ="green": c.fillStyle="red";
-					c.font = '40px monospace';
+					game.inputType=="phone" ? c.font = '38px monospace': c.font = '40px monospace';
 					c.fillText(input,Cw*0.5,Ch*0.72);
-					c.font = '26px monospace';
+					game.inputType=="phone" ? c.font = '24px monospace': c.font = '26px monospace';
 					c.fillText("+ "+game.battle.score,Cw*0.8,Ch*0.23)
 					if (game.timer==0) {
 						game.event="";
@@ -1864,7 +1870,7 @@ function loopAnimation() {
 				break;
 			case "gameover":
 				c.textAlign="center";
-				c.font = '32px monospace';
+				game.inputType=="phone" ? c.font = '30px monospace': c.font = '32px monospace';
 				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
 				switch (game.event){
 				case "begin":
@@ -1921,7 +1927,7 @@ function loopAnimation() {
 					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
 					c.font = '30px monospace';
 					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.46)
-					c.font = '24px monospace';
+					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.54)
 					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
 					c.fillText("Temps de réponse moyen : "+game.stats.avgrep+"sec",Cw*0.13,Ch*0.68)
@@ -1962,7 +1968,7 @@ function loopAnimation() {
 	c.textAlign="start";
 	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
 	c.textAlign="end";
-	c.fillText("Version BETA 1.2.0", Cw*0.99, Ch*0.99);
+	c.fillText("Version BETA 1.2.1", Cw*0.99, Ch*0.99);
 
 	requestAnimationFrame(loopAnimation)
 }
@@ -2188,7 +2194,7 @@ function validatePuzzleMode2() {
 }
 function drawPuzzle(){
 	c.textAlign="center";
-	c.font = '30px monospace';
+	game.inputType=="phone" ? c.font = '28px monospace': c.font = '30px monospace';
 	switch(game.battle.symb) {
 	case "plus":
 		c.drawImage(btl_plus,Cw*0.5-75,Ch*0.43-75,150,150)
