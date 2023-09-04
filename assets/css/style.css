@@ -398,19 +398,22 @@ footer ul li a {
 	justify-content: center;
 	border : white solid 1px;
 	margin: auto;
-	bottom: -208px;
+	bottom: -156px;
 	transition: bottom 0.3s;
 }
 .btn-game-box div{
 	display: none;
 }
 .btn-game-box button{
-	font-size: 26px;
+	font-size: 30px;
 	border: 1px solid rgb(220,220,220);
 	border-radius: 1.15rem; 
 	width: 6rem;
-	height: 2.3rem;
+	height: 2.8rem;
 	margin: 1rem;
+}
+.btn-game-box button img{
+	width: 40px;
 }
 .btn-game-box-fs div{
 	display: block;
@@ -421,10 +424,10 @@ footer ul li a {
 }
 .btn-game-menu {
 	position: absolute;
-	padding:16px 0 0 19px;
+	padding:12px 0 0 8px;
 	font-size: 24px;
 	font-weight: bolder;
-	bottom: 208px;
+	bottom: 156px;
 	width: 50px;
 	height: 50px;
 	border: white solid 1px;
@@ -432,7 +435,7 @@ footer ul li a {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 .btn-game-menu-active {
-	bottom:208px;
+	bottom:156px;
 	background-color: rgba(255, 255, 255, 0.3);
 }
 .btn-game-off {
@@ -463,7 +466,7 @@ footer ul li a {
 	position: fixed;
 	top: 0;
 	left: 0;
-	padding-top: 5%;
+	padding-top: 0.2%;
 	height: 100%;
 	margin: auto;
 	width: 100%;
@@ -595,15 +598,15 @@ footer ul li a {
 		justify-content: center;
 		border : white solid 1px;
 		margin: auto;
-		bottom: -140px;
+		bottom: -149px;
 		transition: bottom 0.3s;
 	}
 	.btn-game-menu {
 		position: absolute;
-		padding:16px 0 0 19px;
+		padding:12px 0 0 8px;
 		font-size: 24px;
 		font-weight: bolder;
-		bottom: 140px;
+		bottom: 149px;
 		width: 50px;
 		height: 50px;
 		border: white solid 1px;
@@ -621,26 +624,26 @@ footer ul li a {
 		border: 1px solid rgb(220,220,220);
 		border-radius: 1rem; 
 		width: 5rem;
-		height: 2rem;
+		height: 2.6rem;
 		margin: 1rem;
 	}
 }
 
-@media (min-width: 562px){
+@media (min-width: 450px){
 	.btn-game-box-fs {
 		position: absolute;
 		justify-content: center;
 		border : white solid 1px;
 		margin: auto;
-		bottom: -66px;
+		bottom: -71px;
 		transition: bottom 0.3s;
 	}
 	.btn-game-menu {
 		position: absolute;
-		padding:16px 0 0 19px;
+		padding:12px 0 0 8px;
 		font-size: 24px;
 		font-weight: bolder;
-		bottom: 64px;
+		bottom: 71px;
 		width: 50px;
 		height: 50px;
 		border: white solid 1px;
@@ -658,8 +661,11 @@ footer ul li a {
 		border: 1px solid rgb(220,220,220);
 		border-radius: 1rem; 
 		width: 5rem;
-		height: 2rem;
+		height: 2.3rem;
 		margin: 1rem;
+	}
+	.btn-game-box button img{
+		width: 33px;
 	}
 }
 @media (min-width: 576px){

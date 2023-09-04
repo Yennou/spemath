@@ -19,11 +19,14 @@ const btngamemenu = () =>{
 	
 	if (btnmenu!=null) {
 		btnmenu.addEventListener('click',()=>{
+			imgmenu()
 			btnmenu.classList.toggle('btn-game-menu-active');
 			nav.classList.toggle('btn-game-box-fs-active');
+			
 		});
 		window.addEventListener('keydown', function(event){
 			if (event.keyCode==222 && fullscreen) {
+				imgmenu()
 				btnmenu.classList.toggle('btn-game-menu-active');
 				nav.classList.toggle('btn-game-box-fs-active');
 			}
@@ -33,6 +36,16 @@ const btngamemenu = () =>{
 btngamemenu()
 
 let zoom=2;
+let menu=false;
+function imgmenu(){
+	if (!menu) {
+		menu=true
+		document.getElementById("game-menu-btn").src="assets/img/down.png";
+	} else {
+		menu=false;
+		document.getElementById("game-menu-btn").src="assets/img/menu.png";
+	}
+}
 function zoomin() {
 	if (zoom==zoommin) {
 		document.getElementById("zoomout").classList.toggle("btn-game-disable");
@@ -45,7 +58,7 @@ function zoomin() {
 	var height=target.height;
 	width*=zoom/2;
 	height*=zoom/2;
-	console.log("hauteur:"+height+" / largeur:"+width)
+	// console.log("hauteur:"+height+" / largeur:"+width)
 	target.style.width=width+"px";
 	target.style.height=height+"px";
 	if (zoom==zoommax) {
@@ -67,7 +80,7 @@ function zoomout() {
 	var height=target.height;	
 	width*=zoom/2;
 	height*=zoom/2;
-	console.log("hauteur:"+height+" / largeur:"+width)
+	// console.log("hauteur:"+height+" / largeur:"+width)
 	target.style.width=width+"px";
 	target.style.height=height+"px";
 	if (zoom==zoommin) {

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
-	<link rel="stylesheet" type="text/css" href="assets/game/assets/pageorder.css">
+	<link rel="stylesheet" type="text/css" href="assets/game/pageorder.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Spé maths</title>
 	<script type="text/javascript">
@@ -32,40 +32,42 @@
 					<button onclick="inputPlayerPhone(7)"> 7 </button>
 					<button onclick="inputPlayerPhone(8)"> 8 </button>
 					<button onclick="inputPlayerPhone(9)"> 9 </button>
-					<button onclick="inputPlayerPhone('Retour')"><- </button>
+					<button onclick="inputPlayerPhone('p')"> <img src="assets/game/assets/btn_pause.png" width="40px"> </button>
 				</div>
 				<div class="btn-game-controler-row">
 					<button onclick="inputPlayerPhone(4)"> 4 </button>
 					<button onclick="inputPlayerPhone(5)"> 5 </button>
 					<button onclick="inputPlayerPhone(6)"> 6 </button>
-					<button onclick="inputPlayerPhone('Negat')">(-)</button>
+					<button onclick="inputPlayerPhone('Retour')"><img src="assets/game/assets/btn_return.png" width="40px"> </button>
 				</div>
 				<div class="btn-game-controler-row">
 					<button onclick="inputPlayerPhone(1)"> 1 </button>
 					<button onclick="inputPlayerPhone(2)"> 2 </button>
 					<button onclick="inputPlayerPhone(3)"> 3 </button>
-					<button onclick="inputPlayerPhone('Enter')"> = </button>
+					<button onclick="inputPlayerPhone('Negat')"><img src="assets/game/assets/btn_plusmoins.png" width="40px"></button>
 				</div>
 				<div class="btn-game-controler-row">
 					<button onclick="inputPlayerPhone(0)"> 0 </button>
 					<button class="btn-game-controller-ghost" disabled>   </button>
 					<button class="btn-game-controller-ghost" disabled>   </button>
-					<button class="btn-game-controller-ghost" disabled>   </button>
+					<button onclick="inputPlayerPhone('Enter')"> <img src="assets/game/assets/btn_enter.png" width="40px"> </button>
 				</div>
 			</div>
 			<div class="btn-game-box">
-				<button class="btn-game-off" id="zoomin" onclick="zoomin()" title="Agrandir la fenêtre de jeu">+</button>
-				<button class="btn-game-off" id="zoomout" onclick="zoomout()" title="Retrécir la fenêtre de jeu">-</button>
-				<button class="btn-game-disable" disabled>lock</button>
-				<button class="btn-game-off" onclick="phone(this)" title="Afficher les contrôles en mode portable">phone</button>
-				<button class="btn-game-off" onclick="lock(this)" title="Vérrouiller la fenêtre de jeu">full</button>
-				<div class="btn-game-menu">!</div>
+				<button class="btn-game-off" id="zoomin" onclick="zoomin()" title="Agrandir la fenêtre de jeu"><img src="assets/img/zoomup.png" width="35px"></button>
+				<button class="btn-game-off" id="zoomout" onclick="zoomout()" title="Retrécir la fenêtre de jeu"><img src="assets/img/zoomdown.png" width="35px"></button>
+				<!-- <button class="btn-game-disable" disabled>lock</button> -->
+				<button class="btn-game-off" onclick="phone(this)" title="Afficher les contrôles en mode portable"><img src="assets/img/modephone.png" width="35px"></button>
+				<button class="btn-game-off" onclick="lock(this)" title="Vérrouiller la fenêtre de jeu"><img src="assets/img/fullscreen.png" width="35px"></button>
+				<div class="btn-game-menu"><img src="assets/img/menu.png" width="32px" id="game-menu-btn"></div>
 			</div>
 		</div>
 		<script type="text/javascript" src="assets/js/scriptpage.js"></script>
-		<script src="assets/game/assets/game.js"></script>
+		<script src="assets/game/game.js"></script>
+		<script src="assets/game/game-levels.js"></script>
+		<script src="assets/game/game-function.js"></script>
 		<script>
-			const zoommax=4;
+			const zoommax=6;
 			const zoommin=0.75;
 		</script>
 		<hr>
@@ -75,12 +77,13 @@
 				<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7...</p>
 			<p>Créez vos programmes d'entrainement personnel et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre record ?</p>
 			<br>
-			<i>Le titre du jeu n'est pas définitif.</i>
 		</article>
 		<article class="desc-game" id="CommentJouer">
 			<h2>Comment jouer ?</h2>
-			<p>Avant de commencer, il est important de verrouiller la fenêtre de jeu en appuyant sur le bouton "full" indiqué sur l'image en dessous afin d'éviter que la page ne bouge pendant que vous jouez.</p>
+			<p>Avant de commencer, il est important de verrouiller la fenêtre de jeu en appuyant sur le bouton comme indiqué sur l'image ci-dessous afin d'éviter que la page bouge pendant que vous jouez.</p>
 			<img src="assets/img/tuto1.png">
+			<p>Si vous jouez sur <b>téléphone ou tablette</b>, cliquez sur le bouton comme indiqué sur l'image ci-dessous pour afficher les contrôles tactiles.</p>
+			<img src="assets/img/tuto1-2.png">
 
 			<h3>Les commandes</h3>
 			<img src="assets/img/controles.png">
@@ -93,37 +96,46 @@
 				<li><h4>2. Format</h4><span>Dans cette deuxième section, vous allez définir le nombre de chiffre qui composeront les calculs qui apparaitront pendant votre session de jeu.</span></li>
 				<li><h4>3. Difficulté</h4><span>Ici, vous choisirez la difficulté de l'entrainement qui jouera grandement sur le <b>temps maximum</b> qui vous sera donner pour effectuer vos opérations.</span></li>
 			</ul>
-
+			<img src="assets/img/tuto2-2.png">
+			<p>Sinon, vous pouvez toujours vous essayer à des niveaux à thème et tenter de réaliser des <b>Parfait</b> sur tout les niveaux proposés</p>
 			<h3>Ecran de jeu</h3>
 			<img src="assets/img/tuto3.png">
 			<ul>
 				<li>
-					<h4>1. Mode</h4>
-					<span>Cette section indique le programme d'entraînement que vous avez choisie pour la session.</span>
+					<h4>1. Mode / Niveau</h4>
+					<span>Indique le mode de jeu ou le niveau que vous jouez sur cette partie.</span>
 				</li>
 				<li>
-					<h4>2. Temps</h4>
-					<span>Ceci est votre barre de temps, pour chaque bonne réponse que vous donnez, cette barre et ce compteur s'incrémente pour vous laisser plus de temps pour la prochaine opération. Une mauvaise réponse vous fera diminuer ce compteur.<br><b>Attention</b> à la barre rouge de l'autre côté de la barre, c'est la jauge d'affaiblissement : Elle ronge votre temps maximum pour chaque opération réalisé réduisant votre cumul de temps possible. Attention à ne pas trop trainer pour réaliser des opérations.</span>
+					<h4>2. Chronomètre</h4>
+					<span>Ce chronomètre indique le temps restant pour donner une réponse avant de subir un contre coup. S'il atteint 0 il peut soit vous mettre hors jeu soit vous faire perdre de la vie en fonction du mode que vous jouez.</span>
 				</li>
 				<li>
-					<h4>3. Score</h4>
-					<span>Ici s'affiche votre score total de la partie. Plus vous répondez correctement et rapidement à une opération et plus vous gagnerez de points. D'autre bonus vous permettrons d'incrémenter ce score plus rapidement.</span>
+					<h4>3. Sablier</h4>
+					<span>Ce sablier vous indique le temps restant pour finir le niveau, attention ne de pas attendre trop longtemps car il vous fera perdre la partie s'il atteint 0.</span>
 				</li>
 				<li>
-					<h4>4. Combo</h4>
-					<span>Ce combo indique le nombre de bonne réponse consécutives que vous avez réalisé. Plus votre combo est élevé et plus vous gagnerez de points bonus. Evidement, la moindre faute dans un calcul et le combo repart à 0.</span>
+					<h4>4. Compteur</h4>
+					<span>Indique le nombre restant d'opérations à effectuer pour terminer le niveau ou le nombre de bonne réponse donné en fonction du mode que vous jouez.</span>
 				</li>
 				<li>
 					<h4>5. Opération</h4>
-					<span>C'est le coeur du jeu. c'est ici que s'affichera vos opérations à effectuer pour gagner un maximum de score, le fond des opérations vous indique rapidement de quel type d'opération il s'agit, il est un bon indicateur au premier regard, faites-y attention.</span>
+					<span>C'est le coeur du jeu. C'est ici que s'affichera vos opérations à effectuer pour gagner un maximum de score, le fond des opérations vous indique rapidement de quel type d'opération il s'agit, il est un bon indicateur au premier regard, faites-y attention.</span>
 				</li>
 				<li>
 					<h4>6. Saisie</h4>
 					<span>Votre saisie pour cette opération. Lorsque vous taperez des chiffres, ils s'afficheront ici.</span>
 				</li>
 				<li>
-					<h4>7. Rappel des Commandes</h4>
-					<span>Vous trouverez dans ce coin un petit rappel des commandes de bases.</span>
+					<h4>7. Score</h4>
+					<span>Indique votre score actuel sur le niveau en cours.</span>
+				</li>
+				<li>
+					<h4>8. Jauge de vie</h4>
+					<span>Indique votre niveau de vie sur le niveau en cours, s'il atteint 0 vous perdez la partie.</span>
+				</li>
+				<li>
+					<h4>9. Combo</h4>
+					<span>Indique le nombre de bonne réponse d'affilé que vous aurez donné, il peut vous conférer un bonus de point si votre série de bonne réponse est suffisament longue. Plus votre série de bonne réponse est grande, plus le bonus donné sera élevé.</span>
 				</li>
 			</ul>
 			<br>
@@ -131,9 +143,9 @@
 		</article>
 		<article class="desc-game" id="NDLR">
 			<h2>Note de l'auteur</h2>
-			<p>Je ne pensais pas du tout créer un jeu éducatif en si peu de temps. Bien évidement, il y a beaucoup d'amélioration à faire, d'options à ajouter, de mécanique à intégrer, bruitages et musiques, etc.
-				<br>Mais c'est déjà un bon début, je pense que ça aidera beaucoup de gens à s'entrainer en s'amusant à faire des Mathématiques.
-			</p>
+			<cite>"Je ne pensais pas du tout créer un jeu éducatif en si peu de temps. Bien évidement, il y a beaucoup d'amélioration à faire, d'options à ajouter, de mécanique à intégrer, bruitages et musiques, etc.
+				<br>Mais c'est déjà un bon début, je pense que ça aidera beaucoup de gens à s'entrainer en s'amusant à faire des Mathématiques."
+			</cite>
 			<p>Yenseng - 19/07/2023</p>
 		</article>
 		<article class="desc-game" id="retour">
@@ -147,6 +159,13 @@
 
 		<article class="desc-game" id="changelog">
 			<h2>Changelog</h2>
+			<h3>BETA 1.3 - </h3>
+			<ul>
+				<li><h4>NOUVEAU MODE : niveaux ! </h4><span> Dans ce mode vous trouverez plusieurs enchainements d'opération thématique, le but étant de vous aider à développer vos propres méthodes de calculs mentaux.<br> Il y aura peu de défis pour cette mise à jour, j'attendrais vos retours sur les différents défis proposé pour les améliorer et en créer de nouveaux.</span></li>
+				<li><h4>Refonte visuelle !</h4><span> De tout nouveaux sprites pour vos yeux et augmentation de la résolution des anciens sprites pour éviter qu'ils apparaissent flous à l'écran</span></li>
+				<li>Nouveaux icons pour le menu de commande de la fenêtre de jeu.</li>
+				<li>Ajustement du CSS.</li>
+			</ul>
 			<h3>BETA 1.2.1 - 09/08/2023</h3>
 			<ul>
 				<li><b>Fix de la touche "-" sur la pavé numérique qui permet maintenant de mettre le signe moins</b></li>
@@ -159,7 +178,7 @@
 				<li><h4>Nouveau menu principal</h4> Il est temps d'ajouter un peu de vie à ce jeu en y ajoutant des icons et autres menu de personnalisation. Vous avez maintenant accès à un <b>écran des options</b> pour modifier l'affichage de certains éléments en jeu. N'hésitez pas à nous donner des idées d'options à ajouter !</li>
 				<li><h4>Equilibrage des opérations</h4> Dans le mode temps, il était possible de tomber sur des opérations vraiment trop simple pour les modes de difficultés élevé. Ceux-ci ont été modifié pour que les opérations collent mieux avec la difficulté choisie et le nombre d'opération sélectionné dans le menu.</li>
 				<li>Ajout d'un ombrage sur les opérations pour augmenter leurs visibilités lorsqu'elles sortent du cadre à cause du grand nombre de caractère qui le compose.</li>
-				<li>Ajustement du CSS pour la version téléphone</li>
+				<li>Ajustement du CSS pour la version téléphone.</li>
 			</ul>
 			<h3>BETA 1.1.1 - 26/07/2023</h3>
 			<ul>
@@ -200,6 +219,5 @@
 		</div>
 		<hr>
 	</main>
-	
 </body>
 </html>
