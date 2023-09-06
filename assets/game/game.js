@@ -2866,9 +2866,10 @@ function loopAnimation() {
 								game.timer=20;
 								break;
 							case 2:
-								setmenu(4,"lr",0,0,0,0);
-								game.screen="hub";
-								game.event="first";
+								setmenu(levels[1].nblvl,"lr",0,0,0,0,game.level.stage);
+								game.screen="level-select";
+								game.mainevent="map";
+								game.event="select";
 								break;
 							}
 						}
