@@ -2923,7 +2923,7 @@ function loopAnimation() {
 	c.textAlign="start";
 	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
 	c.textAlign="end";
-	c.fillText("Version dev-BETA 1.3.1", Cw*0.99, Ch*0.99);
+	c.fillText("Version BETA 1.3.1", Cw*0.99, Ch*0.99);
 
 	requestAnimationFrame(loopAnimation)
 }
