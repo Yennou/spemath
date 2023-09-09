@@ -1,6 +1,5 @@
 const directory="assets/game/assets/";
 
-
 const canvas = document.getElementById("canvas1");
 const c = canvas.getContext("2d");
 canvas.width = 650;
@@ -463,10 +462,19 @@ canvas.addEventListener('mousedown', function(event){
 				switch(game.event){
 				case "finpop":
 					if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.18+150 && mouse.y <= Ch*0.785+50) {
-						game.mainevent="starting";
-						game.event="transition";
-						game.timer=20;
 						resetStats()
+						switch (game.battle.gamemode) {
+						case "survival-timer":
+							game.mainevent="starting";
+							game.event="transition";
+							game.timer=20;
+							break;
+						case "survival-life":
+							game.mainevent="starting";
+							game.event="set";
+							game.timer=20;
+							break;
+						}
 					}
 					if (mouse.x >= Cw*0.465 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.465+220 && mouse.y <= Ch*0.785+50) {
 						setmenu(4,"lr",0,0,0,0);
@@ -1471,7 +1479,7 @@ function loopAnimation() {
 				}
 				if (game.menu.target<game.menu.options) {
 					c.fillRect(Cw*0.63,Ch*0.34,Cw*0.12,Ch*0.2)
-				}
+				}	
 			}
 			c.globalAlpha = 1;
 			c.textAlign="center";
@@ -1724,7 +1732,7 @@ function loopAnimation() {
 					game.stats.pv=0;
 					game.stats.timer=0;
 					switch (game.setbtl.dif){
-					case 2: 			//très facile
+					case 2:	
 						game.stats.maxpv=100;
 						game.stats.maxtimer=1000;
 						game.battle.rangemin=3;
@@ -1736,7 +1744,7 @@ function loopAnimation() {
 						game.battle.decaystep=20;
 						game.battle.timerhplose=25;
 						break;
-					case 1.5: 			//facile
+					case 1.5:
 						game.stats.maxpv=100;
 						game.stats.maxtimer=1000;
 						game.battle.rangemin=5;
@@ -1748,7 +1756,7 @@ function loopAnimation() {
 						game.battle.decaystep=20;
 						game.battle.timerhplose=25;
 						break;
-					case 1: 			//normal
+					case 1:
 						game.stats.maxpv=100;
 						game.stats.maxtimer=1100;
 						game.battle.rangemin=7;
@@ -1760,7 +1768,7 @@ function loopAnimation() {
 						game.battle.decaystep=30;
 						game.battle.timerhplose=50;
 						break;
-					case 0.7: 			//difficile
+					case 0.7:
 						game.stats.maxpv=100;
 						game.stats.maxtimer=1200;
 						game.battle.rangemin=9;
@@ -1945,8 +1953,11 @@ function loopAnimation() {
 							generatePuzzleMode2()
 							break;
 						}
-						
 					}
+					break;
+				default:
+					errormsg("event error !");
+					break;
 				}
 				if (key.p) {
 					game.prevevent=game.mainevent;
@@ -1989,7 +2000,6 @@ function loopAnimation() {
 					game.mainevent="exit";
 					setmenu(2,"lr",0.25,0.8,0.3,0)
 				}
-				
 				break;
 			case "exit":
 				c.fillStyle="black";
@@ -2141,9 +2151,6 @@ function loopAnimation() {
 						game.battle.add? c.drawImage(icon_plusON,Cw*0.66,Ch*0.225,35,35) :c.drawImage(icon_plus,Cw*0.66,Ch*0.225,35,35);
 						game.battle.sub? c.drawImage(icon_moinsON,Cw*0.72,Ch*0.225,35,35) :c.drawImage(icon_moins,Cw*0.72,Ch*0.225,35,35);
 						break;
-					default:
-						errormsg("event error !")
-						break;
 					}
 					c.font = '36px monospace';
 					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
@@ -2163,9 +2170,18 @@ function loopAnimation() {
 							resetStats()
 							switch (game.menu.target){
 							case 1:
-								game.mainevent="starting";
-								game.event="transition";
-								game.timer=20;
+								switch (game.battle.gamemode) {
+								case "survival-timer":
+									game.mainevent="starting";
+									game.event="transition";
+									game.timer=20;
+									break;
+								case "survival-life":
+									game.mainevent="starting";
+									game.event="set";
+									game.timer=20;
+									break;
+								}
 								break;
 							case 2:
 								setmenu(4,"lr",0,0,0,0);
@@ -2175,6 +2191,10 @@ function loopAnimation() {
 							}
 						}
 					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
 				}
 				break;
 			default:
@@ -2217,7 +2237,6 @@ function loopAnimation() {
 				c.fillRect(Cw*0.118,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
 				c.fillStyle="red";
 				c.globalAlpha=0.3+anim.decaybar.time/80;
-				//if (game.battle.gamemode=="") c.fillRect(Cw*0.413-Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.1,Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.113);
 				if (game.battle.decaystep>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.113);
 				if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
 					c.globalAlpha=0.2+anim.lowtimer.time/50;
@@ -2470,6 +2489,14 @@ function loopAnimation() {
 						game.event="begin";
 						game.timer=50;
 					}
+					if (game.stats.vies<=0 && game.stats.maxvies>0) {
+						game.stats.vies=0;
+						game.mainevent="gameover";
+						game.event="begin";
+						game.timer=50;
+					}
+					break;
+				case "lesson":
 					if (game.stats.vies<=0 && game.stats.maxvies>0) {
 						game.stats.vies=0;
 						game.mainevent="gameover";
@@ -2780,6 +2807,8 @@ function loopAnimation() {
 						game.timer=15;
 					}
 					break;
+				default:
+					errormsg("event error !")
 				}
 				break;
 			case "finish":
@@ -2874,6 +2903,9 @@ function loopAnimation() {
 							}
 						}
 					}
+					break;
+				default:
+					errormsg("event error !")
 				}
 				break;
 			default:
@@ -2891,7 +2923,7 @@ function loopAnimation() {
 	c.textAlign="start";
 	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
 	c.textAlign="end";
-	c.fillText("Version BETA 1.3", Cw*0.99, Ch*0.99);
+	c.fillText("Version dev-BETA 1.3.1", Cw*0.99, Ch*0.99);
 
 	requestAnimationFrame(loopAnimation)
 }

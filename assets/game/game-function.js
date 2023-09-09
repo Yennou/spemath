@@ -1,4 +1,3 @@
-
 function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
 	game.menu.options = numoption;
 	game.menu.direction = direction;
@@ -204,6 +203,7 @@ function generatePuzzleMode2() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
 	if (game.battle.sub) tabsymb.push("moins");
+	//if (game.battle.mult) tabsymb.push("mult");
 	game.stats.timeRep=0;
 	if (pass) {
 		if (game.battle.symb=="plus") {
