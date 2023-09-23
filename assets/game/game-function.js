@@ -41,7 +41,6 @@ function showcursor(cursortype=0){
 	c.fillStyle = "white";
 	c.fillRect(Cw*game.menu.posx,Ch*game.menu.posy,20,20)
 }
-
 function inputPlayer(){
 	c.globalAlpha=game.option.inputOpacity/100;
 	c.fillStyle="white";
@@ -71,7 +70,6 @@ function inputPlayerPhone(inputP){
 			}else {
 				key.q=true;
 				key.cooldown=key.cooldownmax;
-				
 			}
 			break;
 		case"Retour":
@@ -121,7 +119,6 @@ function resetInput(inputName){
 		setTimeout(resetInput,2,inputName)
 	}
 }
-
 function resetStats(){
 	game.stats.score = 0;
 	game.stats.clear = 0;
@@ -140,32 +137,21 @@ function resetStats(){
 	input=0;
 	pass=false;
 }
-function IGTtimer(){
-	if (game.mainevent=="play") {
-		if (game.stats.timer>0) {
-			game.stats.timer--;
-		}
-		if (game.stats.time>0) {
-			game.stats.time--;
-		}
-		game.stats.timeRep++;
-		setTimeout(IGTtimer,9)
-	}
-}
-
 function RTAtimer(){
-	if (game.mainevent!="gameover"&&game.mainevent!="pause"&&game.mainevent!="finish") {
+	if (game.mainevent=="play"||game.mainevent=="wait") {
 		game.stats.timeTot++;
-		setTimeout(RTAtimer,9)
 	}
 }
 function ShowTimer(temps){
-	var milisec = temps%100;
-	let sec = Math.floor(temps/100);
-	if (milisec<10) milisec="0"+milisec;
+	var milisec = Math.floor(temps%60*1.6665/10);
+	let sec = Math.floor(temps/60);
 	return sec+"."+milisec
 }
-
+function ShowTimerRes(temps){
+	var milisec = Math.floor(temps%60*1.6665);
+	let sec = Math.floor(temps/60);
+	return sec+"."+milisec
+}
 function generatePuzzleMode1() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
@@ -173,37 +159,66 @@ function generatePuzzleMode1() {
 	if (game.battle.mult) tabsymb.push("mult");
 	game.stats.timeRep=0;
 	game.battle.num1= Math.floor(Math.random()*Math.pow(10,game.battle.numopp));
+	if (game.battle.num1<Math.pow(10,game.battle.numopp-1)) game.battle.num1+=Math.pow(10,game.battle.numopp-1);
 	game.battle.num2= Math.floor(Math.random()*Math.pow(10,game.battle.numopp));
+	if (game.battle.num2<Math.pow(10,game.battle.numopp-1)) game.battle.num2+=Math.pow(10,game.battle.numopp-1);
 	game.battle.symb= tabsymb[Math.floor(Math.random()*tabsymb.length)];
 	if (game.battle.symb=="mult"&& game.battle.numopp>=2) {
-		if (game.battle.numopp>=2&&game.battle.mode=="normal"&&game.battle.symbnum==1) {
-			game.battle.num1= Math.floor(Math.random()*20)+5;
+		if ((game.battle.numopp>=2&&game.battle.numopp<4)&&game.battle.mode=="normal"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*40)+5;
 			game.battle.num2= Math.floor(Math.random()*20)+5;
 		}
-		if (game.battle.numopp==2&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
-			game.battle.num1= Math.floor(Math.random()*40)+5;
-			game.battle.num2= Math.floor(Math.random()*12)+5;
+		else if (game.battle.numopp==2&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*80)+5;
+			game.battle.num2= Math.floor(Math.random()*20)+5;
 		}
-		if (game.battle.numopp==3&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
-			game.battle.num1= Math.floor(Math.random()*70)+5;
-			game.battle.num2= Math.floor(Math.random()*12)+5;
+		else if (game.battle.numopp==3&&game.battle.mode=="normal"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*295)+5;
+			game.battle.num2= Math.floor(Math.random()*200)+5;
+		}
+		else if (game.battle.numopp==3&&game.battle.mode=="normal") {
+			game.battle.num1= Math.floor(Math.random()*195)+5;
+			game.battle.num2= Math.floor(Math.random()*100)+5;
+		}
+		else if (game.battle.numopp==3&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*495)+5;
+			game.battle.num2= Math.floor(Math.random()*300)+5;
 		}
 		else if (game.battle.numopp==3&&game.battle.mode=="hard") {
-			game.battle.num1= Math.floor(Math.random()*20)+5;
-			game.battle.num2= Math.floor(Math.random()*20)+5;
-		} else {
-			game.battle.num1= Math.floor(Math.random()*12);
-			game.battle.num2= Math.floor(Math.random()*12);
+			game.battle.num1= Math.floor(Math.random()*405)+95;
+			game.battle.num2= Math.floor(Math.random()*100)+105;
+		} 
+		else if (game.battle.numopp==4&&game.battle.mode=="very-easy"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*9099)+900;
+			game.battle.num2= Math.floor(Math.random()*9)+1;
+		}
+		else if (game.battle.numopp==4&&game.battle.mode=="easy"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*9099)+900;
+			game.battle.num2= Math.floor(Math.random()*89)+11;
+		}
+		else if (game.battle.numopp==4&&game.battle.mode=="normal"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*9099)+900;
+			game.battle.num2= Math.floor(Math.random()*899)+100;
+		}
+		else if (game.battle.numopp==4&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*9000)+999;
+			game.battle.num2= Math.floor(Math.random()*9099)+900;
+		}
+		else if (game.battle.numopp==4&&game.battle.symbnum>1) {
+			game.battle.num1= Math.floor(Math.random()*9000)+999;
+			game.battle.num2= Math.floor(Math.random()*990)+9;
+		}
+		else {
+			game.battle.num1= Math.floor(Math.random()*19+1);
+			game.battle.num2= Math.floor(Math.random()*18+2);
 		}
 	}
 	game.battle.negat=false;
 }
-
 function generatePuzzleMode2() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
 	if (game.battle.sub) tabsymb.push("moins");
-	//if (game.battle.mult) tabsymb.push("mult");
 	game.stats.timeRep=0;
 	if (pass) {
 		if (game.battle.symb=="plus") {
@@ -247,22 +262,24 @@ function generatePuzzleModelvl() {
 			game.battle.symb="mult";
 			break;
 		}
-		switch (game.level.encounter[select][1].length) {
-		case undefined:
+		if (game.level.encounter[select][1].length==undefined) {
 			game.battle.num1=game.level.encounter[select][1];
-			break;
-		case "prev1":
-			game.battle.num1=prev.num1;
-			break;
-		case "prev2":
-			game.battle.num1=prev.num2;
-			break;
-		case "prevR":
-			game.battle.num1=prev.result;
-			break;
-		default:
-			game.battle.num1=randomNum(game.level.encounter[select][1][0],game.level.encounter[select][1][1]);
-			break;
+		}
+		else {
+			switch (game.level.encounter[select][1]) {
+			case "prev1":
+				game.battle.num1=prev.num1;
+				break;
+			case "prev2":
+				game.battle.num1=prev.num2;
+				break;
+			case "prevR":
+				game.battle.num1=prev.result;
+				break;
+			default:
+				game.battle.num1=randomNum(game.level.encounter[select][1][0],game.level.encounter[select][1][1]);
+				break;
+			}
 		}
 		switch (game.level.encounter[select][2].length) {
 		case undefined:
@@ -289,7 +306,6 @@ function generatePuzzleModelvl() {
 		game.event="begin";
 	}
 }
-
 function validatePuzzle() {
 	let validate = false;
 	if (game.battle.negat) input=input*-1;
@@ -315,17 +331,17 @@ function validatePuzzle() {
 		game.battle.score= score;
 		let bonustime=0;
 		if (game.battle.mode=="very-easy"||game.battle.mode=="easy") {
-			bonustime = Math.floor((300-game.stats.clear)*game.setbtl.dif+game.battle.numopp/2+game.battle.symbnum/3);
+			bonustime = Math.floor((300-game.stats.clear)*(game.setbtl.dif*2/3+game.battle.numopp/3+game.battle.symbnum/3));
 		} else {
-			bonustime = Math.floor((300-game.stats.clear)*(2-game.setbtl.dif+game.battle.numopp/2-(1-game.battle.symbnum/3)));
+			bonustime = Math.floor((240-game.stats.clear)*(game.setbtl.dif*2/3+game.battle.numopp/3+game.battle.symbnum/3));
 		}
-		if (bonustime<120) {bonustime=120}
+		if (bonustime<90) {bonustime=90}
 		game.stats.timer+=bonustime;
 		if (game.stats.timer>game.stats.maxtimer-game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1)))) game.stats.timer=Math.floor(game.stats.maxtimer-game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))));
 	} else {
 		game.stats.miss++;
-		let malustime = Math.floor(200+100*game.stats.clear/100);
-		if (malustime>500) {malustime=500}
+		let malustime = Math.floor(120*(3-game.setbtl.dif)+60*game.stats.clear/100);
+		if (malustime>360) {malustime=360}
 		game.stats.timer-=malustime;
 		if (game.stats.timer<0) game.stats.timer=0;
 		if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
@@ -419,7 +435,7 @@ function validatePuzzlelvl() {
 		game.stats.score+= score;
 		game.battle.score= score;
 		if (game.battle.decaystep>0){
-			if (game.stats.clear%game.battle.decaystep==0 && game.stats.timerDecay<game.stats.maxtimer*0.5) game.stats.timerDecay+=100;
+			if (game.stats.clear%game.battle.decaystep==0 && game.stats.timerDecay<game.stats.maxtimer*0.5) game.stats.timerDecay+=game.battle.decaytimer;
 		}
 		game.battle.rangemin+=game.battle.rangeminstep;
 		game.battle.rangemax+=game.battle.rangemaxstep;
@@ -467,36 +483,34 @@ function validatePuzzlelvl() {
 	game.stats.timer=game.stats.maxtimer-game.stats.timerDecay;
 	return validate
 }
-
 function drawPuzzle(){
 	c.textAlign="center";
 	game.inputType=="phone" ? c.font = '28px monospace': c.font = '30px monospace';
+	c.shadowColor="white";
+	c.shadowBlur=6+anim.operation.time/8;
 	switch(game.battle.symb) {
 	case "plus":
 		c.drawImage(btl_plus,Cw*0.5-75,Ch*0.43-75,150,150)
-		c.fillStyle ="white"
-		c.shadowColor="white";
-		c.shadowBlur=5;
+		c.fillStyle ="white";
+		c.shadowBlur=7;
 		c.fillText(game.battle.num1+" + "+game.battle.num2,Cw*0.5,Ch*0.455)
 		c.fillStyle ="black"
 		c.fillText(game.battle.num1+" + "+game.battle.num2,Cw*0.5,Ch*0.455)
 		break;
 	case "moins":
 		c.drawImage(btl_moins,Cw*0.5-75,Ch*0.43-75,150,150)
-		c.fillStyle ="white"
-		c.shadowColor="white";
-		c.shadowBlur=5;
+		c.fillStyle ="white";
+		c.shadowBlur=7;
 		c.fillText(game.battle.num1+" - "+game.battle.num2,Cw*0.5,Ch*0.455)
-		c.fillStyle ="black"
+		c.fillStyle ="black";
 		c.fillText(game.battle.num1+" - "+game.battle.num2,Cw*0.5,Ch*0.455)
 		break;
 	case "mult":
 		c.drawImage(btl_mult,Cw*0.5-75,Ch*0.43-75,150,150)
-		c.fillStyle ="white"
-		c.shadowColor="white";
-		c.shadowBlur=5;
+		c.fillStyle ="white";
+		c.shadowBlur=7;
 		c.fillText(game.battle.num1+" x "+game.battle.num2,Cw*0.5,Ch*0.455)
-		c.fillStyle ="black"
+		c.fillStyle ="black";
 		c.fillText(game.battle.num1+" x "+game.battle.num2,Cw*0.5,Ch*0.455)
 		break;
 	}
@@ -519,7 +533,6 @@ function returnMode(){
 		break;
 	}
 }
-
 function checkCombo(combo){
 	if (combo<5) {
 		return 1
@@ -560,7 +573,6 @@ function checkCombo(combo){
 		return 5
 	}
 }
-
 function calcAvgTResp(inputTab){
 	let avg = 0;
 	if (inputTab.length>0) {
@@ -569,14 +581,195 @@ function calcAvgTResp(inputTab){
 		}
 		avg=Math.floor(avg/inputTab.length)
 	}
-	return avg/100
+	return avg/60
 }
 function registerScore(score){
 	if (score>saves.levels[game.level.world][game.level.stage].score) {
 		saves.levels[game.level.world][game.level.stage].score=score;
 	}
 }
-
+function showbackground(){
+	if (game.option.bckgrndOpacity>0) {
+		if (anim.background.timer>0)anim.background.timer--;
+		switch(anim.background.type){
+		case 0:
+			if (anim.background.timer==0) {
+				anim.background.timer=Math.floor(Math.random()*50+30)
+				anim.background.stock.push(new bckgrnd1(Math.random()*Cw,Math.random()*1+0.2,Math.random()*2.5+1,Math.random()*60+20))
+			}
+			if (anim.background.stock.length>0) {
+				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
+					anim.background.stock[i].update()
+					anim.background.stock[i].show()
+					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
+				}
+			}
+			break;
+		case 1:
+			if (anim.background.timer==0) {
+				anim.background.timer=Math.floor(Math.random()*5+15)
+				anim.background.stock.push(new bckgrnd2(Math.random()*Cw*0.9+10,Math.random()*Ch*0.9+5,Math.random()*4+2,Math.random()*50+30))
+			}
+			if (anim.background.stock.length>0) {
+				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
+					anim.background.stock[i].update()
+					anim.background.stock[i].show()
+					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
+				}
+			}
+			break;
+		case 2:
+			if (anim.background.timer==0) {
+				anim.background.timer=Math.floor(Math.random()*30+20)
+				anim.background.stock.push(new bckgrnd3(Math.random()*Cw-10,Math.random()*Ch,Math.random()*12+20,Math.random()*10+10))
+			}
+			if (anim.background.stock.length>0) {
+				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
+					anim.background.stock[i].update()
+					anim.background.stock[i].show()
+					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
+				}
+			}
+			break;
+		case 3:
+			if (anim.background.timer==0) {
+				anim.background.timer=Math.floor(Math.random()*10+20)
+				anim.background.stock.push(new bckgrnd4(Math.random()*Cw,Math.random()*0.4+0.2,Math.random()*1.5+1,Math.random()*45+45,Math.random()*12+8))
+			}
+			if (anim.background.stock.length>0) {
+				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
+					anim.background.stock[i].update()
+					anim.background.stock[i].show()
+					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
+				}
+			}
+			break;
+		}
+	}
+}
+class bckgrnd1{
+	constructor(posX,spd,size,opa){
+		this.posX=posX;
+		this.posY=Ch;
+		this.speed=spd;
+		this.size=size;
+		this.opacity=opa;
+		this.destroy=false;
+	}
+	update(){
+		this.posY-=this.speed;
+		if (this.posY<-10) this.destroy=true;
+	}
+	show(){
+		c.shadowColor="white";
+		c.shadowBlur=10;
+		c.globalAlpha=this.opacity/100*(game.option.bckgrndOpacity/100);
+		c.fillStyle= "white";
+		c.beginPath()
+		c.arc(this.posX,this.posY,this.size,0,Math.PI*2)
+		c.fill()
+		c.closePath()
+		c.shadowColor="";
+		c.shadowBlur=0;
+	}
+}
+class bckgrnd2{
+	constructor(posX,posY,size,opamax){
+		this.posX=posX;
+		this.posY=posY;
+		this.size=size;
+		this.opacity=0;
+		this.MAXopacity=opamax;
+		this.invert=false;
+		this.destroy=false;
+	}
+	update(){
+		this.invert ? this.opacity-=0.7:this.opacity+=0.7;
+		this.posY+=0.1;
+		if (this.opacity<0) this.opacity=0;
+		if (this.opacity>=this.MAXopacity) this.invert=true;
+		if (this.opacity<=0&&this.invert) this.destroy=true;
+	}
+	show(){
+		c.shadowColor="white";
+		c.shadowBlur=5;
+		c.globalAlpha=this.opacity/100*(game.option.bckgrndOpacity/100);
+		c.fillStyle= "white";
+		c.beginPath()
+		c.arc(this.posX,this.posY,this.size,0,Math.PI*2)
+		c.fill()
+		c.closePath()
+		c.shadowColor="";
+		c.shadowBlur=0;
+	}
+}
+class bckgrnd3{
+	constructor(posX,posY,size,opamax){
+		this.posX=posX;
+		this.posY=posY;
+		this.size=size;
+		this.opacity=0;
+		this.MINopacity=8;
+		this.MAXopacity=opamax;
+		this.invert=false;
+		this.destroy=false;
+	}
+	update(){
+		if (this.opacity<this.MINopacity&&!this.invert) this.opacity+=0.05;
+		this.invert ? this.opacity-=0.1:this.opacity+=0.01;
+		this.posX+=0.05;
+		if (this.opacity<0) this.opacity=0;
+		if (this.opacity>=this.MAXopacity) this.invert=true;
+		if (this.opacity<=0&&this.invert) this.destroy=true;
+	}
+	show(){
+		c.shadowColor="white";
+		c.shadowBlur=30;
+		c.globalAlpha=this.opacity/100*(game.option.bckgrndOpacity/100);
+		c.fillStyle= "white";
+		c.beginPath()
+		c.arc(this.posX,this.posY,this.size,0,Math.PI*2)
+		c.fill()
+		c.closePath()
+		c.shadowColor="";
+		c.shadowBlur=0;
+	}
+}
+class bckgrnd4{
+	constructor(posX,spd,size,opa,offX){
+		this.posX=posX;
+		this.posY=Ch;
+		this.speed=spd;
+		this.size=size;
+		this.opacity=opa;
+		this.offsetX=offX;
+		this.time=1;
+		this.invert=false;
+		this.decay=false;
+		this.destroy=false;
+	}
+	update(){
+		this.posY-=this.speed;
+		this.invert ?this.time-=0.07:this.time+=0.07;
+		if (this.time>=180||this.time<=0) this.invert=!this.invert;
+		if (this.posY<Ch*0.6) this.decay=true;
+		if (this.decay) this.opacity--;
+		if (this.opacity<0) this.opacity=0;
+		if (this.opacity<=0) this.destroy=true;
+	}
+	show(){
+		c.shadowColor="white";
+		c.shadowBlur=10;
+		c.globalAlpha=this.opacity/100*(game.option.bckgrndOpacity/100);
+		c.fillStyle= "white";
+		c.beginPath()
+		c.arc(this.posX+Math.cos(this.time),this.posY,this.size,0,Math.PI*2)
+		c.fill()
+		c.closePath()
+		c.shadowColor="";
+		c.shadowBlur=0;
+	}
+}
 function errormsg(txt) {
 	c.fillStyle="white";
 	c.globalAlpha=1;

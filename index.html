@@ -65,6 +65,7 @@
 		<script src="assets/game/game.js"></script>
 		<script src="assets/game/game-levels.js"></script>
 		<script src="assets/game/game-function.js"></script>
+		<script src="assets/game/game-event.js"></script>
 		<script>
 			const zoommax=6;
 			const zoommin=0.75;
@@ -81,7 +82,7 @@
 			<h2>Comment jouer ?</h2>
 			<p>Avant de commencer, il est important de verrouiller la fenêtre de jeu en appuyant sur le bouton comme indiqué sur l'image ci-dessous afin d'éviter que la page bouge pendant que vous jouez.</p>
 			<img src="assets/img/tuto1.png">
-			<p>Si vous jouez sur <b>téléphone ou tablette</b>, cliquez sur le bouton comme indiqué sur l'image ci-dessous pour afficher les contrôles tactiles.</p>
+			<p>Si vous jouez sur un <b>smartphone</b> ou une <b>tablette</b>, cliquez sur le bouton comme indiqué sur l'image ci-dessous pour afficher les contrôles tactiles.</p>
 			<img src="assets/img/tuto1-2.png">
 
 			<h3>Les commandes</h3>
@@ -96,7 +97,7 @@
 				<li><h4>3. Difficulté</h4><span>Ici, vous choisirez la difficulté de l'entrainement qui jouera grandement sur le <b>temps maximum</b> qui vous sera donner pour effectuer vos opérations.</span></li>
 			</ul>
 			<img src="assets/img/tuto2-2.png">
-			<p>Sinon, vous pouvez toujours vous essayer à des niveaux à thème et tenter de réaliser des <b>Parfait</b> sur tout les niveaux proposés</p>
+			<p>Vous aurez également la possibilité de vous mesurer à  des niveaux à thème et tenter de réaliser des <b>Sans-Fautes</b> sur tous les niveaux proposés</p>
 			<h3>Ecran de jeu</h3>
 			<img src="assets/img/tuto3.png">
 			<ul>
@@ -106,15 +107,15 @@
 				</li>
 				<li>
 					<h4>2. Chronomètre</h4>
-					<span>Ce chronomètre indique le temps restant pour donner une réponse avant de subir un contre coup. S'il atteint 0 il peut soit vous mettre hors jeu soit vous faire perdre de la vie en fonction du mode que vous jouez.</span>
+					<span>Ce chronomètre indique le temps restant pour donner une réponse avant de subir un contrecoup. S'il atteint zéro il peut soit vous mettre hors jeu soit vous faire perdre des points vies en fonction du mode de jeu.</span>
 				</li>
 				<li>
 					<h4>3. Sablier</h4>
-					<span>Ce sablier vous indique le temps restant pour finir le niveau, attention ne de pas attendre trop longtemps car il vous fera perdre la partie s'il atteint 0.</span>
+					<span>Ce sablier vous indique le temps restant pour finir le niveau, attention ne de pas attendre trop longtemps car il vous fera perdre la partie s'il atteint zéro.</span>
 				</li>
 				<li>
 					<h4>4. Compteur</h4>
-					<span>Indique le nombre restant d'opérations à effectuer pour terminer le niveau ou le nombre de bonne réponse donné en fonction du mode que vous jouez.</span>
+					<span>Indique le nombre d'opérations restantes à effectuer pour terminer le niveau ou le nombre de bonne réponse donné en fonction du mode de jeu choisi.</span>
 				</li>
 				<li>
 					<h4>5. Opération</h4>
@@ -134,11 +135,11 @@
 				</li>
 				<li>
 					<h4>9. Combo</h4>
-					<span>Indique le nombre de bonne réponse d'affilé que vous aurez donné, il peut vous conférer un bonus de point si votre série de bonne réponse est suffisament longue. Plus votre série de bonne réponse est grande, plus le bonus donné sera élevé.</span>
+					<span>Indique le nombre de bonne réponse d'affilé que vous aurez donné, une série de bonnes réponses peut vous conférer un bonus de point Plus votre série de bonne réponse sera grande, plus le bonus donné sera élevé.</span>
 				</li>
 			</ul>
 			<br>
-			<p>Voilà vous avez toute les clés en main pour jouer à ce jeu. En espérant qu'il vous plaira et que vous vous amuserez dessus !</p>
+			<p>Voilà vous avez maintenant toute les clés en main pour jouer à ce jeu. En espérant qu'il vous plaira et que vous vous amuserez dessus !</p>
 		</article>
 		<article class="desc-game" id="NDLR">
 			<h2>Note de l'auteur</h2>
@@ -146,7 +147,6 @@
 				<br>Mais c'est déjà un bon début, je pense que ça aidera beaucoup de gens à s'entrainer en s'amusant à faire des Mathématiques."
 			</cite>
 			<p>Yenseng - 19/07/2023</p>
-			<br>
 		</article>
 		<article class="desc-game" id="retour">
 			<h2>Laisser un avis</h2>
@@ -159,6 +159,24 @@
 
 		<article class="desc-game" id="changelog">
 			<h2>Changelog</h2>
+			<h3>BETA 1.3.2 - 23/09/2023</h3>
+			<ul>
+				<li>Ajout de 5 Nouveaux niveaux.</li>
+				<li>Ajout des opérations à 4 chiffres en mode survis temps.</li>
+				<li>Ajout de transition entre les niveaux et les menus.</li>
+				<li><h4>Ajout de fonds animés.</h4><span>Cet ajout semble minime mais il est un bon indicateur de la progression dans le développement du jeu. Evidement si des problèmes sont a noter sur les fonds animés (gène au niveau du gameplay ou bug visuel), merci de m'en faire part sur le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math</a> du discord.</span></li>
+				<li><h4>Equilibrage sur le temps gagné pour chaque bonne réponse en mode survie temps.</h4><span>Après avoir corrigé un bug majeur à propos de l'écoulement du temps, la plupart des formules de gain de temps en mode survis était devenu obselete. Cette nouvelle formule est en phase de test donc <b>si jamais vous trouver que le temps gagné en mode survie temps n'est pas très équilibré</b>, merci d'en témoigner sur le discord. Bon test à vous</span></li>
+				<li>Modification des interfaces des modes survies pour les rendre plus facile d'utilisation dans la version smartphone et tablette.</li>
+				<li>Modification de plusieurs textures.</li>
+				<li>Bug majeur corrigé du temps qui ne s'écoulait pas à la même vitesse suivant la configuration des appareils.</li>
+				<li>Bug corrigé affichant plus de 2 décimal au chrono pendant l'initialisation de la partie.</li>
+				<li>Bug corrigé en mode "survie vies" affichant le symboles "x" pendant la partie s'il a été sélectionné en mode "survie temps" précédemment (n'affecte pas la partie).</li>
+				<li>Bug corrigé de l'affichage de la barre du sablier ne correspondant pas au temps restant.</li>
+				<li>Bug corrigé de l'animation du sablier lorsque le temps restant est inférieur à 20% du temps maximum.</li>
+				<li>Bug corrigé du menu de sélection des niveaux dans la version smartphone.</li>
+				<li>Bug corrigé du menu Options qui avait une option vide et qui est remplacé maintenant par le réglage de l'opacité des fonds.</li>
+				<li>Correction de certains textes.</li>
+			</ul>
 			<h3>BETA 1.3.1 - 09/09/2023</h3>
 			<ul>
 				<li>5 Nouveaux niveaux ajoutés.</li>
@@ -181,7 +199,7 @@
 			<h3>BETA 1.2 - 07/08/2023</h3>
 			<ul>
 				<li><h4>NOUVEAU MODE : mode vies !</h4> Vous devrez enchainer les bonnes réponses sans vous tromper mais attention, une erreur peut vous coûter la partie entière. Les dégâts que vous subissez sont égaux à <b>la différence entre votre résultat et le résultat attendu</b>. Si le chrono tombe à 0, vous subirez également des dégâts <b>proportionnellement à la difficulté</b> choisie mais ne mettra pas fin à votre partie <i>(sauf si vous n'avez plus de vies)</i>.
-				<br>Attention à ne pas perdre le fil car <b>les résultats se cumulent entre eux !</b><br>Bon jeu, bonne chance et n'hésitez pas à nous faire part de vos retours sur le discord dans le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Retour-test </a> !</li>
+				<br>Attention à ne pas perdre le fil car <b>les résultats se cumulent entre eux !</b><br>Bon jeu, bonne chance et n'hésitez pas à nous faire part de vos retours sur le discord dans le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math</a> !</li>
 				<li><h4>Nouveau menu principal</h4> Il est temps d'ajouter un peu de vie à ce jeu en y ajoutant des icons et autres menu de personnalisation. Vous avez maintenant accès à un <b>écran des options</b> pour modifier l'affichage de certains éléments en jeu. N'hésitez pas à nous donner des idées d'options à ajouter !</li>
 				<li><h4>Equilibrage des opérations</h4> Dans le mode temps, il était possible de tomber sur des opérations vraiment trop simple pour les modes de difficultés élevé. Ceux-ci ont été modifié pour que les opérations collent mieux avec la difficulté choisie et le nombre d'opération sélectionné dans le menu.</li>
 				<li>Ajout d'un ombrage sur les opérations pour augmenter leurs visibilités lorsqu'elles sortent du cadre à cause du grand nombre de caractère qui le compose.</li>
