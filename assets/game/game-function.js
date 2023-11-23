@@ -41,6 +41,7 @@ function showcursor(cursortype=0){
 	c.fillStyle = "white";
 	c.fillRect(Cw*game.menu.posx,Ch*game.menu.posy,20,20)
 }
+
 function inputPlayer(){
 	c.globalAlpha=game.option.inputOpacity/100;
 	c.fillStyle="white";
@@ -70,6 +71,7 @@ function inputPlayerPhone(inputP){
 			}else {
 				key.q=true;
 				key.cooldown=key.cooldownmax;
+				
 			}
 			break;
 		case"Retour":
@@ -119,12 +121,19 @@ function resetInput(inputName){
 		setTimeout(resetInput,2,inputName)
 	}
 }
+
 function resetStats(){
 	game.stats.score = 0;
 	game.stats.clear = 0;
 	game.stats.miss = 0;
 	game.stats.combo = 0;
 	game.stats.maxcombo = 0;
+	game.stats.maxpv=0;
+	game.stats.pv=0;
+	game.stats.maxvies=0;
+	game.stats.vies=0;
+	game.stats.maxtimer=0;
+	game.stats.maxtime=0;
 	game.stats.timer = 0;
 	game.stats.timeRep = 0;
 	game.stats.timeTot = 0;
@@ -134,9 +143,11 @@ function resetStats(){
 	game.battle.num1= 0;
 	game.battle.num2= 0;
 	game.battle.dmg = 0; 
+	game.stats.level= [];
 	input=0;
 	pass=false;
 }
+
 function RTAtimer(){
 	if (game.mainevent=="play"||game.mainevent=="wait") {
 		game.stats.timeTot++;
@@ -152,6 +163,7 @@ function ShowTimerRes(temps){
 	let sec = Math.floor(temps/60);
 	return sec+"."+milisec
 }
+
 function generatePuzzleMode1() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
@@ -215,6 +227,7 @@ function generatePuzzleMode1() {
 	}
 	game.battle.negat=false;
 }
+
 function generatePuzzleMode2() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
@@ -281,22 +294,24 @@ function generatePuzzleModelvl() {
 				break;
 			}
 		}
-		switch (game.level.encounter[select][2].length) {
-		case undefined:
+		if (game.level.encounter[select][2].length==undefined) {
 			game.battle.num2=game.level.encounter[select][2];
-			break;
-		case "prev1":
-			game.battle.num2=prev.num1;
-			break;
-		case "prev2":
-			game.battle.num2=prev.num2;
-			break;
-		case "prevR":
-			game.battle.num2=prev.result;
-			break;
-		default:
-			game.battle.num2=randomNum(game.level.encounter[select][2][0],game.level.encounter[select][2][1]);
-			break;
+		}
+		else {
+			switch (game.level.encounter[select][2]) {
+			case "prev1":
+				game.battle.num2=prev.num1;
+				break;
+			case "prev2":
+				game.battle.num2=prev.num2;
+				break;
+			case "prevR":
+				game.battle.num2=prev.result;
+				break;
+			default:
+				game.battle.num2=randomNum(game.level.encounter[select][2][0],game.level.encounter[select][2][1]);
+				break;
+			}
 		}
 		game.battle.noEncounter=select;
 		game.battle.negat=false;
@@ -306,21 +321,104 @@ function generatePuzzleModelvl() {
 		game.event="begin";
 	}
 }
+function generatePuzzleArcade() {
+	let select = 0;
+	prev.num1=game.battle.num1;
+	prev.num2=game.battle.num2;
+	switch (game.battle.symb){
+	case "plus":
+		prev.result=prev.num1+prev.num2;
+		break;
+	case "moins":
+		prev.result=prev.num1-prev.num2;
+		break;
+	case "mult":
+		prev.result=prev.num1*prev.num2;
+		break;
+	}
+	if (game.battle.arcade.clear<game.battle.arcade.maxclear) {
+		select = Math.floor(Math.random()*game.level.encounter.length);
+		game.stats.timeRep=0;
+		switch (game.level.encounter[select][0]){
+		case "+":
+			game.battle.symb= "plus";
+			break;
+		case "-":
+			game.battle.symb="moins";
+			break;
+		case "x":
+			game.battle.symb="mult";
+			break;
+		}
+		if (game.level.encounter[select][1].length==undefined) {
+			game.battle.num1=game.level.encounter[select][1];
+		}
+		else {
+			switch (game.level.encounter[select][1]) {
+			case "prev1":
+				game.battle.num1=prev.num1;
+				break;
+			case "prev2":
+				game.battle.num1=prev.num2;
+				break;
+			case "prevR":
+				game.battle.num1=prev.result;
+				break;
+			default:
+				game.battle.num1=randomNum(game.level.encounter[select][1][0],game.level.encounter[select][1][1]);
+				break;
+			}
+		}
+		if (game.level.encounter[select][2].length==undefined) {
+			game.battle.num1=game.level.encounter[select][2];
+		}
+		else {
+			switch (game.level.encounter[select][2]) {
+			case "prev1":
+				game.battle.num2=prev.num1;
+				break;
+			case "prev2":
+				game.battle.num2=prev.num2;
+				break;
+			case "prevR":
+				game.battle.num2=prev.result;
+				break;
+			default:
+				game.battle.num2=randomNum(game.level.encounter[select][2][0],game.level.encounter[select][2][1]);
+				break;
+			}
+		}
+		game.battle.negat=false;
+	}
+	else if (game.battle.arcade.clear>=game.battle.arcade.maxclear){
+		game.mainevent="switchmode";
+		game.event="toregen"
+	}
+}
+
 function validatePuzzle() {
 	let validate = false;
+	let result = 0;
+	let dmg=0;
+	let bonustime=0;
+	let timerB=0;
 	if (game.battle.negat) input=input*-1;
 	switch (game.battle.symb) {
 	case "plus":
-		if (game.battle.num1+game.battle.num2==input) validate=true;
+		result = game.battle.num1+game.battle.num2
+		if (result==input) validate=true;
 		break;
 	case "moins":
-		if (game.battle.num1-game.battle.num2==input) validate=true;
+		result = game.battle.num1-game.battle.num2
+		if (result==input) validate=true;
 		break;
 	case "mult":
-		if (game.battle.num1*game.battle.num2==input) validate=true;
+		result = game.battle.num1*game.battle.num2
+		if (result==input) validate=true;
 		break;
 	}
 	game.stats.inputT.push(game.stats.timeRep)
+	timerB=(game.stats.timer+game.stats.timeRep)/60;
 	if (validate) {
 		game.stats.combo++;
 		game.stats.clear++;
@@ -329,7 +427,6 @@ function validatePuzzle() {
 		score = Math.floor(score*checkCombo(game.stats.combo))
 		game.stats.score+= score;
 		game.battle.score= score;
-		let bonustime=0;
 		if (game.battle.mode=="very-easy"||game.battle.mode=="easy") {
 			bonustime = Math.floor((300-game.stats.clear)*(game.setbtl.dif*2/3+game.battle.numopp/3+game.battle.symbnum/3));
 		} else {
@@ -340,32 +437,55 @@ function validatePuzzle() {
 		if (game.stats.timer>game.stats.maxtimer-game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1)))) game.stats.timer=Math.floor(game.stats.maxtimer-game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))));
 	} else {
 		game.stats.miss++;
-		let malustime = Math.floor(120*(3-game.setbtl.dif)+60*game.stats.clear/100);
-		if (malustime>360) {malustime=360}
-		game.stats.timer-=malustime;
+		bonustime = Math.floor(120*(3-game.setbtl.dif)+60*game.stats.clear/100)*-1;
+		if (bonustime<-360) bonustime=-360;
+		game.stats.timer+=bonustime;
 		if (game.stats.timer<0) game.stats.timer=0;
 		if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 		game.stats.combo=0;
 		game.battle.score=0;
 	}
+	game.stats.level.push(new statsoperation(
+		game.battle.num1,
+		game.battle.num2,
+		get_symb(game.battle.symb),
+		input,
+		result,
+		game.stats.timeRep/60,
+		dmg*-1,
+		get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),
+		get_maxtimerdecay(game.stats.maxtimer,game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1)))),
+		timerB,
+		get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),
+		bonustime/60,
+		(validate?game.stats.clear:game.stats.clear+1),
+		validate
+	))
 	return validate
 }
 function validatePuzzle2() {
 	let validate = false;
+	let result = 0;
+	let dmg=0;
+	let timerB=0;
 	if (game.battle.negat) input=input*-1;
 	switch (game.battle.symb) {
 	case "plus":
-		if (game.battle.num1+game.battle.num2==input) validate=true;
+		result = game.battle.num1+game.battle.num2
+		if (result==input) validate=true;
 		break;
 	case "moins":
-		if (game.battle.num1-game.battle.num2==input) validate=true;
+		result = game.battle.num1-game.battle.num2
+		if (result==input) validate=true;
 		break;
 	case "mult":
-		if (game.battle.num1*game.battle.num2==input) validate=true;
+		result = game.battle.num1*game.battle.num2
+		if (result==input) validate=true;
 		break;
 	}
+	game.stats.inputT.push(game.stats.timeRep)
+	timerB=(game.stats.timer+game.stats.timeRep)/60;
 	if (validate && game.stats.timer>0) {
-		game.stats.inputT.push(game.stats.timeRep)
 		game.stats.combo++;
 		game.stats.clear++;
 		let score = 200-game.stats.timeRep/3;
@@ -373,7 +493,7 @@ function validatePuzzle2() {
 		score = Math.floor(score*checkCombo(game.stats.combo))
 		game.stats.score+= score;
 		game.battle.score= score;
-		if (game.stats.clear%game.battle.decaystep==0 && game.stats.timerDecay<game.stats.maxtimer*0.5) game.stats.timerDecay+=100;
+		if (game.stats.clear%game.battle.decaystep==0 && game.stats.timerDecay<game.stats.maxtimer*0.5) game.stats.timerDecay+=60;
 		if (game.stats.clear%game.battle.regenstep==0 && game.stats.pv<game.stats.maxpv) game.stats.pv+=game.battle.regen;
 		if (game.stats.pv>game.stats.maxpv) game.stats.pv=game.stats.maxpv;
 		game.battle.rangemin+=game.battle.rangeminstep;
@@ -381,11 +501,11 @@ function validatePuzzle2() {
 	} else {
 		game.stats.miss++;
 		if (game.stats.timer==0) {
-			game.stats.pv-=game.battle.timerhplose;
-			game.battle.dmg+=game.battle.timerhplose;
+			dmg=game.battle.timerhplose;
+			game.stats.pv-=dmg;
+			game.battle.dmg+=dmg;
 		}
 		else {
-			let dmg=0
 			switch (game.battle.symb) {
 			case "plus":
 				dmg=(game.battle.num1+game.battle.num2)-input;
@@ -408,24 +528,33 @@ function validatePuzzle2() {
 		game.battle.score=0;
 	}
 	game.stats.timer=game.stats.maxtimer-game.stats.timerDecay;
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay),timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),0,(validate?game.stats.clear:game.stats.clear+1),validate))
 	return validate
 }
 function validatePuzzlelvl() {
 	let validate = false;
+	let result = 0;
+	let dmg=0
+	let bonustime=0;
+	let timerB=0;
 	if (game.battle.negat) input=input*-1;
 	switch (game.battle.symb) {
 	case "plus":
-		if (game.battle.num1+game.battle.num2==input) validate=true;
+		result = game.battle.num1+game.battle.num2
+		if (result==input) validate=true;
 		break;
 	case "moins":
-		if (game.battle.num1-game.battle.num2==input) validate=true;
+		result = game.battle.num1-game.battle.num2
+		if (result==input) validate=true;
 		break;
 	case "mult":
-		if (game.battle.num1*game.battle.num2==input) validate=true;
+		result = game.battle.num1*game.battle.num2
+		if (result==input) validate=true;
 		break;
 	}
+	game.stats.inputT.push(game.stats.timeRep)
+	timerB=(game.stats.timer+game.stats.timeRep)/60;
 	if (validate) {
-		game.stats.inputT.push(game.stats.timeRep)
 		game.stats.combo++;
 		game.stats.clear++;
 		if (game.battle.gamemode!="boss")game.battle.left--;
@@ -443,16 +572,17 @@ function validatePuzzlelvl() {
 		game.stats.miss++;
 		if (game.stats.timer==0) {
 			if (game.stats.maxpv>0) {
-				game.stats.pv-=game.battle.timerhplose;
-				game.battle.dmg+=game.battle.timerhplose;
+				dmg=game.battle.timerhplose;
+				game.stats.pv-=dmg;
+				game.battle.dmg+=dmg;
 			}
 			if (game.stats.maxvies>0) {
+				dmg=1;
 				game.stats.vies--;
 				game.battle.dmg++;
 			}
 		}
 		else {
-			let dmg=0
 			switch (game.battle.symb) {
 			case "plus":
 				dmg=(game.battle.num1+game.battle.num2)-input;
@@ -470,6 +600,7 @@ function validatePuzzlelvl() {
 				game.battle.dmg+=dmg;
 			}
 			if (game.stats.maxvies>0) {
+				dmg=-1;
 				game.stats.vies--;
 				game.battle.dmg++;
 			}
@@ -480,9 +611,152 @@ function validatePuzzlelvl() {
 		game.stats.combo=0;
 		game.battle.score=0;
 	}
-	game.stats.timer=game.stats.maxtimer-game.stats.timerDecay;
+	bonustime=game.stats.maxtimer-game.stats.timerDecay;
+	game.stats.timer=bonustime;
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay),timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),(game.stats.maxtimer>0?bonustime/60:-1),(validate?game.stats.clear:game.stats.clear+1),validate))
 	return validate
 }
+function validatePuzzleArcade() {
+	let validate = false;
+	let result = 0;
+	let dmg=0;
+	let bonustime=0;
+	let timerB=0;
+	if (game.battle.negat) input=input*-1;
+	switch (game.battle.symb) {
+	case "plus":
+		result = game.battle.num1+game.battle.num2
+		if (result==input) validate=true;
+		break;
+	case "moins":
+		result = game.battle.num1-game.battle.num2
+		if (result==input) validate=true;
+		break;
+	case "mult":
+		result = game.battle.num1*game.battle.num2
+		if (result==input) validate=true;
+		break;
+	}
+	game.stats.inputT.push(game.stats.timeRep)
+	timerB=(game.stats.timer+game.stats.timeRep)/60;
+	if (validate) {
+		game.stats.combo++;
+		game.stats.clear++;
+		game.battle.arcade.clear++;
+		
+		let score = 200-game.stats.timeRep/(3+game.battle.arcade.level/5);
+		if (score<50) score=50;
+		score = Math.floor(score*checkCombo(game.stats.combo))
+		game.stats.score+= score;
+		game.battle.score= score;
+
+		if (game.battle.arcade.phase=="regen") {
+			if (game.battle.arcade.clear%10==0) {
+				game.battle.arcade.regenlvl++;
+				game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.regenlvl].level))
+			}
+			if (game.stats.vies==game.stats.maxvies) {
+				game.stats.timerDecay+=45;
+				if (game.stats.timerDecay>game.stats.maxtimer*0.8) game.stats.timerDecay=game.stats.maxtimer*0.8;
+			}
+			else {
+				game.battle.arcade.regen++;
+				if (game.battle.arcade.regen==10) {game.stats.vies++;game.battle.arcade.regen=0}
+			}
+		}
+		game.battle.arcade.phase=="normal"? bonustime = Math.floor(game.battle.arcade.gaintimer/100*game.stats.maxtimer): bonustime = game.stats.maxtimer-game.stats.timerDecay;
+		game.stats.timer+=bonustime;
+		if (game.stats.timer>game.stats.maxtimer) game.stats.timer=game.stats.maxtimer;
+		if (game.stats.timer>game.stats.maxtimer-game.stats.timerDecay) game.stats.timer=game.stats.maxtimer-game.stats.timerDecay;
+	} 
+	else {
+		game.stats.miss++;
+		game.battle.arcade.phase=="normal"? bonustime = Math.floor(game.battle.arcade.gaintimer/200*game.stats.maxtimer): bonustime = game.stats.maxtimer-game.stats.timerDecay;
+
+		game.stats.timer+=bonustime;
+		if (game.stats.timer>game.stats.maxtimer) game.stats.timer=game.stats.maxtimer;
+		if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
+		game.stats.combo=0;
+		game.battle.score=0;
+
+		if(game.battle.arcade.phase=="normal"){ game.stats.vies--}else {game.mainevent="switchmode";game.event="tonormal"}
+	}
+
+	game.stats.level.push(new statsoperation(
+		game.battle.num1,
+		game.battle.num2,
+		get_symb(game.battle.symb),
+		input,
+		result,
+		game.stats.timeRep/60,
+		dmg*-1,
+		get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),
+		get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay),
+		timerB,
+		get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),
+		bonustime/60,
+		(validate?game.stats.clear:game.stats.clear+1),
+		validate
+	))
+	return validate
+}
+function get_symb(symb){
+	switch(symb) {
+	case "plus":
+		return "+";
+		break;
+	case "moins":
+		return "-";
+		break;
+	case "mult":
+		return "x";
+		break;
+	default:
+		break;
+	}
+}
+function get_hp(modelife,modehp,life,hp){
+	if (modehp>0) {
+		return hp
+	}
+	else if (modelife>0){
+		return life
+	}
+	else {
+		return -1
+	}
+}
+function get_maxhp(maxlife,maxhp){
+	if (maxhp>0) {
+		return maxhp
+	}
+	else if (maxlife>0){
+		return maxlife
+	}
+	else {
+		return -1
+	}
+}
+function get_timer(maxtime,maxtimer,time,timer){
+	if (maxtime>0) {
+		return time/60
+	}
+	else if (maxtimer>0){
+		return timer/60
+	}
+	else {
+		return 0
+	}
+}
+function get_maxtimerdecay(maxtimer,decay){
+	if (maxtimer>0) {
+		return (Math.floor(maxtimer-decay))/60
+	}
+	else {
+		return 0
+	}
+}
+
 function drawPuzzle(){
 	c.textAlign="center";
 	game.inputType=="phone" ? c.font = '28px monospace': c.font = '30px monospace';
@@ -533,6 +807,7 @@ function returnMode(){
 		break;
 	}
 }
+
 function checkCombo(combo){
 	if (combo<5) {
 		return 1
@@ -573,6 +848,7 @@ function checkCombo(combo){
 		return 5
 	}
 }
+
 function calcAvgTResp(inputTab){
 	let avg = 0;
 	if (inputTab.length>0) {
@@ -587,7 +863,9 @@ function registerScore(score){
 	if (score>saves.levels[game.level.world][game.level.stage].score) {
 		saves.levels[game.level.world][game.level.stage].score=score;
 	}
+	saveUpdate()
 }
+
 function showbackground(){
 	if (game.option.bckgrndOpacity>0) {
 		if (anim.background.timer>0)anim.background.timer--;
@@ -644,9 +922,23 @@ function showbackground(){
 				}
 			}
 			break;
+		case 9:
+			if (anim.background.timer==0) {
+				anim.background.timer=8;
+				anim.background.stock.push(new bckgrnd10(Math.floor(Math.random()*4),Math.floor(Math.random()*12+14),Math.floor(Math.random()*5+10)))
+			}
+			if (anim.background.stock.length>0) {
+				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
+					anim.background.stock[i].update()
+					anim.background.stock[i].show()
+					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
+				}
+			}
+			break;
 		}
 	}
 }
+
 class bckgrnd1{
 	constructor(posX,spd,size,opa){
 		this.posX=posX;
@@ -770,6 +1062,87 @@ class bckgrnd4{
 		c.shadowBlur=0;
 	}
 }
+class bckgrnd10{
+	constructor(side,spd,size){
+		switch(side){
+		case 0:
+			this.posY=-50;
+			this.posX=Math.random()*(1.3-0.3)*Cw;
+			break;
+		case 1:
+			this.posX=Cw+50;
+			this.posY=Math.random()*(1.3-0.3)*Ch;
+			break;
+		case 2:
+			this.posY=Ch+50;
+			this.posX=Math.random()*(1.3-0.3)*Cw;
+			break;
+		case 3:
+			this.posX=-50;
+			this.posY=Math.random()*(1.3-0.3)*Ch;
+			break;
+		}
+		this.speed=spd;
+		this.size=size;
+		this.opacity=50;
+		this.destroy=false;
+	}
+	update(){
+		this.posX+=(Cw/2-this.posX)/(50-this.speed);
+		this.posY+=(Ch/2-this.posY)/(50-this.speed);
+		this.size/=1.05;
+		if (this.posX>Cw/2-10&&this.posX<Cw/2+10&&this.posY>Ch/2-10&&this.posY<Ch/2+10) {
+			this.destroy=true;
+		}
+	}
+	show(){
+		c.shadowColor="white";
+		c.shadowBlur=5;
+		c.globalAlpha=this.opacity/100*(game.option.bckgrndOpacity/100);
+		c.fillStyle= "white";
+		c.beginPath()
+		c.arc(this.posX,this.posY,this.size,0,Math.PI*2)
+		c.fill()
+		c.closePath()
+		c.shadowColor="";
+		c.shadowBlur=0;
+	}
+}
+
+class statsoperation{
+	constructor(num1,num2,optype,inputP,res,time,HPlost,HPleft,maxtimer,timerB,timerleft,bonustime,opleft,valide){
+		this.num1 = num1;
+		this.num2 = num2;
+		this.optype = optype;
+		this.inputP = inputP;
+		this.result = res;
+		this.timeResp = time;
+		this.HPlost = HPlost;
+		this.HPleft = HPleft;
+		this.maxtimer = maxtimer;
+		this.timerB = timerB;
+		this.timerleft = timerleft;
+		this.bonustime = bonustime;
+		this.opleft = opleft;
+		this.valide = valide;
+	}
+}
+
+function saveUpdate(){
+	localStorage.setItem("save",JSON.stringify(saves))
+}
+function optionsUpdate(){
+	localStorage.setItem("option",JSON.stringify(game.option))
+}
+
+function mirrorDraw(img,initx,inity,cropx,cropy,posx,posy,width,height){
+	c.save()
+	c.translate(c.width,0);
+	c.scale(-1,1)
+	c.drawImage(img,initx,inity,cropx,cropy,-posx,posy,width,height)
+	c.restore()
+}
+
 function errormsg(txt) {
 	c.fillStyle="white";
 	c.globalAlpha=1;

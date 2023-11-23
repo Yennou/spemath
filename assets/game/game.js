@@ -10,6 +10,11 @@ let canvasPosition = canvas.getBoundingClientRect();
 const mouse = {
 	x: canvas.width/2,
 	y: canvas.height/2,
+	prex: canvas.width/2,
+	prey: canvas.height/2,
+	down:false,
+	hasmove:false,
+	range:0,
 }
 const key = {
 	q:false,
@@ -22,9 +27,9 @@ const key = {
 	left:false,
 	cooldown : 0,
 	cooldownmax : 1,
-	pausecooldown : 0
+	pausecooldown : 0 
 };
-
+const version="BETA-1.4.0";
 const Cw= canvas.width, Ch= canvas.height;
 const game = {
 	screen : "loading",
@@ -69,7 +74,8 @@ const game = {
 		pv:0,
 		maxpv:0,
 		vies:0,
-		maxvies:0
+		maxvies:0,
+		level : [],
 	},
 	setbtl : {
 		mode:1,
@@ -103,6 +109,15 @@ const game = {
 		timerhplose:25,
 		skiptonext:false,
 		order:"",
+		arcade:{
+			level:0,
+			phase:"normal",
+			maxclear:0,
+			clear:0,
+			gaintimer:40,
+			regen:0,
+			regenlvl:0
+		}
 	},
 	level : {
 		world:1,
@@ -119,6 +134,11 @@ const anim = {
 	},
 	lowtimer:{
 		time:30,
+		mode:"alt"
+	},
+	regenbar: {
+		time:49,
+		invert:false,
 		mode:"alt"
 	},
 	perfect:{
@@ -144,6 +164,10 @@ const anim = {
 		type:3,
 		stock:[],
 		timer:0,
+	},
+	graph:{
+		init:0,
+		step:25
 	}
 }
 let input = 0;
@@ -170,7 +194,9 @@ const icon_operation= new Image();
 const icon_lt_life= new Image();
 const icon_lt_timer= new Image();
 const icon_lt_time= new Image();
+const icon_lt_op= new Image();
 const menu_lvl= new Image();
+const menu_arcade= new Image();
 const menu_time= new Image();
 const menu_life= new Image();
 const menu_opt= new Image();
@@ -179,9 +205,10 @@ const txt_perfect1= new Image();
 const txt_perfect2= new Image();
 const ui_hpbar= new Image();
 const ui_timerbar= new Image();
-const ui_timebar= new Image();
+const ui_timerbarprogress= new Image();
 const ui_timer= new Image();
 const ui_time= new Image();
+const ui_regen= new Image();
 const ui_lifebar1= new Image();
 const ui_lifebar3= new Image();
 const ui_lifebar5= new Image();
@@ -196,6 +223,9 @@ const lvlmap_level= new Image();
 const lvlmap_levelP= new Image();
 const lvlmap_center= new Image();
 const lvlmap_select= new Image();
+const frame_graph= new Image();
+const frame_stats= new Image();
+
 btl_plus.src = directory+"plus.png";
 btl_moins.src = directory+"moins.png";
 btl_mult.src = directory+"mult.png";
@@ -213,18 +243,22 @@ icon_operation.src = directory+"icon_operation.png";
 icon_lt_life.src = directory+"icon_lt_life.png";
 icon_lt_timer.src = directory+"icon_lt_timer.png";
 icon_lt_time.src = directory+"icon_lt_time.png";
+icon_lt_op.src = directory+"icon_lt_operation.png";
 menu_lvl.src = directory+"menu_level.png";
+menu_arcade.src = directory+"menu_arcade.png";
 menu_time.src = directory+"menu_time.png";
 menu_life.src = directory+"menu_life.png";
 menu_opt.src = directory+"menu_options.png";
 txt_perfect.src = directory+"txt_perfect.png";
 txt_perfect1.src = directory+"txt_perfect_layer1.png";
 txt_perfect2.src = directory+"txt_perfect_layer2.png";
+
 ui_hpbar.src = directory+"UI_hpbar.png";
 ui_timerbar.src = directory+"UI_timerbar.png";
-ui_timebar.src = directory+"UI_timebar.png";
+ui_timerbarprogress.src = directory+"UI_timerbarprogress.png";
 ui_timer.src = directory+"UI_timer.png";
 ui_time.src = directory+"UI_time.png";
+ui_regen.src = directory+"UI_regen.png";
 ui_lifebar1.src = directory+"UI_lifebar1.png";
 ui_lifebar3.src = directory+"UI_lifebar3.png";
 ui_lifebar5.src = directory+"UI_lifebar5.png";
@@ -232,13 +266,19 @@ ui_lifebar7.src = directory+"UI_lifebar7.png";
 ui_lifebar10.src = directory+"UI_lifebar10.png";
 ui_lifebar20.src = directory+"UI_lifebar20.png";
 ui_progressbar.src = directory+"UI_progressbar.png";
+
 btn_enter.src = directory+"btn_enter.png";
 btn_return.src = directory+"btn_return.png";
 btn_plusmoins.src = directory+"btn_plusmoins.png";
+
+frame_stats.src = directory+"frame_stats.png";
+frame_graph.src = directory+"frame_graph.png";
+
 lvlmap_level.src = directory+"lvlmap_level.png";
 lvlmap_levelP.src = directory+"lvlmap_levelP.png";
 lvlmap_center.src = directory+"lvlmap_center.png";
 lvlmap_select.src = directory+"lvlmap_select.png";
+
 function loopAnimation() {
 	if (key.cooldown>0) {key.cooldown--}
 	if (game.timer>0) {game.timer--}
@@ -263,6 +303,9 @@ function loopAnimation() {
 				c.closePath()
 				c.stroke()
 			} else {
+				if (localStorage.getItem("version")==null) {
+					localStorage.setItem("version",version)
+				}
 				game.screen="title";
 			}
 			break;
@@ -277,8 +320,8 @@ function loopAnimation() {
 					c.fillText("Spé Maths",Cw*0.5,Ch*0.35)
 					if (game.inputType=="keyboard") {
 						c.font = '22px monospace';
-						c.fillText("Contrôles :",Cw*0.2,Ch*0.66)
 						c.fillText("Commencer",Cw*0.5,Ch*0.58)
+						c.fillText("Contrôles :",Cw*0.2,Ch*0.66)
 						c.fillStyle="yellow";
 						c.textAlign="start";
 						c.fillText("Espace/ Entrée",Cw*0.1,Ch*0.72)
@@ -300,7 +343,7 @@ function loopAnimation() {
 					}
 					if (key.space) {
 						if(game.menu.target==1){
-							setmenu(4,"lr",0,0,0,0);
+							setmenu(5,"lr",0,0,0,0);
 							game.screen="hub";
 						}
 					}
@@ -324,7 +367,7 @@ function loopAnimation() {
 			c.font = '100px monospace';
 			c.fillText("<",Cw*0.25,Ch*0.55)
 			c.fillText(">",Cw*0.75,Ch*0.55)
-			game.inputType=="phone" ? c.font = '28px monospace': c.font = '26px monospace';
+			game.inputType=="phone" ? c.font = '32px monospace': c.font = '36px monospace';
 			switch (game.menu.target){
 			case 1:
 				c.drawImage(menu_lvl,Cw*0.5-75,Ch*0.25-75,150,150)
@@ -339,6 +382,17 @@ function loopAnimation() {
 				c.fillText("",Cw*0.05,Ch*0.89)
 				break;
 			case 2:
+				c.drawImage(menu_arcade,Cw*0.5-75,Ch*0.25-75,150,150)
+				c.fillText("Arcade",Cw*0.5,Ch*0.55)
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
+				c.textAlign="start";
+				c.fillStyle="white";
+				c.fillText("Mettez à l'épreuve votre puissance de",Cw*0.05,Ch*0.65)
+				c.fillText("calcul mental dans ce défi très difficile et",Cw*0.05,Ch*0.70)
+				c.fillText("atteignez des records en cumullant un maximum",Cw*0.05,Ch*0.75)
+				c.fillText("de points.",Cw*0.05,Ch*0.80)
+				break;
+			case 3:
 				c.drawImage(menu_time,Cw*0.5-75,Ch*0.25-75,150,150)
 				c.fillText("Survi Temps",Cw*0.5,Ch*0.55)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
@@ -350,7 +404,7 @@ function loopAnimation() {
 				c.fillText("pour chaque bonne réponse.",Cw*0.05,Ch*0.82)
 				c.fillText("Idéal pour faire une partie personnalisée.",Cw*0.05,Ch*0.89)
 				break;
-			case 3:
+			case 4:
 				c.drawImage(menu_life,Cw*0.5-75,Ch*0.25-75,150,150)
 				c.fillText("Survi Vies",Cw*0.5,Ch*0.55)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
@@ -362,7 +416,7 @@ function loopAnimation() {
 				c.fillText("atteignez des sommets avec le cumul des résultats.",Cw*0.05,Ch*0.82)
 				c.fillText("Un bon entrainement pour garder le fil.",Cw*0.05,Ch*0.89)
 				break;
-			case 4:
+			case 5:
 				c.drawImage(menu_opt,Cw*0.5-75,Ch*0.25-75,150,150)
 				c.fillText("Options",Cw*0.5,Ch*0.55)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
@@ -397,17 +451,25 @@ function loopAnimation() {
 						game.event="select";
 						break;
 					case 2:
+						setmenu(4,"lr",0,0,0,0);
+						game.screen="modeArcade";
+						game.mainevent="first";
+						game.event="";
+						break;
+					case 3:
 						setmenu(4,"lr",0.065,0.43,0.23,0);
 						game.screen="mode1";
 						game.mainevent="first";
+						game.event="";
 						break;
-					case 3:
+					case 4:
 						setmenu(3,"lr",0.165,0.43,0.23,0);
 						game.screen="mode2";
 						game.mainevent="first";
-						if (game.battle.mult) game.battle.mult=false;
+						game.event="";
+						if (game.battle.mult) {game.battle.mult=false;game.battle.symbnum--}
 						break;				
-					case 4:
+					case 5:
 						setmenu(4,"ud",0.045,0.46,0,0.1,4);
 						game.screen="options";
 						game.mainevent="menu";
@@ -485,14 +547,14 @@ function loopAnimation() {
 					anim.decaybar.time=39;
 				}
 				if (anim.decaybar.time==0||anim.decaybar.time==40) anim.decaybar.invert=!anim.decaybar.invert;
-				c.fillRect(Cw*0.35,Ch*0.285,Cw*0.5*0.12,Ch*0.125)
+				c.fillRect(Cw*0.35,Ch*0.285,Cw*0.5*0.12,Ch*0.113)
 				c.fillStyle="red"
 				c.globalAlpha=0.2+anim.lowtimer.time/50;
-				c.fillRect(Cw*0.35,Ch*0.285,Cw*0.5*0.12,Ch*0.125)
+				c.fillRect(Cw*0.35,Ch*0.285,Cw*0.5*0.12,Ch*0.113)
 				c.globalAlpha=1;
 				c.fillStyle="red";
 				c.globalAlpha=0.3+anim.decaybar.time/80;
-				c.fillRect(Cw*0.577,Ch*0.285,Cw*0.07,Ch*0.08)
+				c.fillRect(Cw*0.577,Ch*0.285,Cw*0.07,Ch*0.072)
 				c.globalAlpha=1;
 				c.drawImage(ui_timerbar,Cw*0.5-101,Ch*0.275,202,72)
 				c.fillStyle="white";
@@ -555,7 +617,7 @@ function loopAnimation() {
 						game.mainevent="select";
 						break;
 					case 4:
-						setmenu(4,"lr",0,0,0,0,4);
+						setmenu(5,"lr",0,0,0,0,5);
 						game.screen="hub";
 						game.mainevent="";
 						game.event="";
@@ -563,7 +625,7 @@ function loopAnimation() {
 					}
 				}
 				if (key.d) {
-					setmenu(4,"lr",0,0,0,0,4);
+					setmenu(6,"lr",0,0,0,0,6);
 					game.screen="hub";
 					game.mainevent="";
 					game.event="";
@@ -618,10 +680,12 @@ function loopAnimation() {
 					case 1:
 						anim.lowtimer.mode="fix";
 						anim.decaybar.mode="fix";
+						anim.regenbar.mode="fix";
 						break;
 					case 2:
 						anim.lowtimer.mode="alt";
 						anim.decaybar.mode="alt";
+						anim.regenbar.mode="alt";
 						break;
 					}
 					if (key.d||key.space) {
@@ -633,6 +697,228 @@ function loopAnimation() {
 				break;
 			default:
 				errormsg("Mainevent error !")
+				break;
+			}
+			break;
+		case "scoreboard":
+
+			break;
+		case "modeArcade":
+			showbackground()
+			c.fillStyle="white";
+			c.globalAlpha=1;
+			c.textAlign="center";
+			c.font = '30px monospace';
+			c.fillText("> Mode Arcade <",Cw*0.5,Ch*0.15)
+			if (game.inputType=="keyboard") {
+				movemenu()
+			} else {
+				c.globalAlpha=0.15;
+				c.fillRect(Cw*0.01,Ch*0.02,Cw*0.285,Ch*0.1)
+				c.globalAlpha=1;
+				c.textAlign="start";
+				c.font = '20px monospace';
+				c.fillText("Retour au menu",Cw*0.02,Ch*0.08)
+			}
+			switch (game.mainevent){
+			case "first":
+				c.textAlign="start";
+				game.inputType=="phone"? c.font = '27px monospace':c.font = '30px monospace';
+				c.fillText("Difficulté :",Cw*0.15,Ch*0.45)
+				c.textAlign="center";
+				c.font = '80px monospace';
+				c.fillText("<",Cw*0.3,Ch*0.62)
+				c.fillText(">",Cw*0.7,Ch*0.62)
+				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
+				if (game.inputType=="phone") c.fillText("Suiv.",Cw*0.86,Ch*0.6);
+				switch (game.menu.target) {
+				case 1:
+					c.fillText("Très facile",Cw*0.5,Ch*0.6)
+					game.setbtl.dif=2;
+					game.battle.mode="very-easy";
+					break;
+				case 2:
+					c.fillText("Facile",Cw*0.5,Ch*0.6)
+					game.setbtl.dif=1.5;
+					game.battle.mode="easy";
+					break;
+				case 3:
+					c.fillText("Normal",Cw*0.5,Ch*0.6)
+					game.setbtl.dif=1;
+					game.battle.mode="normal";
+					break;
+				case 4:
+					c.fillText("Difficile",Cw*0.5,Ch*0.6)
+					game.setbtl.dif=0.7;
+					game.battle.mode="hard";
+					break;
+				}
+				
+				if (game.inputType=="phone") {
+					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.64,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.76,Ch*0.535,Cw*0.2,Ch*0.1)
+				}
+				if (key.d) {
+					setmenu(5,"lr",0,0,0,0,2);
+					game.screen="hub";
+					game.mainevent="";
+				}
+				if (key.space) {
+					setmenu(2,"lr",0.05,0.605,0.31,0,2);
+					game.mainevent="second";
+					game.event="ready";
+				}
+				c.globalAlpha=1;
+				c.textAlign="start";
+				c.font = '22px monospace';
+				switch (game.battle.mode){
+				case "very-easy":
+					c.fillText("Temps maximum : 16 secondes",Cw*0.25,Ch*0.83)
+					break;
+				case "easy":
+					c.fillText("Temps maximum : 14 secondes",Cw*0.25,Ch*0.83)
+					break;
+				case "normal":
+					c.fillText("Temps maximum : 12 secondes",Cw*0.25,Ch*0.83)
+					break;
+				case "hard":
+					c.fillText("Temps maximum : 12 secondes",Cw*0.25,Ch*0.83)
+					break;
+				}
+				break;
+			case "second":
+				c.textAlign="start";
+				game.inputType=="phone"? c.font = '24px monospace':c.font = '26px monospace';
+				c.fillText("Difficulté :",Cw*0.03,Ch*0.37)
+				switch (game.setbtl.dif) {
+				case 2:
+					c.fillText("Très facile",Cw*0.3,Ch*0.37)
+					break;
+				case 1.5:
+					c.fillText("facile",Cw*0.3,Ch*0.37)
+					break;
+				case 1:
+					c.fillText("Normal",Cw*0.3,Ch*0.37)
+					break;
+				case 0.7:
+					c.fillText("Difficile",Cw*0.3,Ch*0.37)
+					break;
+				}
+				c.drawImage(icon_lt_life,Cw*0.6,Ch*0.195,50,50)
+				c.fillText("5 vies",Cw*0.72,Ch*0.27)
+				c.drawImage(icon_lt_timer,Cw*0.6,Ch*0.29,50,50)
+				switch (game.battle.mode){
+				case "very-easy":
+					c.fillText("16 sec.",Cw*0.72,Ch*0.37)
+					break;
+				case "easy":
+					c.fillText("14 sec.",Cw*0.72,Ch*0.37)
+					break;
+				case "normal":
+					c.fillText("12 sec.",Cw*0.72,Ch*0.37)
+					break;
+				case "hard":
+					c.fillText("12 sec.",Cw*0.72,Ch*0.37)
+					break;
+				}
+				
+				c.textAlign="center";
+				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
+				c.font = '42px monospace';
+				c.fillText("Jouer",Cw*0.5,Ch*0.65)
+				c.font = '30px monospace';
+				c.fillText("Retour",Cw*0.18,Ch*0.65)
+				break;
+			default:
+				errormsg("Mainevent error")
+				break;
+			}
+			c.globalAlpha=1;
+			c.textAlign="start";
+			c.font = '22px monospace';
+			
+			c.globalAlpha=0.6;
+			if (game.inputType=="keyboard") {
+				c.fillText("- Valider",Cw*0.32,Ch*0.9)
+				c.fillText("- Retour",Cw*0.8,Ch*0.9)
+				c.fillText("- Déplacer",Cw*0.58,Ch*0.96)
+				c.fillStyle="yellow";
+				c.fillText("Espace/ Entrée",Cw*0.05,Ch*0.9)
+				c.fillText("D/ Rtr.Arrière",Cw*0.52,Ch*0.9)
+				c.fillText("Flèche directionnel",Cw*0.2,Ch*0.96)
+			}
+			else {
+				c.fillText("Appuyez pour faire vos choix",Cw*0.24,Ch*0.9)
+			}
+			switch (game.event){
+			case "":
+				break;
+			case "ready":
+				if (game.inputType=="phone") {
+					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.07,Ch*0.57,Cw*0.22,Ch*0.12)
+					c.fillRect(Cw*0.37,Ch*0.55,Cw*0.26,Ch*0.14)
+				}
+				else {
+					c.globalAlpha=1;
+					showcursor()
+				}
+				if (key.d) {
+					setmenu(4,"lr",0,0,0,0);
+					game.mainevent="first";
+					game.event="";
+				}
+				if (key.space) {
+					switch (game.menu.target){
+					case 1:
+						setmenu(4,"lr",0,0,0,0);
+						game.mainevent="first";
+						game.event="";
+						break;
+					case 2:
+						game.event="transition";
+						game.timer=7;
+						break;
+					}
+				}
+				break;
+			case "transition":
+				c.fillStyle="rgb(240,240,240)";
+				c.globalAlpha=0.7;
+				c.fillRect(Cw*0.5-Cw*(0.5*((7-game.timer)/7)),Ch*0.5,Cw*((7-game.timer)/7),5)
+				if (game.timer==0) {
+					game.event="transition2";
+					game.timer=25;
+				}
+				break;
+			case "transition2":
+				c.fillStyle="rgb(240,240,240)";
+				c.globalAlpha=0.7+0.3*((25-game.timer)/25);
+				c.fillRect(0,Ch*0.5-Ch*(0.5*(25-game.timer)/25),Cw,5+Ch*((25-game.timer)/25))
+				if (game.timer==0) {
+					game.event="transition3";
+					game.timer=30;
+				}
+				break;
+			case "transition3":
+				c.globalAlpha=1;;
+				c.fillStyle="rgb(240,240,240)";
+				c.fillRect(0,0,Cw,Ch)
+				if (game.timer==0) {
+					game.screen="arcade";
+					game.battle.gamemode="arcade";
+					game.mainevent="starting";
+					game.event="set";
+					game.timer=60;
+					anim.background.type=Math.floor(Math.random()*4);
+					anim.lvltransition.time=100;
+					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
+				}
+				break;
+			default:
+				errormsg("Event error !")
 				break;
 			}
 			break;
@@ -730,7 +1016,7 @@ function loopAnimation() {
 					game.menu.target=2;
 				}
 				if (key.d) {
-					setmenu(4,"lr",0,0,0,0,2);
+					setmenu(5,"lr",0,0,0,0,3);
 					game.screen="hub";
 					game.mainevent=""
 				}
@@ -798,19 +1084,19 @@ function loopAnimation() {
 				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
 				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
 				game.battle.mult ? c.drawImage(icon_multON,Cw*0.4,Ch*0.2,50,50): c.drawImage(icon_mult,Cw*0.4,Ch*0.2,50,50);
-				c.fillText("Format :",Cw*0.5,Ch*0.27)
+				c.fillText("Format :",Cw*0.6,Ch*0.27)
 				switch (game.battle.numopp) {
 				case 1:
-					c.fillText(">1<",Cw*0.7,Ch*0.27)
+					c.fillText(">1<",Cw*0.8,Ch*0.27)
 					break;
 				case 2:
-					c.fillText(">2<",Cw*0.7,Ch*0.27)
+					c.fillText(">2<",Cw*0.8,Ch*0.27)
 					break;
 				case 3:
-					c.fillText(">3<",Cw*0.7,Ch*0.27)
+					c.fillText(">3<",Cw*0.8,Ch*0.27)
 					break;
 				case 4:
-					c.fillText(">4<",Cw*0.7,Ch*0.27)
+					c.fillText(">4<",Cw*0.8,Ch*0.27)
 					break;
 				}
 				game.inputType=="phone"? c.font = '27px monospace':c.font = '30px monospace';
@@ -868,19 +1154,19 @@ function loopAnimation() {
 				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
 				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
 				game.battle.mult ? c.drawImage(icon_multON,Cw*0.4,Ch*0.2,50,50): c.drawImage(icon_mult,Cw*0.4,Ch*0.2,50,50);
-				c.fillText("Format :",Cw*0.5,Ch*0.27)
+				c.fillText("Format :",Cw*0.6,Ch*0.27)
 				switch (game.battle.numopp) {
 				case 1:
-					c.fillText(">1<",Cw*0.7,Ch*0.27)
+					c.fillText(">1<",Cw*0.8,Ch*0.27)
 					break;
 				case 2:
-					c.fillText(">2<",Cw*0.7,Ch*0.27)
+					c.fillText(">2<",Cw*0.8,Ch*0.27)
 					break;
 				case 3:
-					c.fillText(">3<",Cw*0.7,Ch*0.27)
+					c.fillText(">3<",Cw*0.8,Ch*0.27)
 					break;
 				case 4:
-					c.fillText(">4<",Cw*0.7,Ch*0.27)
+					c.fillText(">4<",Cw*0.8,Ch*0.27)
 					break;
 				}
 				c.fillText("Difficulté :",Cw*0.03,Ch*0.37)
@@ -898,6 +1184,8 @@ function loopAnimation() {
 					c.fillText("Difficile",Cw*0.3,Ch*0.37)
 					break;
 				}
+				c.drawImage(icon_lt_timer,Cw*0.6,Ch*0.29,50,50)
+					c.fillText((Math.floor(20*game.setbtl.mode*game.setbtl.chif*game.setbtl.dif))+" sec. MAX",Cw*0.72,Ch*0.37)
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
 				c.font = '42px monospace';
@@ -915,7 +1203,13 @@ function loopAnimation() {
 			c.globalAlpha=1;
 			c.textAlign="start";
 			c.font = '22px monospace';
-			c.fillText("Temps maximum : "+(Math.floor(20*mult*multn*multd))+" secondes",Cw*0.25,Ch*0.83)
+			switch (game.mainevent){
+			case "first":
+			case "second":
+			case "third":
+				c.fillText("Temps maximum : "+(Math.floor(20*mult*multn*multd))+" secondes",Cw*0.25,Ch*0.83)
+				break;
+			}
 			c.globalAlpha=0.6;
 			if (game.inputType=="keyboard") {
 				c.fillText("- Valider",Cw*0.32,Ch*0.9)
@@ -1076,14 +1370,14 @@ function loopAnimation() {
 				}
 				if (key.down) {
 					key.down=false;
-					game.menu.target=4;
+					game.menu.target=3;
 				}
 				if (key.up) {
 					key.up=false;
 					game.menu.target=2;
 				}
 				if (key.d) {
-					setmenu(4,"lr",0,0,0,0,3);
+					setmenu(5,"lr",0,0,0,0,4);
 					game.screen="hub";
 					game.event=""
 				}
@@ -1124,7 +1418,15 @@ function loopAnimation() {
 					game.battle.mode="hard";
 					break;
 				}
-				
+				c.textAlign="start";
+				c.font = '22px monospace';
+				if (game.battle.mode=="very-easy"||game.battle.mode=="easy") {
+					c.fillText("Temps maximum : 10 secondes",Cw*0.25,Ch*0.83)
+				} else if (game.battle.mode=="normal") {
+					c.fillText("Temps maximum : 9 secondes",Cw*0.25,Ch*0.83)
+				} else {
+					c.fillText("Temps maximum : 8 secondes",Cw*0.25,Ch*0.83)
+				}
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
 					c.fillRect(Cw*0.04,Ch*0.535,Cw*0.2,Ch*0.1)
@@ -1163,8 +1465,23 @@ function loopAnimation() {
 					c.fillText("Difficile",Cw*0.3,Ch*0.37)
 					break;
 				}
-				c.drawImage(icon_life,Cw*0.5,Ch*0.2,50,50)
-				c.fillText("100 PV",Cw*0.62,Ch*0.27)
+				c.drawImage(icon_lt_life,Cw*0.6,Ch*0.195,50,50)
+				c.fillText("100 PV",Cw*0.72,Ch*0.27)
+				c.drawImage(icon_lt_timer,Cw*0.6,Ch*0.29,50,50)
+				switch (game.battle.mode){
+				case "very-easy":
+					c.fillText("10 sec.",Cw*0.72,Ch*0.37)
+					break;
+				case "easy":
+					c.fillText("10 sec.",Cw*0.72,Ch*0.37)
+					break;
+				case "normal":
+					c.fillText("9 sec.",Cw*0.72,Ch*0.37)
+					break;
+				case "hard":
+					c.fillText("8 sec.",Cw*0.72,Ch*0.37)
+					break;
+				}
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
 				c.font = '42px monospace';
@@ -1179,13 +1496,6 @@ function loopAnimation() {
 			c.globalAlpha=1;
 			c.textAlign="start";
 			c.font = '22px monospace';
-			if (game.battle.mode=="very-easy"||game.battle.mode=="easy") {
-				c.fillText("Temps maximum : 10 secondes",Cw*0.25,Ch*0.83)
-			} else if (game.battle.mode=="normal") {
-				c.fillText("Temps maximum : 9 secondes",Cw*0.25,Ch*0.83)
-			} else {
-				c.fillText("Temps maximum : 8 secondes",Cw*0.25,Ch*0.83)
-			}
 			c.globalAlpha=0.6;
 			if (game.inputType=="keyboard") {
 				c.fillText("- Valider",Cw*0.32,Ch*0.9)
@@ -1278,6 +1588,7 @@ function loopAnimation() {
 				c.globalAlpha=0.15;
 				c.fillRect(Cw*0.07,Ch*0.81,Cw*0.22,Ch*0.13)
 				c.fillRect(Cw*0.34,Ch*0.82,Cw*0.32,Ch*0.14)
+				//c.fillRect(Cw*0.7,Ch*0.81,Cw*0.23,Ch*0.13)
 				if (game.menu.target>1) {
 					c.fillRect(Cw*0.25,Ch*0.34,Cw*0.12,Ch*0.2)
 				}
@@ -1291,6 +1602,7 @@ function loopAnimation() {
 			c.fillText("Jouer",Cw*0.5,Ch*0.92)
 			c.font = '30px monospace';
 			c.fillText("Retour",Cw*0.18,Ch*0.9)
+			//c.fillText("Détails",Cw*0.82,Ch*0.9)
 			c.font = '24px monospace';
 			c.textAlign="start";
 			c.fillText("Record :",Cw*0.05,Ch*0.65)
@@ -1435,7 +1747,7 @@ function loopAnimation() {
 						game.event="selected"
 					}
 					if (key.d) {
-						setmenu(4,"lr",0,0,0,0);
+						setmenu(5,"lr",0,0,0,0);
 						game.screen="hub";
 						game.mainevent="";
 						game.event=""
@@ -1535,14 +1847,14 @@ function loopAnimation() {
 			c.fillText(game.stats.clear,Cw*0.5,Ch*0.17)
 			c.font = '30px monospace';
 			c.textAlign="start";
-			c.fillRect(Cw*0.118,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
+			c.drawImage(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.timer/game.stats.maxtimer),ui_timerbarprogress.height,Cw*0.119,Ch*0.096,Cw*0.293*(game.stats.timer/game.stats.maxtimer),Ch*0.117)
 			c.fillStyle="red";
 			c.globalAlpha=0.3+anim.decaybar.time/80;
-			if (game.battle.gamemode=="survival-timer") c.fillRect(Cw*0.413-Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.1,Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.113);
-			if (game.battle.gamemode=="survival-life") c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.113);
+			if (game.battle.gamemode=="survival-timer") c.fillRect(Cw*0.413-Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.1,Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.072);
+			if (game.battle.gamemode=="survival-life") c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
 			if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
 				c.globalAlpha=0.2+anim.lowtimer.time/50;
-				c.fillRect(Cw*0.118,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
+				c.fillRect(Cw*0.119,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
 			}
 			c.globalAlpha=1;
 			c.fillStyle="white";
@@ -1581,55 +1893,60 @@ function loopAnimation() {
 					c.fillRect(0,0,Cw,Ch)
 					game.stats.pv=0;
 					game.stats.timer=0;
-					switch (game.setbtl.dif){
-					case 2:
-						game.stats.maxpv=100;
-						game.stats.maxtimer=600;
-						game.battle.rangemin=3;
-						game.battle.rangemax=8;
-						game.battle.rangeminstep=0.3;
-						game.battle.rangemaxstep=0.75;
-						game.battle.regen=5;
-						game.battle.regenstep=3;
-						game.battle.decaystep=20;
-						game.battle.timerhplose=25;
-						break;
-					case 1.5:
-						game.stats.maxpv=100;
-						game.stats.maxtimer=600;
-						game.battle.rangemin=5;
-						game.battle.rangemax=15;
-						game.battle.rangeminstep=0.35;
-						game.battle.rangemaxstep=0.9;
-						game.battle.regen=5;
-						game.battle.regenstep=5;
-						game.battle.decaystep=20;
-						game.battle.timerhplose=25;
-						break;
-					case 1:
-						game.stats.maxpv=100;
-						game.stats.maxtimer=540;
-						game.battle.rangemin=7;
-						game.battle.rangemax=20;
-						game.battle.rangeminstep=0.6;
-						game.battle.rangemaxstep=1.3;
-						game.battle.regen=3;
-						game.battle.regenstep=5;
-						game.battle.decaystep=30;
-						game.battle.timerhplose=50;
-						break;
-					case 0.7:
-						game.stats.maxpv=100;
-						game.stats.maxtimer=480;
-						game.battle.rangemin=9;
-						game.battle.rangemax=25;
-						game.battle.rangeminstep=1.1;
-						game.battle.rangemaxstep=1.7;
-						game.battle.regen=1;
-						game.battle.regenstep=3;
-						game.battle.decaystep=30;
-						game.battle.timerhplose=80;
-						break;
+					if (game.battle.gamemode=="survival-life") {
+						switch (game.setbtl.dif){
+						case 2: 			//très facile
+							game.stats.maxpv=100;
+							game.stats.maxtimer=600;
+							game.battle.rangemin=3;
+							game.battle.rangemax=8;
+							game.battle.rangeminstep=0.3;
+							game.battle.rangemaxstep=0.75;
+							game.battle.regen=5;
+							game.battle.regenstep=3;
+							game.battle.decaystep=20;
+							game.battle.timerhplose=25;
+							break;
+						case 1.5: 			//facile
+							game.stats.maxpv=100;
+							game.stats.maxtimer=600;
+							game.battle.rangemin=5;
+							game.battle.rangemax=15;
+							game.battle.rangeminstep=0.35;
+							game.battle.rangemaxstep=0.9;
+							game.battle.regen=5;
+							game.battle.regenstep=5;
+							game.battle.decaystep=20;
+							game.battle.timerhplose=25;
+							break;
+						case 1: 			//normal
+							game.stats.maxpv=100;
+							game.stats.maxtimer=540;
+							game.battle.rangemin=7;
+							game.battle.rangemax=20;
+							game.battle.rangeminstep=0.6;
+							game.battle.rangemaxstep=1.3;
+							game.battle.regen=3;
+							game.battle.regenstep=5;
+							game.battle.decaystep=30;
+							game.battle.timerhplose=50;
+							break;
+						case 0.7: 			//difficile
+							game.stats.maxpv=100;
+							game.stats.maxtimer=480;
+							game.battle.rangemin=9;
+							game.battle.rangemax=25;
+							game.battle.rangeminstep=1.1;
+							game.battle.rangemaxstep=1.7;
+							game.battle.regen=1;
+							game.battle.regenstep=3;
+							game.battle.decaystep=30;
+							game.battle.timerhplose=80;
+							break;
+						}
+					}
+					else if (game.battle.gamemode=="survival-timer"){
+						game.stats.maxtimer=(Math.floor(20*game.setbtl.mode*game.setbtl.chif*game.setbtl.dif))*60;
 					}
 					game.event="fadeout";
 					break;
@@ -1861,7 +2178,7 @@ function loopAnimation() {
 			case "exit":
 				c.fillStyle="black";
 				c.globalAlpha=0.8;
-				c.fillRect(0,Ch*0.05,Cw,Ch)
+				c.fillRect(0,0,Cw,Ch)
 				c.globalAlpha=1;
 				c.fillStyle="white";
 				c.textAlign="center";
@@ -1904,7 +2221,7 @@ function loopAnimation() {
 			case "exitgame":
 				c.fillStyle="black";
 				c.globalAlpha=0.8;
-				c.fillRect(0,Ch*0.05,Cw,Ch)
+				c.fillRect(0,0,Cw,Ch)
 				c.globalAlpha=1;
 				c.fillStyle="white";
 				c.textAlign="center";
@@ -1931,7 +2248,7 @@ function loopAnimation() {
 					c.fillRect(0,0,Cw,Ch)
 					if (game.timer==0) {
 						resetStats()
-						setmenu(4,"lr",0,0,0,0);
+						setmenu(6,"lr",0,0,0,0,3);
 						game.screen="hub";
 						game.mainevent="";
 						game.event="fadeout";
@@ -1981,7 +2298,7 @@ function loopAnimation() {
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
 						game.timer=20;
-						setmenu(2,"lr",0.17,0.82,0.27,0);
+						setmenu(3,"lr",0.11,0.82,0.25,0);
 					}
 					break;
 				case "finpop":
@@ -2033,14 +2350,16 @@ function loopAnimation() {
 					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
 					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+" sec",Cw*0.13,Ch*0.68)
 					c.fillText("Durée de la partie : "+ShowTimerRes(game.stats.timeTot)+" sec",Cw*0.13,Ch*0.75)
-					c.fillText("Rejouer",Cw*0.22,Ch*0.86)
-					c.fillText("Retour au menu",Cw*0.5,Ch*0.86)
+					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
+					c.fillText("Continuer",Cw*0.4,Ch*0.86)
+					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
 					switch (game.event){
 					case "finpop":
 						if (game.inputType=="phone") {
 							c.globalAlpha = 0.15*(1-game.timer/20);
-							c.fillRect(Cw*0.185,Ch*0.785,Cw*0.21,Ch*0.12)
-							c.fillRect(Cw*0.46,Ch*0.785,Cw*0.34,Ch*0.12)
+							c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
+							c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
+							c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
 						}
 						else {
 							movemenu()
@@ -2049,22 +2368,19 @@ function loopAnimation() {
 								switch (game.menu.target){
 								case 1:
 									resetStats()
-									switch (game.battle.gamemode) {
-									case "survival-timer":
-										game.mainevent="starting";
-										game.event="transition";
-										game.timer=20;
-										break;
-									case "survival-life":
-										game.mainevent="starting";
-										game.event="set";
-										game.timer=20;
-										break;
-									}
+									game.mainevent="starting";
+									game.event="set";
+									game.timer=20;
 									break;
 								case 2:
 									game.event="transition2";
 									game.timer=50;
+									break;
+								case 3:
+									game.mainevent="stats";
+									game.event="global";
+									setmenu(game.stats.level.length,"ud",0,0,0,0);
+									game.menu.target=game.stats.level.length;
 									break;
 								}
 							}
@@ -2085,7 +2401,7 @@ function loopAnimation() {
 						c.globalAlpha=1;
 						c.fillRect(0,0,Cw,Ch)
 						if (game.timer==0) {
-							setmenu(4,"lr",0,0,0,0,2);
+							setmenu(6,"lr",0,0,0,0,3);
 							game.screen="hub";
 							game.mainevent="";
 							game.event="fadeout";
@@ -2099,6 +2415,260 @@ function loopAnimation() {
 				default:
 					errormsg("event error !")
 					break;
+				}
+				break;
+			case "stats":
+				c.fillStyle="black";
+				c.globalAlpha = 0.92;
+				c.fillRect(0,0,canvas.width,canvas.height)
+				if (game.inputType=="phone") {
+					c.fillStyle="white";
+					c.globalAlpha = 0.15;
+					c.fillRect(Cw*0.27,Ch*0.145,Cw*0.08,Ch*0.11)
+					c.fillRect(Cw*0.65,Ch*0.145,Cw*0.08,Ch*0.11)
+					c.fillRect(Cw*0.77,Ch*0.15,Cw*0.2,Ch*0.1)
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.globalAlpha=1;
+					c.fillText("Retour",Cw*0.87,Ch*0.22)
+				}
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.font = '32px monospace';
+				c.textAlign="center";
+				c.fillText("Statistiques de performance",Cw*0.5,Ch*0.125)
+				movemenu()
+				switch(game.event){
+				case "global":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<       Global   >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_op,Cw*0.375,Ch*0.16,40,40)
+					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
+					c.textAlign="start";
+					c.fillText("N°    Opération        Résultat       Temps",Cw*0.07,Ch*0.3)
+					let j=0;
+					if (game.stats.level.length>0) {
+						for (let i=game.menu.target-1; i < game.menu.target+9; i++) {
+							if (i<game.stats.level.length&&i>=0) {
+								c.textAlign="center";
+								game.stats.level[i].opleft!=j ? c.fillText(game.stats.level[i].opleft ,Cw*0.085,Ch*0.43+Ch*0.055*(i-game.menu.target)):c.fillText("|",Cw*0.085,Ch*0.43+Ch*0.055*(i-game.menu.target));
+								j=game.stats.level[i].opleft;
+								c.fillText(game.stats.level[i].num1 ,Cw*0.22,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillText(game.stats.level[i].optype ,Cw*0.3,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillText(game.stats.level[i].num2 ,Cw*0.38,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								game.stats.level[i].valide ?  c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+								c.fillText(game.stats.level[i].inputP ,Cw*0.532,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillStyle="white";
+								if (!game.stats.level[i].valide) {
+									c.textAlign="start";
+									c.fillText("->  "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								}
+								c.textAlign="end";
+								c.fillText(Math.floor(game.stats.level[i].timeResp*100)/100+"s",Cw*0.95,Ch*0.43+Ch*0.055*(i-game.menu.target))
+							}
+						}
+					}
+					else {
+						c.textAlign="center";
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_stats,Cw*0.025,Ch*0.31,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.035,Ch*0.33,Cw*0.93,Ch*0.055)
+					if (key.left) {
+						game.event="temps";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="vies";
+						key.right=false;
+					}
+					break;
+				case "vies":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<        Vies    >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_life,Cw*0.375,Ch*0.16,40,40)
+					let maxHP=get_maxhp(game.stats.maxvies,game.stats.maxpv);
+					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
+						anim.graph.init--;
+					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
+						anim.graph.init++;
+					}
+					if (maxHP>0 && game.stats.level.length>0) {
+						c.font = '20px monospace';
+						c.fillText(maxHP,Cw*0.045,Ch*0.32)
+						c.fillText(0,Cw*0.045,Ch*0.82)
+						c.fillText(anim.graph.init,Cw*0.085,Ch*0.85)
+						c.strokeStyle="grey";
+						c.lineWidth=1;
+						c.globalAlpha=0.5;
+						for (let i = 0; i < anim.graph.step; i++) {
+							c.strokeRect(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1),Ch*0.8-Ch*0.515,1,Ch*0.515)
+						}
+						c.fillStyle="white";
+						c.strokeStyle="red";
+						c.lineWidth=3;
+						c.globalAlpha=1;
+						c.beginPath()
+						c.lineTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].HPleft/maxHP))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].HPleft/maxHP))
+								if (i == anim.graph.init+anim.graph.step-1||i==game.stats.level.length-1) c.fillText((i+1),Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.85);
+							}
+						}
+						c.stroke()
+						c.strokeStyle="white";
+						c.lineWidth=1;
+						c.fillStyle="red";
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].HPleft/maxHP),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.textAlign="center";
+						c.fillStyle="white";
+						c.fillText("N°",Cw*0.12,Ch*0.91)
+						c.fillText("PV restant",Cw*0.27,Ch*0.91)
+						c.fillText("PV perdu",Cw*0.47,Ch*0.91)
+						c.fillText("Temps Réponse/Restant",Cw*0.75,Ch*0.91)
+						c.fillText(game.stats.level[game.menu.target-1].opleft ,Cw*0.12,Ch*0.955)
+						c.fillText(game.stats.level[game.menu.target-1].HPleft ,Cw*0.27,Ch*0.955)
+						game.stats.level[game.menu.target-1].valide ?  c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+						c.fillText(game.stats.level[game.menu.target-1].HPlost ,Cw*0.47,Ch*0.955)
+						c.fillStyle="white";
+						c.textAlign="end";
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timeResp*100)/100+"s",Cw*0.75,Ch*0.955)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerleft*100)/100+"s",Cw*0.92,Ch*0.955)
+					}
+					else {
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_graph,Cw*0.025,Ch*0.24,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.08,Ch*0.87,Cw*0.87,Ch*0.1)
+					if (key.left) {
+						game.event="global";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="temps";
+						key.right=false;
+					}
+					break;
+				case "temps":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<       Temps    >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_time,Cw*0.375,Ch*0.16,40,40)
+					let maxTimer=game.stats.maxtimer/60;
+					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
+						anim.graph.init--;
+					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
+						anim.graph.init++;
+					}
+					if (maxTimer>0 && game.stats.level.length>0) {
+						c.font = '20px monospace';
+						c.fillText(maxTimer+"s",Cw*0.045,Ch*0.32)
+						c.fillText(0,Cw*0.045,Ch*0.82)
+						c.fillText(anim.graph.init,Cw*0.085,Ch*0.85)
+						c.strokeStyle="grey";
+						c.lineWidth=1;
+						c.globalAlpha=0.5;
+						for (let i = 0; i < anim.graph.step; i++) {
+							c.strokeRect(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1),Ch*0.8-Ch*0.515,1,Ch*0.515)
+						}
+						c.fillStyle="white";
+						c.lineWidth=3;
+						c.globalAlpha=1;
+						c.strokeStyle="rgb(38, 183, 255)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].maxtimer/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].maxtimer/maxTimer))
+								if (i == anim.graph.init+anim.graph.step-1||i==game.stats.level.length-1) c.fillText((i+1),Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.85);
+							}
+						}
+						c.stroke()
+						c.strokeStyle="rgb(80, 80, 255)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timerB/maxTimer))
+							}
+						}
+						c.stroke()
+						c.strokeStyle="rgb(75, 214, 71)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timeResp/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timeResp/maxTimer))
+							}
+						}
+						c.stroke()
+						c.strokeStyle="white";
+						c.fillStyle="rgb(80, 80, 255)";
+						c.lineWidth=1;
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].timerB/maxTimer),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.fillStyle="rgb(75, 214, 71)";
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].timeResp/maxTimer),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.textAlign="center";
+						c.fillStyle="rgb(38, 183, 255)";
+						c.fillText("Temps Max.",Cw*0.26,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].maxtimer*100)/100+"s" ,Cw*0.26,Ch*0.955)
+						c.fillStyle="rgb(80, 80, 255)";
+						c.fillText("Action",Cw*0.41,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerB*100)/100+"s" ,Cw*0.41,Ch*0.955)
+						c.fillStyle="rgb(75, 214, 71)";
+						c.fillText("Réponse",Cw*0.54,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timeResp*100)/100+"s",Cw*0.54,Ch*0.955)
+						c.fillStyle="white";
+						c.fillText("N°",Cw*0.12,Ch*0.91)
+						c.fillText("Temps Bonus/Restant",Cw*0.77,Ch*0.91)
+						c.fillText(game.stats.level[game.menu.target-1].opleft ,Cw*0.12,Ch*0.955)
+						c.textAlign="end";
+						game.stats.level[game.menu.target-1].valide ?  c.fillStyle ="white": c.fillStyle="rgb(217, 38, 22)";
+						game.stats.level[game.menu.target-1].bonustime==0 ? c.fillStyle ="rgb(50, 50, 50)":null;
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].bonustime*100)/100+"s",Cw*0.79,Ch*0.955)
+						game.stats.level[game.menu.target-1].timerleft==game.stats.level[game.menu.target-1].maxtimer ?  c.fillStyle ="rgb(237, 216, 24)": c.fillStyle="white";
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerleft*100)/100+"s",Cw*0.93,Ch*0.955)
+					}
+					else {
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_graph,Cw*0.025,Ch*0.24,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.08,Ch*0.87,Cw*0.87,Ch*0.1)
+					if (key.left) {
+						game.event="vies";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="global";
+						key.right=false;
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				if (key.d) {
+					game.mainevent="gameover";
+					game.event="finpop";
+					setmenu(3,"lr",0.11,0.82,0.25,0,3);
 				}
 				break;
 			default:
@@ -2165,13 +2735,13 @@ function loopAnimation() {
 			c.font = '30px monospace';
 			c.textAlign="start";
 			if (game.stats.maxtimer>0) {
-				c.fillRect(Cw*0.118,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
+				c.drawImage(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.timer/game.stats.maxtimer),ui_timerbarprogress.height,Cw*0.119,Ch*0.096,Cw*0.293*(game.stats.timer/game.stats.maxtimer),Ch*0.117)
 				c.fillStyle="red";
 				c.globalAlpha=0.3+anim.decaybar.time/80;
-				if (game.battle.decaystep>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.113);
+				if (game.battle.decaystep>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
 				if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
 					c.globalAlpha=0.2+anim.lowtimer.time/50;
-					c.fillRect(Cw*0.118,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
+					c.fillRect(Cw*0.119,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
 				}
 				c.globalAlpha=1;
 				c.fillStyle="white";
@@ -2179,21 +2749,21 @@ function loopAnimation() {
 				c.drawImage(ui_timerbar,Cw*0.11,Ch*0.09,202,72)
 			}
 			if (game.stats.maxtime>0) {
-				c.fillRect(Cw*0.611+Cw*0.289*(1-game.stats.time/game.stats.maxtime),Ch*0.1,Cw*0.289*(game.stats.time/game.stats.maxtime),Ch*0.113)
+				mirrorDraw(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.time/game.stats.maxtime),ui_timerbarprogress.height,Cw*0.88,Ch*0.096,Cw*0.293*(game.stats.time/game.stats.maxtime),Ch*0.117)
 				c.fillStyle="red";
 				c.globalAlpha=0.3+anim.decaybar.time/80;
 				if (game.stats.time<=game.stats.maxtime*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
 					c.globalAlpha=0.2+anim.lowtimer.time/50;
-					c.fillRect(Cw*0.611+Cw*0.289*(1-game.stats.time/game.stats.maxtime),Ch*0.1,Cw*0.289*(game.stats.time/game.stats.maxtime),Ch*0.113)
+					c.fillRect(Cw*0.59+Cw*0.29*(1-game.stats.time/game.stats.maxtime),Ch*0.1,Cw*0.289*(game.stats.time/game.stats.maxtime),Ch*0.113)
 				}
 				c.globalAlpha=1;
 				c.fillStyle="white";
-				c.drawImage(ui_time,Cw*0.9,Ch*0.09,60,60)
-				c.drawImage(ui_timebar,Cw*0.6,Ch*0.09,202,72)
+				c.drawImage(ui_time,Cw*0.895,Ch*0.09,60,60)
+				mirrorDraw(ui_timerbar,0,0,ui_timerbar.width,ui_timerbar.height,Cw*0.89,Ch*0.09,202,72)
 			}
 			c.textAlign="end";
 			if (game.stats.maxtimer>0) c.fillText(ShowTimer(game.stats.timer),Cw*0.4,Ch*0.226);
-			if (game.stats.maxtime>0) c.fillText(ShowTimer(game.stats.time),Cw*0.775,Ch*0.226);
+			if (game.stats.maxtime>0) c.fillText(ShowTimer(game.stats.time),Cw*0.75,Ch*0.226);
 			c.globalAlpha = 0.2;
 			c.fillText("00000000",Cw*0.225,Ch*0.83)
 			c.globalAlpha = 1;
@@ -2552,7 +3122,7 @@ function loopAnimation() {
 			case "exit":
 				c.fillStyle="black";
 				c.globalAlpha=0.8;
-				c.fillRect(0,Ch*0.05,Cw,Ch)
+				c.fillRect(0,0,Cw,Ch)
 				c.globalAlpha=1;
 				c.fillStyle="white";
 				c.textAlign="center";
@@ -2595,7 +3165,7 @@ function loopAnimation() {
 			case "exitgame":
 				c.fillStyle="black";
 				c.globalAlpha=0.8;
-				c.fillRect(0,Ch*0.05,Cw,Ch)
+				c.fillRect(0,0,Cw,Ch)
 				c.globalAlpha=1;
 				c.fillStyle="white";
 				c.textAlign="center";
@@ -2672,7 +3242,7 @@ function loopAnimation() {
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
 						game.timer=20;
-						setmenu(2,"lr",0.17,0.46,0.27,0);
+						setmenu(3,"lr",0.11,0.82,0.25,0);
 					}
 					break;
 				case "finpop":
@@ -2690,26 +3260,26 @@ function loopAnimation() {
 					c.fillText("Niveau "+game.level.world+"-"+game.level.stage,Cw*0.5,Ch*0.3)
 					c.textAlign="start";
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
-
-					c.fillText("Rejouer",Cw*0.22,Ch*0.5)
-					c.fillText("Retour au menu",Cw*0.5,Ch*0.5)
-					
+					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
+					c.fillText("Continuer",Cw*0.4,Ch*0.86)
+					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
 					break;
 				}
 				switch (game.event){
 				case "finpop":
 					if (game.inputType=="phone") {
 						c.globalAlpha = 0.15*(1-game.timer/20);
-						c.fillRect(Cw*0.185,Ch*0.425,Cw*0.21,Ch*0.12)
-						c.fillRect(Cw*0.46,Ch*0.425,Cw*0.34,Ch*0.12)
+						c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
+						c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
+						c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
 					}
 					else {
 						movemenu()
 						showcursor()
 						if (key.space) {
-							resetStats()
 							switch (game.menu.target){
 							case 1:
+								resetStats()
 								game.mainevent="starting";
 								game.event="set";
 								game.timer=20;
@@ -2717,6 +3287,13 @@ function loopAnimation() {
 							case 2:
 								game.event="transition2";
 								game.timer=50;
+								break;
+							case 3:
+								game.prevevent="gameover";
+								game.mainevent="stats";
+								game.event="global";
+								setmenu(game.stats.level.length,"ud",0,0,0,0);
+								game.menu.target=game.stats.level.length;
 								break;
 							}
 						}
@@ -2838,6 +3415,7 @@ function loopAnimation() {
 					if (game.timer==0) {
 						if ((game.stats.maxvies>0&&game.stats.vies==game.stats.maxvies)||(game.stats.maxpv>0&&game.stats.pv==game.stats.maxpv)&&game.stats.miss==0) {
 							saves.levels[game.level.world][game.level.stage].perfect=true;
+							saveUpdate()
 							game.mainevent="perfect";
 							game.event="init"
 						}
@@ -2856,7 +3434,7 @@ function loopAnimation() {
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
 						game.timer=20;
-						setmenu(2,"lr",0.17,0.82,0.27,0);
+						setmenu(3,"lr",0.11,0.82,0.25,0);
 					}
 					break;
 				case "finpop":
@@ -2882,25 +3460,9 @@ function loopAnimation() {
 					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
 					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+"sec",Cw*0.13,Ch*0.68)
 					c.fillText("Durée de la partie : "+ShowTimerRes(game.stats.timeTot)+"sec",Cw*0.13,Ch*0.75)
-					c.fillText("Rejouer",Cw*0.22,Ch*0.86)
-					c.fillText("Continuer",Cw*0.52,Ch*0.86)
-					if (game.inputType=="keyboard") {
-						movemenu()
-						showcursor()
-						if (key.space) {
-							switch (game.menu.target){
-							case 1:
-								game.mainevent="starting";
-								game.event="set";
-								game.timer=20;
-								break;
-							case 2:
-								game.event="transition2";
-								game.timer=50;
-								break;
-							}
-						}
-					}
+					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
+					c.fillText("Continuer",Cw*0.4,Ch*0.86)
+					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
 					break;
 				default:
 					errormsg("event error !")
@@ -2909,16 +3471,17 @@ function loopAnimation() {
 				case "finpop":
 					if (game.inputType=="phone") {
 						c.globalAlpha = 0.15*(1-game.timer/20);
-						c.fillRect(Cw*0.185,Ch*0.785,Cw*0.21,Ch*0.12)
-						c.fillRect(Cw*0.46,Ch*0.785,Cw*0.3,Ch*0.12)
+						c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
+						c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
+						c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
 					}
 					else {
 						movemenu()
 						showcursor()
 						if (key.space) {
-							resetStats()
 							switch (game.menu.target){
 							case 1:
+								resetStats()
 								game.mainevent="starting";
 								game.event="set";
 								game.timer=20;
@@ -2926,6 +3489,13 @@ function loopAnimation() {
 							case 2:
 								game.event="transition2";
 								game.timer=50;
+								break;
+							case 3:
+								game.prevevent="finish";
+								game.mainevent="stats";
+								game.event="global";
+								setmenu(game.stats.level.length,"ud",0,0,0,0);
+								game.menu.target=game.stats.level.length;
 								break;
 							}
 						}
@@ -2957,6 +3527,260 @@ function loopAnimation() {
 					break;
 				}
 				break;
+			case "stats":
+				c.fillStyle="black";
+				c.globalAlpha = 0.92;
+				c.fillRect(0,0,canvas.width,canvas.height)
+				if (game.inputType=="phone") {
+					c.fillStyle="white";
+					c.globalAlpha = 0.15;
+					c.fillRect(Cw*0.27,Ch*0.145,Cw*0.08,Ch*0.11)
+					c.fillRect(Cw*0.65,Ch*0.145,Cw*0.08,Ch*0.11)
+					c.fillRect(Cw*0.77,Ch*0.15,Cw*0.2,Ch*0.1)
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.globalAlpha=1;
+					c.fillText("Retour",Cw*0.87,Ch*0.22)
+				}
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.font = '32px monospace';
+				c.textAlign="center";
+				c.fillText("Statistiques de performance",Cw*0.5,Ch*0.125)
+				movemenu()
+				switch(game.event){
+				case "global":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<       Global   >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_op,Cw*0.375,Ch*0.16,40,40)
+					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
+					c.textAlign="start";
+					c.fillText("N°    Opération        Résultat       Temps",Cw*0.07,Ch*0.3)
+					let j=0;
+					if (game.stats.level.length>0) {
+						for (let i=game.menu.target-1; i < game.menu.target+9; i++) {
+							if (i<game.stats.level.length) {
+								c.textAlign="center";
+								game.stats.level[i].opleft!=j ? c.fillText(game.stats.level[i].opleft ,Cw*0.085,Ch*0.43+Ch*0.055*(i-game.menu.target)):c.fillText("|",Cw*0.085,Ch*0.43+Ch*0.055*(i-game.menu.target));
+								j=game.stats.level[i].opleft;
+								c.fillText(game.stats.level[i].num1 ,Cw*0.22,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillText(game.stats.level[i].optype ,Cw*0.3,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillText(game.stats.level[i].num2 ,Cw*0.38,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								game.stats.level[i].valide ?  c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+								c.fillText(game.stats.level[i].inputP ,Cw*0.532,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillStyle="white";
+								if (!game.stats.level[i].valide) {
+									c.textAlign="start";
+									c.fillText("->  "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								}
+								c.textAlign="end";
+								c.fillText(Math.floor(game.stats.level[i].timeResp*100)/100+"s",Cw*0.95,Ch*0.43+Ch*0.055*(i-game.menu.target))
+							}
+						}
+					}
+					else {
+						c.textAlign="center";
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_stats,Cw*0.025,Ch*0.31,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.035,Ch*0.33,Cw*0.93,Ch*0.055)
+					if (key.left) {
+						game.event="temps";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="vies";
+						key.right=false;
+					}
+					break;
+				case "vies":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<        Vies    >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_life,Cw*0.375,Ch*0.16,40,40)
+					let maxHP=get_maxhp(game.stats.maxvies,game.stats.maxpv);
+					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
+						anim.graph.init--;
+					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
+						anim.graph.init++;
+					}
+					if (maxHP>0 && game.stats.level.length>0) {
+						c.font = '20px monospace';
+						c.fillText(maxHP,Cw*0.045,Ch*0.32)
+						c.fillText(0,Cw*0.045,Ch*0.82)
+						c.fillText(anim.graph.init,Cw*0.085,Ch*0.85)
+						c.strokeStyle="grey";
+						c.lineWidth=1;
+						c.globalAlpha=0.5;
+						for (let i = 0; i < anim.graph.step; i++) {
+							c.strokeRect(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1),Ch*0.8-Ch*0.515,1,Ch*0.515)
+						}
+						c.fillStyle="white";
+						c.strokeStyle="red";
+						c.lineWidth=3;
+						c.globalAlpha=1;
+						c.beginPath()
+						c.lineTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].HPleft/maxHP))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].HPleft/maxHP))
+								if (i == anim.graph.init+anim.graph.step-1||i==game.stats.level.length-1) c.fillText((i+1),Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.85);
+							}
+						}
+						c.stroke()
+						c.strokeStyle="white";
+						c.lineWidth=1;
+						c.fillStyle="red";
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].HPleft/maxHP),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.textAlign="center";
+						c.fillStyle="white";
+						c.fillText("N°",Cw*0.12,Ch*0.91)
+						c.fillText("PV restant",Cw*0.27,Ch*0.91)
+						c.fillText("PV perdu",Cw*0.47,Ch*0.91)
+						c.fillText("Temps Réponse/Restant",Cw*0.75,Ch*0.91)
+						c.fillText(game.stats.level[game.menu.target-1].opleft ,Cw*0.12,Ch*0.955)
+						c.fillText(game.stats.level[game.menu.target-1].HPleft ,Cw*0.27,Ch*0.955)
+						game.stats.level[game.menu.target-1].valide ?  c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+						c.fillText(game.stats.level[game.menu.target-1].HPlost ,Cw*0.47,Ch*0.955)
+						c.fillStyle="white";
+						c.textAlign="end";
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timeResp*100)/100+"s",Cw*0.75,Ch*0.955)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerleft*100)/100+"s",Cw*0.92,Ch*0.955)
+					}
+					else {
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_graph,Cw*0.025,Ch*0.24,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.08,Ch*0.87,Cw*0.87,Ch*0.1)
+					if (key.left) {
+						game.event="global";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="temps";
+						key.right=false;
+					}
+					break;
+				case "temps":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<       Temps    >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_time,Cw*0.375,Ch*0.16,40,40)
+					let maxTimer=game.stats.maxtimer/60;
+					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
+						anim.graph.init--;
+					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
+						anim.graph.init++;
+					}
+					if (maxTimer>0 && game.stats.level.length>0) {
+						c.font = '20px monospace';
+						c.fillText(maxTimer+"s",Cw*0.045,Ch*0.32)
+						c.fillText(0,Cw*0.045,Ch*0.82)
+						c.fillText(anim.graph.init,Cw*0.085,Ch*0.85)
+						c.strokeStyle="grey";
+						c.lineWidth=1;
+						c.globalAlpha=0.5;
+						for (let i = 0; i < anim.graph.step; i++) {
+							c.strokeRect(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1),Ch*0.8-Ch*0.515,1,Ch*0.515)
+						}
+						c.fillStyle="white";
+						c.lineWidth=3;
+						c.globalAlpha=1;
+						c.strokeStyle="rgb(38, 183, 255)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].maxtimer/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].maxtimer/maxTimer))
+								if (i == anim.graph.init+anim.graph.step-1||i==game.stats.level.length-1) c.fillText((i+1),Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.85);
+							}
+						}
+						c.stroke()
+						c.strokeStyle="rgb(80, 80, 255)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timerB/maxTimer))
+							}
+						}
+						c.stroke()
+						c.strokeStyle="rgb(75, 214, 71)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timeResp/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timeResp/maxTimer))
+							}
+						}
+						c.stroke()
+						c.strokeStyle="white";
+						c.fillStyle="rgb(80, 80, 255)";
+						c.lineWidth=1;
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].timerB/maxTimer),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.fillStyle="rgb(75, 214, 71)";
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].timeResp/maxTimer),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.textAlign="center";
+						c.fillStyle="rgb(38, 183, 255)";
+						c.fillText("Temps Max.",Cw*0.26,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].maxtimer*100)/100+"s" ,Cw*0.26,Ch*0.955)
+						c.fillStyle="rgb(80, 80, 255)";
+						c.fillText("Action",Cw*0.41,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerB*100)/100+"s" ,Cw*0.41,Ch*0.955)
+						c.fillStyle="rgb(75, 214, 71)";
+						c.fillText("Réponse",Cw*0.54,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timeResp*100)/100+"s",Cw*0.54,Ch*0.955)
+						c.fillStyle="white";
+						c.fillText("N°",Cw*0.12,Ch*0.91)
+						c.fillText("Temps Bonus/Restant",Cw*0.77,Ch*0.91)
+						c.fillText(game.stats.level[game.menu.target-1].opleft ,Cw*0.12,Ch*0.955)
+						c.textAlign="end";
+						game.stats.level[game.menu.target-1].valide ?  c.fillStyle ="white": c.fillStyle="rgb(217, 38, 22)";
+						game.stats.level[game.menu.target-1].bonustime==0 ? c.fillStyle ="rgb(50, 50, 50)":null;
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].bonustime*100)/100+"s",Cw*0.79,Ch*0.955)
+						game.stats.level[game.menu.target-1].timerleft==game.stats.level[game.menu.target-1].maxtimer ?  c.fillStyle ="rgb(237, 216, 24)": c.fillStyle="white";
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerleft*100)/100+"s",Cw*0.93,Ch*0.955)
+					}
+					else {
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_graph,Cw*0.025,Ch*0.24,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.08,Ch*0.87,Cw*0.87,Ch*0.1)
+					if (key.left) {
+						game.event="vies";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="global";
+						key.right=false;
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				if (key.d) {
+					game.prevevent=="finish"?game.mainevent="finish":game.mainevent="gameover";
+					game.event="finpop";
+					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+				}
+				break;
 			default:
 				errormsg("mainevent error !")
 				break;
@@ -2966,6 +3790,874 @@ function loopAnimation() {
 			c.textAlign="start";
 			c.font = '20px monospace';
 			c.fillText("Niveau "+game.level.world+"-"+game.level.stage,Cw*0.02,Ch*0.04)
+			break;
+		case "arcade":
+			showbackground()
+			RTAtimer()
+			anim.operation.invert ? anim.operation.time++:anim.operation.time--;
+			if (anim.operation.time==0||anim.operation.time==60) anim.operation.invert=!anim.operation.invert;
+			if (anim.decaybar.mode=="alt") {
+				anim.decaybar.invert ? anim.decaybar.time++:anim.decaybar.time--;
+			}else {
+				anim.decaybar.time=40;
+			}
+			if (anim.decaybar.time==0||anim.decaybar.time==40) anim.decaybar.invert=!anim.decaybar.invert;
+			if (game.stats.timer<=game.stats.maxtimer*0.2 && anim.lowtimer.mode=="alt") {
+				anim.lowtimer.time>0 ? anim.lowtimer.time--:anim.lowtimer.time=30;
+			}else {
+				anim.lowtimer.time=30;
+			}
+
+			if (anim.regenbar.mode=="alt") {
+				anim.regenbar.invert ? anim.regenbar.time++:anim.regenbar.time--;
+			}else {
+				anim.regenbar.time=50;
+			}
+			if (anim.regenbar.time==0||anim.regenbar.time==50) anim.regenbar.invert=!anim.regenbar.invert;
+			c.fillStyle="white";
+			c.globalAlpha=1;
+			c.font = '26px monospace';
+			c.textAlign="start";
+			c.fillText("Score :",Cw*0.03,Ch*0.77)
+			c.font = '20px monospace';
+			c.textAlign="center";
+			game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
+			game.battle.arcade.phase=="normal"?c.fillText("Correct",Cw*0.5,Ch*0.08):c.fillText("Bonus",Cw*0.5,Ch*0.08);
+			c.globalAlpha=0.15;
+			c.fillStyle="white";
+			c.fillRect(Cw*0.035,Ch*0.875,120,40)
+			c.globalAlpha=0.6;
+			c.font = '26px monospace';
+			c.fillText("Pause",Cw*0.125,Ch*0.94)
+			c.globalAlpha=1;
+			c.font = '40px monospace';
+			game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
+			game.battle.arcade.phase=="normal"?c.fillText(game.stats.clear,Cw*0.5,Ch*0.17):c.fillText(game.battle.arcade.clear,Cw*0.5,Ch*0.17);
+			c.font = '30px monospace';
+			c.textAlign="start";
+			if (game.stats.maxtimer>0) {
+				c.drawImage(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.timer/game.stats.maxtimer),ui_timerbarprogress.height,Cw*0.119,Ch*0.096,Cw*0.293*(game.stats.timer/game.stats.maxtimer),Ch*0.117)
+				c.fillStyle="red";
+				c.globalAlpha=0.3+anim.decaybar.time/80;
+				if (game.battle.decaystep>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
+				if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
+					c.globalAlpha=0.2+anim.lowtimer.time/50;
+					c.fillRect(Cw*0.119,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
+				}
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.drawImage(ui_timer,Cw*0.01,Ch*0.09,60,60)
+				c.drawImage(ui_timerbar,Cw*0.11,Ch*0.09,202,72)
+			}
+			game.battle.arcade.phase=="normal"?mirrorDraw(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.battle.arcade.clear/game.battle.arcade.maxclear),ui_timerbarprogress.height,Cw*0.88,Ch*0.096,Cw*0.293*(game.battle.arcade.clear/game.battle.arcade.maxclear),Ch*0.117):mirrorDraw(ui_timerbarprogress,0,0,ui_timerbarprogress.width,ui_timerbarprogress.height,Cw*0.88,Ch*0.096,Cw*0.293,Ch*0.117);
+			c.globalAlpha=1;
+			c.fillStyle="white";
+			c.drawImage(ui_regen,Cw*0.9,Ch*0.09,60,60)
+			mirrorDraw(ui_timerbar,0,0,ui_timerbar.width,ui_timerbar.height,Cw*0.89,Ch*0.09,202,72)
+			c.fillText("Niv.:"+(game.battle.arcade.level+1),Cw*0.585,Ch*0.226);
+			c.textAlign="end";
+			if (game.stats.maxtimer>0) c.fillText(ShowTimer(game.stats.timer),Cw*0.4,Ch*0.226);
+			c.globalAlpha = 0.2;
+			c.fillText("00000000",Cw*0.225,Ch*0.83)
+			c.globalAlpha = 1;
+			c.fillText(game.stats.score,Cw*0.225,Ch*0.83)
+			c.textAlign="start";
+			c.globalAlpha=1;
+			if (game.stats.maxvies>0) {
+				if (game.battle.arcade.phase=="regen") {
+					c.globalAlpha=0.4+anim.regenbar.time/100;
+					c.fillStyle ="rgb(75, 214, 71)"
+					c.fillRect(Cw*0.268,Ch*0.867,Cw*0.474*((game.stats.vies+game.battle.arcade.regen/10)/game.stats.maxvies),Ch*0.08)
+				}
+				c.globalAlpha=0.5;
+				c.fillStyle="red";
+				c.fillRect(Cw*0.268+Cw*0.474*(game.stats.vies/game.stats.maxvies),Ch*0.867,Cw*0.474*(game.battle.dmg/game.stats.maxvies),Ch*0.08)
+				game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
+				c.globalAlpha=1;
+				c.fillRect(Cw*0.268,Ch*0.867,Cw*0.474*(game.stats.vies/game.stats.maxvies),Ch*0.08)
+				switch (game.stats.maxvies) {
+				case 1:
+					c.drawImage(ui_lifebar1,Cw*0.255,Ch*0.75,Cw*0.5,94)
+					break;
+				case 3:
+					c.drawImage(ui_lifebar3,Cw*0.255,Ch*0.75,Cw*0.5,94)
+					break;
+				case 5:
+					c.drawImage(ui_lifebar5,Cw*0.255,Ch*0.75,Cw*0.5,94)
+					break;
+				case 7:
+					c.drawImage(ui_lifebar7,Cw*0.255,Ch*0.75,Cw*0.5,94)
+					break;
+				case 10:
+					c.drawImage(ui_lifebar10,Cw*0.255,Ch*0.75,Cw*0.5,94)
+					break;
+				case 20:
+					c.drawImage(ui_lifebar20,Cw*0.255,Ch*0.75,Cw*0.5,94)
+					break;
+				}
+				c.textAlign="center";
+				game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
+				c.fillText(Math.floor(game.stats.vies),Cw*0.5,Ch*0.848)
+			}
+			c.fillStyle="white";
+			c.font = '28px monospace';
+			c.textAlign="start";
+			if (game.stats.combo>4) c.fillText("COMBO "+game.stats.combo,Cw*0.11,Ch*0.35);
+			if (game.stats.combo>9) c.fillText("x "+checkCombo(game.stats.combo),Cw*0.115,Ch*0.4);
+
+			switch (game.mainevent){
+			case "starting":
+				switch (game.event){
+				case "set":
+					c.fillStyle="rgb(240,240,240)";
+					c.globalAlpha=1;
+					c.fillRect(0,0,Cw,Ch)
+					game.stats.vies=0;
+					game.stats.timer=0;
+					switch (game.setbtl.dif){
+					case 2:
+						game.stats.maxvies=5;
+						game.stats.maxtimer=960;
+						game.battle.arcade.level=0;
+						break;
+					case 1.5:
+						game.stats.maxvies=5;
+						game.stats.maxtimer=840;
+						game.battle.arcade.level=0;
+						break;
+					case 1:
+						game.stats.maxvies=5;
+						game.stats.maxtimer=720;
+						game.battle.arcade.level=1;
+						break;
+					case 0.7:
+						game.stats.maxvies=5;
+						game.stats.maxtimer=720;
+						game.battle.arcade.level=2;
+						break;
+					}
+					
+					game.battle.arcade.phase="normal";
+					game.battle.arcade.maxclear=arcade[game.battle.arcade.level].maxclear;
+					game.battle.arcade.clear=0;
+					game.battle.arcade.gaintimer=40;
+					game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.level].level))
+					game.event="fadeout";
+					break;
+				case "fadeout":
+					anim.lvltransition.time--;
+					c.fillStyle="rgb(240,240,240)";
+					c.globalAlpha=anim.lvltransition.time/100;
+					c.fillRect(0,0,Cw,Ch)
+					if (anim.lvltransition.time<=0) {
+						game.event="transition";
+						game.timer=20
+					}
+					break;
+				case "transition":
+					if (game.timer==0) {
+						if (game.stats.vies<game.stats.maxvies) {
+							game.stats.vies+=game.stats.maxvies/40;
+							if (game.stats.vies>game.stats.maxvies) game.stats.vies=game.stats.maxvies;
+						}
+						if (game.stats.timer<game.stats.maxtimer) {
+							game.stats.timer+=game.stats.maxtimer/40;
+							if (game.stats.timer>game.stats.maxtimer) game.stats.timer=game.stats.maxtimer;
+						}
+						if (game.stats.pv==game.stats.maxpv&&game.stats.vies==game.stats.maxvies&&game.stats.timer==game.stats.maxtimer) {
+							game.battle.dmg=0;
+							game.event="attention";
+							game.timer=20
+						}
+					}
+					break;
+				case "attention":
+					c.textAlign="center";
+					c.font = '30px monospace';
+					c.fillText("Prêt ?",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
+					if (game.timer==0) {
+						game.timer=50;
+						game.event="pret"
+					}
+					break;
+				case "pret":
+					c.textAlign="center";
+					c.font = '30px monospace';
+					c.fillText("Prêt ?",Cw*0.5,Ch*0.5)
+					if (game.timer==0) {
+						game.timer=20;
+						game.event="partez"
+					}
+					break;
+				case "partez":
+					c.textAlign="center";
+					c.font = '30px monospace';
+					c.fillText("Prêt ?",Cw*(0.5+0.6*(1-game.timer/20)),Ch*0.5)
+					c.fillText("PARTEZ !",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
+					if (game.timer==0) {
+						game.timer=20;
+						game.event="start"
+					}
+					break;
+				case "start":
+					c.textAlign="center";
+					c.font = '30px monospace';
+					c.fillText("PARTEZ !",Cw*0.5,Ch*0.5)
+					if (game.timer==0) {
+						game.event="";
+						game.mainevent="play";
+						generatePuzzleArcade()
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				if (key.p) {
+					game.prevevent=game.mainevent;
+					game.mainevent="pause";
+					game.prevtimer=game.timer;
+					game.timer=40;
+				}
+				break;
+			case "switchmode":
+				switch(game.event){
+				case "toregen":
+					game.battle.arcade.phase="regen";
+					anim.background.type=9;
+					anim.lvltransition.time=100;
+					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
+					game.battle.arcade.clear=0;
+					game.battle.arcade.maxclear=999;
+					game.battle.arcade.regen=0;
+					game.battle.arcade.regenlvl=game.battle.arcade.level-2;
+					if (game.battle.arcade.regenlvl<0) game.battle.arcade.regenlvl=0;
+					game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.level].level))
+					game.event="fadeout";
+					break;
+				case "tonormal":
+					game.battle.arcade.phase="normal";
+					anim.background.type=Math.floor(Math.random()*4);
+					anim.lvltransition.time=60;
+					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
+					game.battle.arcade.clear=0;
+					game.battle.arcade.regen=0;
+					game.battle.arcade.level++;
+					game.battle.arcade.gaintimer+=5;
+					game.stats.timerDecay=0;
+					game.stats.timer=Math.floor(game.stats.maxtimer*0.8);
+					game.battle.arcade.maxclear=arcade[game.battle.arcade.level].maxclear;
+					game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.level].level))
+					game.event="fadeout";
+					break;
+				case "fadeout":
+					anim.lvltransition.time--;
+					c.fillStyle="rgb(240,240,240)";
+					c.globalAlpha=anim.lvltransition.time/60;
+					c.fillRect(0,0,Cw,Ch)
+					if (anim.lvltransition.time<=0) {
+						game.event="";
+						game.mainevent="play";
+						input=0;
+						generatePuzzleArcade()
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				if (key.p) {
+					game.prevevent=game.mainevent;
+					game.mainevent="pause";
+					game.prevtimer=game.timer;
+					game.timer=40;
+				}
+				break;
+			case "play":
+				if (game.battle.dmg>0) game.battle.dmg--;
+				if (game.stats.timer>0) game.stats.timer--;
+				if (game.stats.time>0) game.stats.time--;
+				game.stats.timeRep++;
+				c.textAlign="center";
+				c.font = '32px monospace';
+				c.fillStyle="white";
+				c.font = '40px monospace';
+				game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+				drawPuzzle()
+				inputPlayer()
+				if (game.stats.timer<=0) {
+					game.stats.timer=0;
+					game.mainevent="wait";
+					game.event="calc";
+					game.timer=25;
+				}
+				if (game.stats.vies<=0) {
+					game.stats.vies=0;
+					game.mainevent="gameover";
+					game.event="begin";
+					game.timer=100;
+				}
+				if (key.space) {
+					game.mainevent="wait";
+					game.event="calc";
+				}
+				if (key.p) {
+					game.prevevent=game.mainevent;
+					game.mainevent="pause";
+					game.prevtimer=game.timer;
+					game.timer=40;
+				}
+				break;
+			case "wait":
+				drawPuzzle()
+				c.textAlign="center";
+				c.font = '32px monospace';
+				switch(game.event){
+				case "calc":
+					pass =validatePuzzleArcade()
+					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+					c.font = '40px monospace';
+					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+					game.event=="calc"?game.event="wait":null;
+					game.timer=20;
+					break;
+				case "wait":
+					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+					c.font = '40px monospace';
+					c.fillText(input,Cw*0.5,Ch*0.72);
+					c.font = '26px monospace';
+					if (pass) c.fillText("+ "+game.battle.score,Cw*0.2,Ch*0.7);
+					if (game.timer==0) {
+						game.event="";
+						game.mainevent="play";
+						input=0;
+						generatePuzzleArcade()
+					}
+					break;
+				default:
+					errormsg("event error !");
+					break;
+				}
+				if (key.p) {
+					game.prevevent=game.mainevent;
+					game.mainevent="pause";
+					game.prevtimer=game.timer;
+					game.timer=40;
+				}
+				break;
+			case "pause":
+				c.fillStyle="black";
+				c.globalAlpha=0.8;
+				c.fillRect(0,0,Cw,Ch)
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.textAlign="center";
+				c.font = '38px monospace';
+				c.fillText("PAUSE",Cw*0.5,Ch*0.5)
+				if (game.inputType=="keyboard") {
+					c.font = '24px monospace';
+					c.fillText("Appuyez sur [Espace] pour reprendre",Cw*0.5,Ch*0.7)
+					c.fillText("[D] pour Quitter la partie",Cw*0.5,Ch*0.85)
+				} else {
+					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.3,Ch*0.78,Cw*0.4,Ch*0.12)
+					c.globalAlpha=1;
+					c.font = '22px monospace';
+					c.fillText("Toucher l'écran pour reprendre",Cw*0.5,Ch*0.7)
+					c.fillText("Quitter la partie",Cw*0.5,Ch*0.85)
+				}
+				if ((key.space||key.p)&& game.timer==0) {
+					game.mainevent=game.prevevent;
+					game.timer = game.prevtimer;
+					game.prevevent="";
+					key.p=false;
+					key.space=false
+				}
+				if (key.d) {
+					game.mainevent="exit";
+					setmenu(2,"lr",0.25,0.8,0.3,0)
+				}
+				break;
+			case "exit":
+				c.fillStyle="black";
+				c.globalAlpha=0.8;
+				c.fillRect(0,0,Cw,Ch)
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.textAlign="center";
+				c.font = '24px monospace';
+				c.fillText("Êtes-vous sûre de vouloir quitter la partie ?",Cw*0.5,Ch*0.5)
+				c.font = '22px monospace';
+				c.fillText("Votre score ne sera pas sauvegardé.",Cw*0.5,Ch*0.6)
+				movemenu()
+				if (game.inputType=="phone") {
+					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.24,Ch*0.765,Cw*0.225,Ch*0.12)
+					c.fillRect(Cw*0.54,Ch*0.765,Cw*0.225,Ch*0.12)
+				} else {
+					showcursor()
+				}
+				c.globalAlpha=1;
+				c.font = '30px monospace';
+				c.fillText("Non",Cw*0.35,Ch*0.845)
+				c.fillText("Oui",Cw*0.65,Ch*0.845)
+				if (key.d) {
+					game.mainevent="pause";
+					key.d=false
+				}
+				if (key.space) {
+					switch (game.menu.target){
+					case 1:
+						game.mainevent="pause";
+						key.space=false;
+						break;
+					case 2:
+						game.mainevent="exitgame";
+						game.event="transition";
+						game.timer=50;
+						break;
+					default:
+						break;
+					}
+				}
+				break;
+			case "exitgame":
+				c.fillStyle="black";
+				c.globalAlpha=0.8;
+				c.fillRect(0,0,Cw,Ch)
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.textAlign="center";
+				c.font = '24px monospace';
+				c.fillText("Êtes-vous sûre de vouloir quitter la partie ?",Cw*0.5,Ch*0.5)
+				c.font = '22px monospace';
+				c.fillText("Votre score ne sera pas sauvegardé.",Cw*0.5,Ch*0.6)
+				c.font = '30px monospace';
+				c.fillText("Non",Cw*0.35,Ch*0.845)
+				c.fillText("Oui",Cw*0.65,Ch*0.845)
+				switch (game.event){
+				case "transition":
+					c.fillStyle="black";
+					c.globalAlpha=1-game.timer/50;
+					c.fillRect(0,0,Cw,Ch)
+					if (game.timer==0) {
+						game.event="wait";
+						game.timer=20;
+					}
+					break;
+				case "wait":
+					c.fillStyle="black";
+					c.globalAlpha=1;
+					c.fillRect(0,0,Cw,Ch)
+					if (game.timer==0) {
+						resetStats()
+						setmenu(6,"lr",0,0,0,0,2);
+						game.screen="hub";
+						game.mainevent="";
+						game.event="fadeout";
+						anim.lvltransition.time=50;
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				break;
+			case "gameover":
+				c.textAlign="center";
+				c.font = '32px monospace';
+				drawPuzzle()
+				c.shadowColor="black";
+				c.shadowBlur=3;
+				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
+				c.fillStyle="white";
+				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
+				c.shadowColor="";
+				c.shadowBlur=0;
+				switch (game.event){
+				case "begin":
+					if (game.battle.dmg>20) game.battle.dmg--;
+					if (game.battle.dmg>0) game.battle.dmg--;
+					pass ? c.fillStyle ="green": c.fillStyle="red";
+					c.font = '40px monospace';
+					c.fillText(input,Cw*0.5,Ch*0.72);
+					if (game.battle.dmg==0 && game.timer<=0) {
+						game.event="transition";
+						game.timer=15;
+					}
+					break;
+				case "end":
+					if (game.timer==0) {
+						game.event="transition";
+						game.timer=50;
+					}
+					break;
+				case "transition":
+					c.fillStyle="black";
+					c.globalAlpha = 0.92*(1-game.timer/50);
+					c.fillRect(0,0,canvas.width,canvas.height)
+					if (game.timer==0) {
+						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
+						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
+						game.event="finpop";
+						game.timer=20;
+						setmenu(3,"lr",0.11,0.82,0.25,0);
+					}
+					break;
+				case "finpop":
+				case "transition2":
+				case "transition3":
+					c.fillStyle="black";
+					c.globalAlpha = 0.92;
+					c.fillRect(0,0,canvas.width,canvas.height)
+					c.fillStyle="white";
+					c.globalAlpha = 1-game.timer/20;
+					c.textAlign="center";
+					c.font = '38px monospace';
+					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.18)
+					c.font = '30px monospace';
+					c.textAlign="start";
+					c.fillText("Mode: Arcade "+returnMode(),Cw*0.13,Ch*0.28)
+					c.font = '36px monospace';
+					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
+					c.font = '30px monospace';
+					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.445)
+					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
+					c.fillText("Niveau atteint : "+game.battle.arcade.level,Cw*0.13,Ch*0.51)
+					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.57)
+					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.63)
+					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+" sec",Cw*0.13,Ch*0.69)
+					c.fillText("Durée de la partie : "+ShowTimerRes(game.stats.timeTot)+" sec",Cw*0.13,Ch*0.75)
+					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
+					c.fillText("Continuer",Cw*0.4,Ch*0.86)
+					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
+					switch (game.event){
+					case "finpop":
+						if (game.inputType=="phone") {
+							c.globalAlpha = 0.15*(1-game.timer/20);
+							c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
+							c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
+							c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
+						}
+						else {
+							movemenu()
+							showcursor()
+							if (key.space) {
+								switch (game.menu.target){
+								case 1:
+									resetStats()
+									game.mainevent="starting";
+									game.event="set";
+									game.timer=20;
+									break;
+								case 2:
+									game.event="transition2";
+									game.timer=50;
+									break;
+								case 3:
+									game.mainevent="stats";
+									game.event="global";
+									setmenu(game.stats.level.length,"ud",0,0,0,0);
+									game.menu.target=game.stats.level.length;
+									break;
+								}
+							}
+						}
+						break;
+					case "transition2":
+						c.fillStyle="black";
+						c.globalAlpha=1-game.timer/50;
+						c.fillRect(0,0,Cw,Ch)
+						if (game.timer==0) {
+							resetStats()
+							game.event="transition3";
+							game.timer=20;
+						}
+						break;
+					case "transition3":
+						c.fillStyle="black";
+						c.globalAlpha=1;
+						c.fillRect(0,0,Cw,Ch)
+						if (game.timer==0) {
+							setmenu(6,"lr",0,0,0,0,2);
+							game.screen="hub";
+							game.mainevent="";
+							game.event="fadeout";
+							anim.lvltransition.time=50;
+						}
+						break;
+					default:
+						break;
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				break;
+			case "stats":
+				c.fillStyle="black";
+				c.globalAlpha = 0.92;
+				c.fillRect(0,0,canvas.width,canvas.height)
+				if (game.inputType=="phone") {
+					c.fillStyle="white";
+					c.globalAlpha = 0.15;
+					c.fillRect(Cw*0.27,Ch*0.145,Cw*0.08,Ch*0.11)
+					c.fillRect(Cw*0.65,Ch*0.145,Cw*0.08,Ch*0.11)
+					c.fillRect(Cw*0.77,Ch*0.15,Cw*0.2,Ch*0.1)
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.globalAlpha=1;
+					c.fillText("Retour",Cw*0.87,Ch*0.22)
+				}
+				c.globalAlpha=1;
+				c.fillStyle="white";
+				c.font = '32px monospace';
+				c.textAlign="center";
+				c.fillText("Statistiques de performance",Cw*0.5,Ch*0.125)
+				movemenu()
+				switch(game.event){
+				case "global":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<       Global   >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_op,Cw*0.375,Ch*0.16,40,40)
+					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
+					c.textAlign="start";
+					c.fillText("N°    Opération        Résultat       Temps",Cw*0.07,Ch*0.3)
+					let j=0;
+					if (game.stats.level.length>0) {
+						for (let i=game.menu.target-1; i < game.menu.target+9; i++) {
+							if (i<game.stats.level.length&&i>=0) {
+								c.textAlign="center";
+								game.stats.level[i].opleft!=j ? c.fillText(game.stats.level[i].opleft ,Cw*0.085,Ch*0.43+Ch*0.055*(i-game.menu.target)):c.fillText("|",Cw*0.085,Ch*0.43+Ch*0.055*(i-game.menu.target));
+								j=game.stats.level[i].opleft;
+								c.fillText(game.stats.level[i].num1 ,Cw*0.22,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillText(game.stats.level[i].optype ,Cw*0.3,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillText(game.stats.level[i].num2 ,Cw*0.38,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								game.stats.level[i].valide ?  c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+								c.fillText(game.stats.level[i].inputP ,Cw*0.532,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								c.fillStyle="white";
+								if (!game.stats.level[i].valide) {
+									c.textAlign="start";
+									c.fillText("->  "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
+								}
+								c.textAlign="end";
+								c.fillText(Math.floor(game.stats.level[i].timeResp*100)/100+"s",Cw*0.95,Ch*0.43+Ch*0.055*(i-game.menu.target))
+							}
+						}
+					}
+					else {
+						c.textAlign="center";
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_stats,Cw*0.025,Ch*0.31,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.035,Ch*0.33,Cw*0.93,Ch*0.055)
+					if (key.left) {
+						game.event="temps";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="vies";
+						key.right=false;
+					}
+					break;
+				case "vies":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<        Vies    >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_life,Cw*0.375,Ch*0.16,40,40)
+					let maxHP=get_maxhp(game.stats.maxvies,game.stats.maxpv);
+					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
+						anim.graph.init--;
+					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
+						anim.graph.init++;
+					}
+					if (maxHP>0 && game.stats.level.length>0) {
+						c.font = '20px monospace';
+						c.fillText(maxHP,Cw*0.045,Ch*0.32)
+						c.fillText(0,Cw*0.045,Ch*0.82)
+						c.fillText(anim.graph.init,Cw*0.085,Ch*0.85)
+						c.strokeStyle="grey";
+						c.lineWidth=1;
+						c.globalAlpha=0.5;
+						for (let i = 0; i < anim.graph.step; i++) {
+							c.strokeRect(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1),Ch*0.8-Ch*0.515,1,Ch*0.515)
+						}
+						c.fillStyle="white";
+						c.strokeStyle="red";
+						c.lineWidth=3;
+						c.globalAlpha=1;
+						c.beginPath()
+						c.lineTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].HPleft/maxHP))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].HPleft/maxHP))
+								if (i == anim.graph.init+anim.graph.step-1||i==game.stats.level.length-1) c.fillText((i+1),Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.85);
+							}
+						}
+						c.stroke()
+						c.strokeStyle="white";
+						c.lineWidth=1;
+						c.fillStyle="red";
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].HPleft/maxHP),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.textAlign="center";
+						c.fillStyle="white";
+						c.fillText("N°",Cw*0.12,Ch*0.91)
+						c.fillText("PV restant",Cw*0.27,Ch*0.91)
+						c.fillText("PV perdu",Cw*0.47,Ch*0.91)
+						c.fillText("Temps Réponse/Restant",Cw*0.75,Ch*0.91)
+						c.fillText(game.stats.level[game.menu.target-1].opleft ,Cw*0.12,Ch*0.955)
+						c.fillText(game.stats.level[game.menu.target-1].HPleft ,Cw*0.27,Ch*0.955)
+						game.stats.level[game.menu.target-1].valide ?  c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
+						c.fillText(game.stats.level[game.menu.target-1].HPlost ,Cw*0.47,Ch*0.955)
+						c.fillStyle="white";
+						c.textAlign="end";
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timeResp*100)/100+"s",Cw*0.75,Ch*0.955)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerleft*100)/100+"s",Cw*0.92,Ch*0.955)
+					}
+					else {
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_graph,Cw*0.025,Ch*0.24,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.08,Ch*0.87,Cw*0.87,Ch*0.1)
+					if (key.left) {
+						game.event="global";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="temps";
+						key.right=false;
+					}
+					break;
+				case "temps":
+					c.font = '26px monospace';
+					c.textAlign="center";
+					c.fillText("<       Temps    >",Cw*0.5,Ch*0.22)
+					c.drawImage(icon_lt_time,Cw*0.375,Ch*0.16,40,40)
+					let maxTimer=game.stats.maxtimer/60;
+					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
+						anim.graph.init--;
+					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
+						anim.graph.init++;
+					}
+					if (maxTimer>0 && game.stats.level.length>0) {
+						c.font = '20px monospace';
+						c.fillText(maxTimer+"s",Cw*0.045,Ch*0.32)
+						c.fillText(0,Cw*0.045,Ch*0.82)
+						c.fillText(anim.graph.init,Cw*0.085,Ch*0.85)
+						c.strokeStyle="grey";
+						c.lineWidth=1;
+						c.globalAlpha=0.5;
+						for (let i = 0; i < anim.graph.step; i++) {
+							c.strokeRect(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1),Ch*0.8-Ch*0.515,1,Ch*0.515)
+						}
+						c.fillStyle="white";
+						c.lineWidth=3;
+						c.globalAlpha=1;
+						c.strokeStyle="rgb(38, 183, 255)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].maxtimer/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].maxtimer/maxTimer))
+								if (i == anim.graph.init+anim.graph.step-1||i==game.stats.level.length-1) c.fillText((i+1),Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.85);
+							}
+						}
+						c.stroke()
+						c.strokeStyle="rgb(80, 80, 255)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timerB/maxTimer))
+							}
+						}
+						c.stroke()
+						c.strokeStyle="rgb(75, 214, 71)";
+						c.beginPath()
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timeResp/maxTimer))
+						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
+							if (i>=0&&i<game.stats.level.length) {
+								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timeResp/maxTimer))
+							}
+						}
+						c.stroke()
+						c.strokeStyle="white";
+						c.fillStyle="rgb(80, 80, 255)";
+						c.lineWidth=1;
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].timerB/maxTimer),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.fillStyle="rgb(75, 214, 71)";
+						c.beginPath()
+						c.arc(Cw*0.09+(Cw*0.85/anim.graph.step)*(game.menu.target-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[(game.menu.target-1)].timeResp/maxTimer),5,0,Math.PI*2)
+						c.fill()
+						c.stroke()
+						c.closePath()
+						c.textAlign="center";
+						c.fillStyle="rgb(38, 183, 255)";
+						c.fillText("Temps Max.",Cw*0.26,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].maxtimer*100)/100+"s" ,Cw*0.26,Ch*0.955)
+						c.fillStyle="rgb(80, 80, 255)";
+						c.fillText("Action",Cw*0.41,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerB*100)/100+"s" ,Cw*0.41,Ch*0.955)
+						c.fillStyle="rgb(75, 214, 71)";
+						c.fillText("Réponse",Cw*0.54,Ch*0.91)
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timeResp*100)/100+"s",Cw*0.54,Ch*0.955)
+						c.fillStyle="white";
+						c.fillText("N°",Cw*0.12,Ch*0.91)
+						c.fillText("Temps Bonus/Restant",Cw*0.77,Ch*0.91)
+						c.fillText(game.stats.level[game.menu.target-1].opleft ,Cw*0.12,Ch*0.955)
+						c.textAlign="end";
+						game.stats.level[game.menu.target-1].valide ?  c.fillStyle ="white": c.fillStyle="rgb(217, 38, 22)";
+						game.stats.level[game.menu.target-1].bonustime==0 ? c.fillStyle ="rgb(50, 50, 50)":null;
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].bonustime*100)/100+"s",Cw*0.79,Ch*0.955)
+						game.stats.level[game.menu.target-1].timerleft==game.stats.level[game.menu.target-1].maxtimer ?  c.fillStyle ="rgb(237, 216, 24)": c.fillStyle="white";
+						c.fillText(Math.floor(game.stats.level[game.menu.target-1].timerleft*100)/100+"s",Cw*0.93,Ch*0.955)
+					}
+					else {
+						c.font = '30px monospace';
+						c.fillText("Données insuffisantes",Cw*0.5,Ch*0.5)
+					}
+					c.drawImage(frame_graph,Cw*0.025,Ch*0.24,Cw*0.95,Ch*0.6)
+					c.strokeRect(Cw*0.08,Ch*0.87,Cw*0.87,Ch*0.1)
+					if (key.left) {
+						game.event="vies";
+						key.left=false;
+					}
+					if (key.right) {
+						game.event="global";
+						key.right=false;
+					}
+					break;
+				default:
+					errormsg("event error !")
+					break;
+				}
+				if (key.d) {
+					game.mainevent="gameover";
+					game.event="finpop";
+					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+				}
+				break;
+			default:
+				errormsg("mainevent error !")
+				break;
+			}
+			c.fillStyle="white";
+			c.globalAlpha=1;
+			c.textAlign="start";
+			c.font = '20px monospace';
+			c.fillText("Arcade "+returnMode(),Cw*0.02,Ch*0.04)
 			break;
 		default :
 			errormsg("screenevent error !")
@@ -2977,8 +4669,9 @@ function loopAnimation() {
 	c.textAlign="start";
 	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
 	c.textAlign="end";
-	c.fillText("Version BETA 1.3.2", Cw*0.99, Ch*0.99);
+	c.fillText("Version "+version, Cw*0.99, Ch*0.99);
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
+
 chargement++

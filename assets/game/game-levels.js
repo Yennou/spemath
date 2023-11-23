@@ -15,6 +15,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:25,
 			level:[
 				["x",1,3],
@@ -63,6 +64,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:25,
 			level:[
 				["x",1,4],
@@ -111,6 +113,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:30,
 			level:[
 				["x",1,5],
@@ -164,6 +167,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:25,
 			level:[
 				["x",1,6],
@@ -212,48 +216,49 @@ const levels = {
 			boss:0,
 			skiptonext:true,
 			order:"random",
+
 			count:40,
 			level:[
-				["x",[5,1],3],
-				["x",[5,1],3],
-				["x",[5,1],3],
-				["x",[5,1],3],
-				["x",[5,1],3],
-				["x",[5,1],4],
-				["x",[5,1],4],
-				["x",[5,1],4],
-				["x",[5,1],4],
-				["x",[5,1],4],
-				["x",[5,1],5],
-				["x",[5,1],5],
-				["x",[5,1],5],
-				["x",[5,1],5],
-				["x",[5,1],5],
-				["x",[5,1],6],
-				["x",[5,1],6],
-				["x",[5,1],6],
-				["x",[5,1],6],
-				["x",[5,1],6],
-				["x",[5,6],3],
-				["x",[5,6],3],
-				["x",[5,6],3],
-				["x",[5,6],3],
-				["x",[5,6],3],
-				["x",[5,6],4],
-				["x",[5,6],4],
-				["x",[5,6],4],
-				["x",[5,6],4],
-				["x",[5,6],4],
-				["x",[5,6],5],
-				["x",[5,6],5],
-				["x",[5,6],5],
-				["x",[5,6],5],
-				["x",[5,6],5],
-				["x",[5,6],6],
-				["x",[5,6],6],
-				["x",[5,6],6],
-				["x",[5,6],6],
-				["x",[5,6],6],
+				["x",3,2],
+				["x",3,3],
+				["x",3,4],
+				["x",3,5],
+				["x",3,6],
+				["x",4,2],
+				["x",4,3],
+				["x",4,4],
+				["x",4,5],
+				["x",4,6],
+				["x",5,2],
+				["x",5,3],
+				["x",5,4],
+				["x",5,5],
+				["x",5,6],
+				["x",6,2],
+				["x",6,3],
+				["x",6,4],
+				["x",6,5],
+				["x",6,6],
+				["x",3,7],
+				["x",3,8],
+				["x",3,9],
+				["x",3,10],
+				["x",3,1],
+				["x",4,7],
+				["x",4,8],
+				["x",4,9],
+				["x",4,10],
+				["x",4,1],
+				["x",5,7],
+				["x",5,8],
+				["x",5,9],
+				["x",5,10],
+				["x",5,1],
+				["x",6,7],
+				["x",6,8],
+				["x",6,9],
+				["x",6,10],
+				["x",6,1],
 			],
 			starscond: [
 				["incorrect",5],
@@ -265,7 +270,7 @@ const levels = {
 			title:"2-9,9 large...",
 			type:"chrono",
 			timer:600,
-			time:6000,
+			time:7200,
 			life:5,
 			hp:0,
 			timerdecay:0,
@@ -275,6 +280,7 @@ const levels = {
 			boss:0,
 			skiptonext:true,
 			order:"random",
+
 			count:40,
 			level:[
 				["+",9,[30,11]],
@@ -338,6 +344,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:25,
 			level:[
 				["x",1,7],
@@ -386,6 +393,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:25,
 			level:[
 				["x",1,8],
@@ -434,6 +442,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:25,
 			level:[
 				["x",1,9],
@@ -482,6 +491,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:35,
 			level:[
 				["x",1,10],
@@ -540,48 +550,49 @@ const levels = {
 			boss:0,
 			skiptonext:true,
 			order:"random",
+
 			count:40,
 			level:[
-				["x",[5,1],7],
-				["x",[5,1],7],
-				["x",[5,1],7],
-				["x",[5,1],7],
-				["x",[5,1],7],
-				["x",[5,1],8],
-				["x",[5,1],8],
-				["x",[5,1],8],
-				["x",[5,1],8],
-				["x",[5,1],8],
-				["x",[5,1],9],
-				["x",[5,1],9],
-				["x",[5,1],9],
-				["x",[5,1],9],
-				["x",[5,1],9],
-				["x",[5,1],10],
-				["x",[5,1],10],
-				["x",[5,1],10],
-				["x",[5,1],10],
-				["x",[5,1],10],
-				["x",[5,6],7],
-				["x",[5,6],7],
-				["x",[5,6],7],
-				["x",[5,6],7],
-				["x",[5,6],7],
-				["x",[5,6],8],
-				["x",[5,6],8],
-				["x",[5,6],8],
-				["x",[5,6],8],
-				["x",[5,6],8],
-				["x",[5,6],9],
-				["x",[5,6],9],
-				["x",[5,6],9],
-				["x",[5,6],9],
-				["x",[5,6],9],
-				["x",[5,6],10],
-				["x",[5,6],10],
-				["x",[5,6],10],
-				["x",[5,6],10],
-				["x",[5,6],10],
+				["x",7,1],
+				["x",7,2],
+				["x",7,3],
+				["x",7,4],
+				["x",7,5],
+				["x",8,1],
+				["x",8,2],
+				["x",8,3],
+				["x",8,4],
+				["x",8,5],
+				["x",9,1],
+				["x",9,2],
+				["x",9,3],
+				["x",9,4],
+				["x",9,5],
+				["x",10,1],
+				["x",10,2],
+				["x",10,3],
+				["x",10,4],
+				["x",10,5],
+				["x",7,6],
+				["x",7,7],
+				["x",7,8],
+				["x",7,9],
+				["x",7,10],
+				["x",8,6],
+				["x",8,7],
+				["x",8,8],
+				["x",8,9],
+				["x",8,10],
+				["x",9,6],
+				["x",9,7],
+				["x",9,8],
+				["x",9,9],
+				["x",9,10],
+				["x",10,6],
+				["x",10,7],
+				["x",10,8],
+				["x",10,9],
+				["x",10,10],
 			],
 			starscond: [
 				["incorrect",5],
@@ -603,6 +614,7 @@ const levels = {
 			boss:0,
 			skiptonext:true,
 			order:"normal",	
+
 			count:16,
 			level:[
 				["x",1,2],
@@ -642,6 +654,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:35,
 			level:[
 				["+",100,[20,11]],
@@ -700,6 +713,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"random",
+
 			count:80,
 			level:[
 				["x",3,1],
@@ -803,6 +817,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:30,
 			level:[
 				["+",100,[20,11]],
@@ -856,6 +871,7 @@ const levels = {
 			boss:0,
 			skiptonext:false,
 			order:"normal",
+
 			count:50,
 			level:[
 				["+",[9,1],[9,1]],
@@ -917,92 +933,220 @@ const levels = {
 		}
 	}
 }
-const saves = {
-	levels : {
-		1: {
-			1:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			2:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			3:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			4:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			5:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			6:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			7:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			8:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			9:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			10:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			11:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			12:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			13:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			14:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			15:{
-				score:0,
-				perfect:false,
-				clear: false,
-			},
-			16:{
-				score:0,
-				perfect:false,
-				clear: false,
+const arcade = {
+	0:{
+		maxclear:20,
+		level:[
+			["+",[9,1],[9,1]],
+			["+",[9,1],[9,1]],
+			["+",[6,4],[9,1]],
+			["-",[6,4],[4,1]],
+			["-",[3,7],[4,4]],
+		]
+	},
+	1:{
+		maxclear:25,
+		level:[
+			["+",[9,1],[9,1]],
+			["-",[9,1],[9,1]],
+			["+",[9,1],[9,1]],
+			["-",[5,1],[5,5]],
+			["+",[90,10],[90,10]],
+			["+",[90,10],[90,10]],
+		]
+	},
+	2:{
+		maxclear:30,
+		level:[
+			["+",[9,1],[9,1]],
+			["x",[8,2],[8,2]],
+			["x",[8,2],[5,5]],
+			["-",[5,1],[5,5]],
+			["+",[90,10],[90,10]],
+			["+",[90,10],[90,10]],
+			["+",[90,10],[90,10]],
+			["-",[90,10],[60,1]],
+			["-",[90,10],[60,1]],
+		]
+	},
+	3:{
+		maxclear:35,
+		level:[
+			["x",[8,2],[8,2]],
+			["+",[90,10],[90,10]],
+			["+",[90,10],[90,10]],
+			["-",[90,10],[60,1]],
+			["-",[40,10],[60,40]],
+			["+",[400,100],[400,100]],
+			["+",[800,200],[700,300]],
+		]
+	},
+	4:{
+		maxclear:40,
+		level:[
+			["x",[11,9],[12,6]],
+			["+",[90,10],[90,10]],
+			["+",[90,10],[90,10]],
+			["-",[90,10],[60,1]],
+			["-",[40,10],[60,40]],
+			["+",[800,100],[800,100]],
+			["+",[800,200],[700,300]],
+		]
+	},
+	5:{
+		maxclear:45,
+		level:[
+			["x",[11,9],[12,9]],
+			["x",[31,9],[12,9]],
+			["-",[800,200],[600,10]],
+			["-",[400,100],[600,400]],
+			["+",[800,100],[800,100]],
+			["+",[800,200],[700,300]],
+		]
+	},
+	6:{
+		maxclear:50,
+		level:[
+			["x",[11,12],[12,12]],
+			["x",[31,12],[12,12]],
+			["-",[800,200],[600,10]],
+			["-",[400,100],[600,400]],
+			["+",[800,100],[800,100]],
+			["+",[800,200],[700,300]],
+			["+",[5000,1000],[5000,1000]],
+			["+",[5000,5000],[5000,5000]],
+		]
+	},
+	7:{
+		maxclear:50,
+		level:[
+			["x",[61,32],[52,32]],
+			["-",[900,100],[900,100]],
+			["+",[800,200],[700,300]],
+			["+",[5000,1000],[5000,1000]],
+			["+",[5000,5000],[5000,5000]],
+			["-",[5000,1000],[5000,1000]],
+			["-",[5000,5000],[5000,5000]],
+		]
+	},
+	8:{
+		maxclear:50,
+		level:[
+			["x",[110,90],[120,90]],
+			["x",[400,100],[400,100]],
+			["+",[5000,1000],[5000,1000]],
+			["+",[5000,5000],[5000,5000]],
+			["+",[9000,1000],[9000,1000]],
+			["-",[5000,1000],[5000,1000]],
+			["-",[5000,5000],[5000,5000]],
+			["-",[9000,1000],[9000,1000]],
+		]
+	},
+	9:{
+		maxclear:50,
+		level:[
+			["x",[900,100],[900,100]],
+			["+",[9000,1000],[9000,1000]],
+			["-",[9000,1000],[9000,1000]],
+			["+",[9000,1000],[9000,1000]],
+			["-",[9000,1000],[9000,1000]],
+		]
+	},
+}
+let saves = {};
+
+if (localStorage.getItem("save")!=null) {
+	saves=JSON.parse(localStorage.save.toString())
+}
+else {
+	saves = {
+		levels : {
+			1: {
+				1:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				2:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				3:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				4:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				5:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				6:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				7:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				8:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				9:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				10:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				11:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				12:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				13:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				14:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				15:{
+					score:0,
+					perfect:false,
+					clear: false,
+				},
+				16:{
+					score:0,
+					perfect:false,
+					clear: false,
+				}
 			}
 		}
 	}
 }
+
 function randomNum(range,min=0){
 	return Math.floor(Math.random()*range+min)
 }

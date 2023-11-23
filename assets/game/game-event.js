@@ -142,14 +142,157 @@ window.addEventListener('keyup', function(event){
 });
 canvas.addEventListener('mousedown', function(event){
 	if (game.inputType=="phone") {
+		mouse.down=true;
 		canvasPosition = canvas.getBoundingClientRect();
 		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
 		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+	}
+});
+canvas.addEventListener('mousemove', function(event){
+	if (game.inputType=="phone"&&mouse.down) {
+		canvasPosition = canvas.getBoundingClientRect();
+		mouse.prex=mouse.x;
+		mouse.prey=mouse.y;
+		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
+		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+		mouse.hasmove=true;
 		switch(game.screen){
+		case "survival":
+			switch(game.mainevent){
+			case "stats":
+				switch(game.event){
+				case "global":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.975&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prey-mouse.y)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							game.menu.target--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							game.menu.target++;
+						}
+					}
+					break;
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prex-mouse.x)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							anim.graph.init--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							anim.graph.init++;
+						}
+					}
+					if (anim.graph.init<0) {
+						anim.graph.init=0;
+					}
+					else if (anim.graph.init>game.menu.options-1){
+						anim.graph.init=game.menu.options-1
+					}
+					break;
+				}
+				break;
+			}
+			break;
+		case "level":
+			switch(game.mainevent){
+			case "stats":
+				switch(game.event){
+				case "global":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prey-mouse.y)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							game.menu.target--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							game.menu.target++;
+						}
+					}
+					break;
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prex-mouse.x)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							anim.graph.init--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							anim.graph.init++;
+						}
+					}
+					if (anim.graph.init<0) {
+						anim.graph.init=0;
+					}
+					else if (anim.graph.init>game.menu.options-1){
+						anim.graph.init=game.menu.options-1
+					}
+					break;
+				}
+				break;
+			}
+			break;
+		case "arcade":
+			switch(game.mainevent){
+			case "stats":
+				switch(game.event){
+				case "global":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prey-mouse.y)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							game.menu.target--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							game.menu.target++;
+						}
+					}
+					break;
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prex-mouse.x)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							anim.graph.init--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							anim.graph.init++;
+						}
+					}
+					if (anim.graph.init<0) {
+						anim.graph.init=0;
+					}
+					else if (anim.graph.init>game.menu.options-1){
+						anim.graph.init=game.menu.options-1
+					}
+					break;
+				}
+				break;
+			}
+			break;
+		}
+	}
+});
+canvas.addEventListener('mouseup', function(event){
+	if (game.inputType=="phone") {
+		mouse.down=false;
+		if (!mouse.hasmove) {clicEvent()}
+		mouse.hasmove=false;
+		mouse.range=0;
+		if (game.menu.target<1) game.menu.target=1;
+		if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
+	}
+})
+function clicEvent(){
+	switch(game.screen){
 		case "title":
 			switch(game.mainevent){
 			case "mainmenu":
-				setmenu(4,"lr",0,0,0,0);
+				setmenu(5,"lr",0,0,0,0);
 				game.screen="hub";
 			default:
 				break;
@@ -157,10 +300,10 @@ canvas.addEventListener('mousedown', function(event){
 			break;
 		case "hub":
 			if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.18+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
-				game.menu.target==1 ? game.menu.target=4:game.menu.target--;
+				game.menu.target==1 ? game.menu.target=6:game.menu.target--;
 			}
 			if (mouse.x >= Cw*0.68 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.68+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
-				game.menu.target==4 ? game.menu.target=1:game.menu.target++;
+				game.menu.target==6 ? game.menu.target=1:game.menu.target++;
 			}
 			if (mouse.x >= Cw*0.34 && mouse.y >= Ch*0.47 && mouse.x <= Cw*0.34+Cw*0.32 && mouse.y <= Ch*0.47+Ch*0.11) {
 				switch (game.menu.target){
@@ -171,19 +314,25 @@ canvas.addEventListener('mousedown', function(event){
 					game.event="select";
 					break;
 				case 2:
+					setmenu(4,"lr",0,0,0,0);
+					game.screen="modeArcade";
+					game.mainevent="first";
+					game.event="";
+					break;
+				case 3:
 					setmenu(4,"lr",0.065,0.43,0.23,0);
 					game.screen="mode1";
 					game.mainevent="first";
 					game.event="";
 					break;
-				case 3:
+				case 4:
 					setmenu(3,"lr",0.165,0.43,0.23,0);
 					game.screen="mode2";
 					game.mainevent="first";
 					game.event="";
-					game.battle.mult=false;
+					if (game.battle.mult) {game.battle.mult=false;game.battle.symbnum--}
 					break;
-				case 4:
+				case 5:
 					setmenu(4,"ud",0.045,0.46,0,0.1,4);
 					game.screen="options";
 					game.mainevent="menu";
@@ -218,7 +367,7 @@ canvas.addEventListener('mousedown', function(event){
 					game.event="animchrono";
 				}
 				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.74 && mouse.x <= Cw*0.07+Cw*0.2 && mouse.y <= Ch*0.74+Ch*0.08) {
-					setmenu(4,"lr",0,0,0,0,4);
+					setmenu(5,"lr",0,0,0,0,6);
 					game.screen="hub";
 					game.mainevent=""
 				}
@@ -252,9 +401,47 @@ canvas.addEventListener('mousedown', function(event){
 				break; 
 			}
 			break;
+		case "modeArcade":
+			if (mouse.x >= Cw*0.01 && mouse.y >= Ch*0.02 && mouse.x <= Cw*0.02+Cw*0.285 && mouse.y <= Ch*0.02+Ch*0.1) {
+				setmenu(5,"lr",0,0,0,0,2);
+				game.screen="hub";
+				game.mainevent="";
+				game.event=""
+			}
+			switch(game.mainevent){
+			case "first":
+				if (mouse.x >= Cw*0.25 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.25+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+					game.menu.target==1 ? game.menu.target=4:game.menu.target--;
+				}
+				if (mouse.x >= Cw*0.64 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.64+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+					game.menu.target==4 ? game.menu.target=1:game.menu.target++;
+				}
+				if (mouse.x >= Cw*0.76 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.76+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+					setmenu(2,"lr",0.05,0.605,0.31,0,2);
+					game.mainevent="second";
+					game.event="ready";
+				}
+				break;
+			case "second":
+				if (game.event=="ready") {
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.57 && mouse.x <= Cw*0.07+Cw*0.22 && mouse.y <= Ch*0.57+Ch*0.12) {
+						setmenu(4,"lr",0.3,0.56,0,0);
+						game.mainevent="first";
+						game.event="";
+					}
+					if (mouse.x >= Cw*0.37 && mouse.y >= Ch*0.55 && mouse.x <= Cw*0.37+Cw*0.26 && mouse.y <= Ch*0.55+Ch*0.14) {
+						game.event="transition";
+						game.timer=7;
+					}
+				}
+				break;
+			default:
+				break;
+			}
+			break;
 		case "mode1":
 			if (mouse.x >= Cw*0.01 && mouse.y >= Ch*0.02 && mouse.x <= Cw*0.02+Cw*0.285 && mouse.y <= Ch*0.02+Ch*0.1) {
-				setmenu(4,"lr",0,0,0,0,2);
+				setmenu(5,"lr",0,0,0,0,3);
 				game.screen="hub";
 				game.mainevent="";
 				game.event=""
@@ -335,7 +522,7 @@ canvas.addEventListener('mousedown', function(event){
 			break;
 		case "mode2":
 			if (mouse.x >= Cw*0.01 && mouse.y >= Ch*0.02 && mouse.x <= Cw*0.02+Cw*0.285 && mouse.y <= Ch*0.02+Ch*0.1) {
-				setmenu(4,"lr",0,0,0,0,3);
+				setmenu(5,"lr",0,0,0,0,4);
 				game.screen="hub";
 				game.mainevent="";
 				game.event="";
@@ -401,7 +588,7 @@ canvas.addEventListener('mousedown', function(event){
 				case "selected":
 					game.event="select";
 					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.81 && mouse.x <= Cw*0.07+Cw*0.22 && mouse.y <= Ch*0.81+Ch*0.13){
-						setmenu(4,"lr",0,0,0,0);
+						setmenu(5,"lr",0,0,0,0);
 						game.screen="hub";
 						game.event=""
 					}
@@ -464,7 +651,7 @@ canvas.addEventListener('mousedown', function(event){
 			case "gameover":
 				switch(game.event){
 				case "finpop":
-					if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.18+150 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.12 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.12+Cw*0.21 && mouse.y <= Ch*0.785+50) {
 						resetStats()
 						switch (game.battle.gamemode) {
 						case "survival-timer":
@@ -479,12 +666,60 @@ canvas.addEventListener('mousedown', function(event){
 							break;
 						}
 					}
-					if (mouse.x >= Cw*0.465 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.465+220 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.365 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.365+Cw*0.24 && mouse.y <= Ch*0.785+50) {
 						game.event="transition2";
 						game.timer=50;
 					}
+					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+						game.mainevent="stats";
+						game.event="global";
+						setmenu(game.stats.level.length,"ud",0,0,0,0);
+						game.menu.target=game.stats.level.length
+					}
 					break;
 				default:
+					break;
+				}
+				break;
+			case "stats":
+				if (mouse.x >= Cw*0.77 && mouse.y >= Ch*0.15 && mouse.x <= Cw*0.77+Cw*0.2 && mouse.y <= Ch*0.15+Ch*0.1) {
+					game.prevevent=="finish"?game.mainevent="finish":game.mainevent="gameover";  // remplacer par gameover seulement
+					game.event="finpop";
+					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+				}
+				if (mouse.x >= Cw*0.27 && mouse.y >= Ch*0.145 && mouse.x <= Cw*0.27+Cw*0.08 && mouse.y <= Ch*0.145+Ch*0.11) {
+					switch(game.event){
+					case "global":
+						game.event="temps";
+						break;
+					case "vies":
+						game.event="global";
+						break;
+					case "temps":
+						game.event="vies";
+						break;
+					}
+				}
+				if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.145 && mouse.x <= Cw*0.65+Cw*0.08 && mouse.y <= Ch*0.145+Ch*0.11) {
+					switch(game.event){
+					case "global":
+						game.event="vies";
+						break;
+					case "vies":
+						game.event="temps";
+						break;
+					case "temps":
+						game.event="global";
+						break;
+					}
+				}
+				switch(game.event){
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.08&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						game.menu.target=Math.floor((mouse.x-Cw*0.09)/(Cw*0.85)*anim.graph.step)+anim.graph.init;
+						if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
+					}
 					break;
 				}
 				break;
@@ -532,18 +767,67 @@ canvas.addEventListener('mousedown', function(event){
 			case "gameover":
 				switch(game.event){
 				case "finpop":
-					if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.425 && mouse.x <= Cw*0.18+150 && mouse.y <= Ch*0.425+50) {
+					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
 						game.mainevent="starting";
 						game.event="set";
 						game.timer=20;
 						resetStats()
 					}
-					if (mouse.x >= Cw*0.465 && mouse.y >= Ch*0.425 && mouse.x <= Cw*0.465+220 && mouse.y <= Ch*0.425+50) {
+					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
 						game.event="transition2";
 						game.timer=50;
 					}
+					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+						game.mainevent="stats";
+						game.prevevent="gameover";
+						game.event="global";
+						setmenu(game.stats.level.length,"ud",0,0,0,0);
+						game.menu.target=game.stats.level.length
+					}
 					break;
 				default:
+					break;
+				}
+				break;
+			case "stats":
+				if (mouse.x >= Cw*0.77 && mouse.y >= Ch*0.15 && mouse.x <= Cw*0.77+Cw*0.2 && mouse.y <= Ch*0.15+Ch*0.1) {
+					game.prevevent=="finish"?game.mainevent="finish":game.mainevent="gameover"; 
+					game.event="finpop";
+					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+				}
+				if (mouse.x >= Cw*0.27 && mouse.y >= Ch*0.145 && mouse.x <= Cw*0.27+Cw*0.08 && mouse.y <= Ch*0.145+Ch*0.11) {
+					switch(game.event){
+					case "global":
+						game.event="temps";
+						break;
+					case "vies":
+						game.event="global";
+						break;
+					case "temps":
+						game.event="vies";
+						break;
+					}
+				}
+				if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.145 && mouse.x <= Cw*0.65+Cw*0.08 && mouse.y <= Ch*0.145+Ch*0.11) {
+					switch(game.event){
+					case "global":
+						game.event="vies";
+						break;
+					case "vies":
+						game.event="temps";
+						break;
+					case "temps":
+						game.event="global";
+						break;
+					}
+				}
+				switch(game.event){
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.08&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						game.menu.target=Math.floor((mouse.x-Cw*0.09)/(Cw*0.85)*anim.graph.step)+anim.graph.init;
+						if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
+					}
 					break;
 				}
 				break;
@@ -560,6 +844,146 @@ canvas.addEventListener('mousedown', function(event){
 						game.event="transition2";
 						game.timer=50;
 					}
+					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+						game.mainevent="stats";
+						game.prevevent="finish";
+						game.event="global";
+						setmenu(game.stats.level.length,"ud",0,0,0,0);
+						game.menu.target=game.stats.level.length
+					}
+					break;
+				default:
+					break;
+				}
+				break;
+			default:
+				break;
+			}
+			break;
+		case "arcade":
+			switch (game.mainevent){
+			case "starting":
+			case "play":
+			case "wait":
+				if (mouse.x >= Cw*0.035 && mouse.y >= Ch*0.875 && mouse.x <= Cw*0.035+120 && mouse.y <= Ch*0.875+40) {
+					game.prevevent=game.mainevent;
+					game.mainevent="pause";
+					game.prevtimer=game.timer;
+					game.timer=40;
+				}
+				break;
+			case "pause":
+				if (mouse.x >= Cw*0.3 && mouse.y >= Ch*0.78 && mouse.x <= Cw*0.3+Cw*0.4 && mouse.y <= Ch*0.78+Ch*0.12) {
+					game.mainevent="exit";
+					setmenu(2,"lr",0.25,0.8,0.3,0)
+				}
+				else {
+					game.mainevent=game.prevevent;
+					if (game.mainevent=="play") IGTtimer();
+					game.timer = game.prevtimer;
+					game.prevevent="";
+					RTAtimer()
+					key.p=false;
+					key.space=false;
+				}
+				break;
+			case "exit":
+				if (mouse.x >= Cw*0.24 && mouse.y >= Ch*0.765 && mouse.x <= Cw*0.24+Cw*0.225 && mouse.y <= Ch*0.765+Ch*0.32) {
+					game.mainevent="pause";
+				}
+				if (mouse.x >= Cw*0.54 && mouse.y >= Ch*0.765 && mouse.x <= Cw*0.54+Cw*0.225 && mouse.y <= Ch*0.765+Ch*0.32) {
+					game.mainevent="exitgame";
+					game.event="transition";
+					game.timer=50;
+				}
+				break;
+			case "gameover":
+				switch(game.event){
+				case "finpop":
+					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
+						game.mainevent="starting";
+						game.event="set";
+						game.timer=20;
+						resetStats()
+					}
+					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
+						game.event="transition2";
+						game.timer=50;
+					}
+					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+						game.mainevent="stats";
+						game.prevevent="gameover";
+						game.event="global";
+						setmenu(game.stats.level.length,"ud",0,0,0,0);
+						game.menu.target=game.stats.level.length
+					}
+					break;
+				default:
+					break;
+				}
+				break;
+			case "stats":
+				if (mouse.x >= Cw*0.77 && mouse.y >= Ch*0.15 && mouse.x <= Cw*0.77+Cw*0.2 && mouse.y <= Ch*0.15+Ch*0.1) {
+					game.prevevent=="finish"?game.mainevent="finish":game.mainevent="gameover"; 
+					game.event="finpop";
+					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+				}
+				if (mouse.x >= Cw*0.27 && mouse.y >= Ch*0.145 && mouse.x <= Cw*0.27+Cw*0.08 && mouse.y <= Ch*0.145+Ch*0.11) {
+					switch(game.event){
+					case "global":
+						game.event="temps";
+						break;
+					case "vies":
+						game.event="global";
+						break;
+					case "temps":
+						game.event="vies";
+						break;
+					}
+				}
+				if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.145 && mouse.x <= Cw*0.65+Cw*0.08 && mouse.y <= Ch*0.145+Ch*0.11) {
+					switch(game.event){
+					case "global":
+						game.event="vies";
+						break;
+					case "vies":
+						game.event="temps";
+						break;
+					case "temps":
+						game.event="global";
+						break;
+					}
+				}
+				switch(game.event){
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.08&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						game.menu.target=Math.floor((mouse.x-Cw*0.09)/(Cw*0.85)*anim.graph.step)+anim.graph.init;
+						if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
+					}
+					break;
+				}
+				break;
+			case "finish":
+				switch(game.event){
+				case "finpop":
+					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
+						game.mainevent="starting";
+						game.event="set";
+						game.timer=20;
+						resetStats()
+					}
+					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
+						game.event="transition2";
+						game.timer=50;
+					}
+					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+						game.mainevent="stats";
+						game.prevevent="finish";
+						game.event="global";
+						setmenu(game.stats.level.length,"ud",0,0,0,0);
+						game.menu.target=game.stats.level.length
+					}
 					break;
 				default:
 					break;
@@ -572,6 +996,5 @@ canvas.addEventListener('mousedown', function(event){
 		default:
 			break;
 		}
-	}
-});
+}
 chargement++
