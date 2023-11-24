@@ -104,6 +104,7 @@ window.addEventListener('keydown', function(event){
 		}
 	}
 });
+
 window.addEventListener('keyup', function(event){
 	keypressed = event.key;
 	switch (keypressed) {
@@ -140,21 +141,21 @@ window.addEventListener('keyup', function(event){
 			break;
 	}
 });
-canvas.addEventListener('mousedown', function(event){
+canvas.addEventListener('touchstart', function(event){
 	if (game.inputType=="phone") {
 		mouse.down=true;
 		canvasPosition = canvas.getBoundingClientRect();
-		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
-		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+		mouse.x=Math.floor(Cw*((event.touches[0].clientX-canvasPosition.left)/canvasPosition.width));
+		mouse.y=Math.floor(Ch*((event.touches[0].clientY-canvasPosition.top)/canvasPosition.height));
 	}
-});
-canvas.addEventListener('mousemove', function(event){
+})
+canvas.addEventListener('touchmove', function(event){
 	if (game.inputType=="phone"&&mouse.down) {
 		canvasPosition = canvas.getBoundingClientRect();
 		mouse.prex=mouse.x;
 		mouse.prey=mouse.y;
-		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
-		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+		mouse.x=Math.floor(Cw*((event.touches[0].clientX-canvasPosition.left)/canvasPosition.width));
+		mouse.y=Math.floor(Ch*((event.touches[0].clientY-canvasPosition.top)/canvasPosition.height));
 		mouse.hasmove=true;
 		switch(game.screen){
 		case "survival":
@@ -277,7 +278,7 @@ canvas.addEventListener('mousemove', function(event){
 		}
 	}
 });
-canvas.addEventListener('mouseup', function(event){
+canvas.addEventListener("touchend", function(event){
 	if (game.inputType=="phone") {
 		mouse.down=false;
 		if (!mouse.hasmove) {clicEvent()}
@@ -300,10 +301,10 @@ function clicEvent(){
 			break;
 		case "hub":
 			if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.18+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
-				game.menu.target==1 ? game.menu.target=6:game.menu.target--;
+				game.menu.target==1 ? game.menu.target=5:game.menu.target--;
 			}
 			if (mouse.x >= Cw*0.68 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.68+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
-				game.menu.target==6 ? game.menu.target=1:game.menu.target++;
+				game.menu.target==5 ? game.menu.target=1:game.menu.target++;
 			}
 			if (mouse.x >= Cw*0.34 && mouse.y >= Ch*0.47 && mouse.x <= Cw*0.34+Cw*0.32 && mouse.y <= Ch*0.47+Ch*0.11) {
 				switch (game.menu.target){

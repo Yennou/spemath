@@ -27,7 +27,7 @@ const key = {
 	left:false,
 	cooldown : 0,
 	cooldownmax : 1,
-	pausecooldown : 0 
+	pausecooldown : 0
 };
 const version="BETA-1.4.0";
 const Cw= canvas.width, Ch= canvas.height;
@@ -38,6 +38,7 @@ const game = {
 	inputType:"keyboard",
 	prevevent : "",
 	prevtimer : 0,
+
 	option : {
 		music : 100,
 		sound : 100,
@@ -177,6 +178,7 @@ let prev = {
 	num2:0
 }
 let pass= false;
+
 const btl_plus= new Image();
 const btl_moins= new Image();
 const btl_mult= new Image();
@@ -252,7 +254,6 @@ menu_opt.src = directory+"menu_options.png";
 txt_perfect.src = directory+"txt_perfect.png";
 txt_perfect1.src = directory+"txt_perfect_layer1.png";
 txt_perfect2.src = directory+"txt_perfect_layer2.png";
-
 ui_hpbar.src = directory+"UI_hpbar.png";
 ui_timerbar.src = directory+"UI_timerbar.png";
 ui_timerbarprogress.src = directory+"UI_timerbarprogress.png";
@@ -266,14 +267,11 @@ ui_lifebar7.src = directory+"UI_lifebar7.png";
 ui_lifebar10.src = directory+"UI_lifebar10.png";
 ui_lifebar20.src = directory+"UI_lifebar20.png";
 ui_progressbar.src = directory+"UI_progressbar.png";
-
 btn_enter.src = directory+"btn_enter.png";
 btn_return.src = directory+"btn_return.png";
 btn_plusmoins.src = directory+"btn_plusmoins.png";
-
 frame_stats.src = directory+"frame_stats.png";
 frame_graph.src = directory+"frame_graph.png";
-
 lvlmap_level.src = directory+"lvlmap_level.png";
 lvlmap_levelP.src = directory+"lvlmap_levelP.png";
 lvlmap_center.src = directory+"lvlmap_center.png";
@@ -335,7 +333,6 @@ function loopAnimation() {
 						c.fillText("- Symbole négatif (-)",Cw*0.5,Ch*0.84)
 						c.fillText("- Saisir chiffre",Cw*0.5,Ch*0.90)
 						c.fillText("- Se déplacer",Cw*0.5,Ch*0.96)
-					
 						showcursor()
 					}else {
 						c.font = '30px monospace';
@@ -625,7 +622,7 @@ function loopAnimation() {
 					}
 				}
 				if (key.d) {
-					setmenu(6,"lr",0,0,0,0,6);
+					setmenu(5,"lr",0,0,0,0,5);
 					game.screen="hub";
 					game.mainevent="";
 					game.event="";
@@ -700,9 +697,6 @@ function loopAnimation() {
 				break;
 			}
 			break;
-		case "scoreboard":
-
-			break;
 		case "modeArcade":
 			showbackground()
 			c.fillStyle="white";
@@ -753,7 +747,6 @@ function loopAnimation() {
 					game.battle.mode="hard";
 					break;
 				}
-				
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
 					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
@@ -823,7 +816,6 @@ function loopAnimation() {
 					c.fillText("12 sec.",Cw*0.72,Ch*0.37)
 					break;
 				}
-				
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
 				c.font = '42px monospace';
@@ -838,7 +830,6 @@ function loopAnimation() {
 			c.globalAlpha=1;
 			c.textAlign="start";
 			c.font = '22px monospace';
-			
 			c.globalAlpha=0.6;
 			if (game.inputType=="keyboard") {
 				c.fillText("- Valider",Cw*0.32,Ch*0.9)
@@ -1895,7 +1886,7 @@ function loopAnimation() {
 					game.stats.timer=0;
 					if (game.battle.gamemode=="survival-life") {
 						switch (game.setbtl.dif){
-						case 2: 			//très facile
+						case 2:
 							game.stats.maxpv=100;
 							game.stats.maxtimer=600;
 							game.battle.rangemin=3;
@@ -1907,7 +1898,7 @@ function loopAnimation() {
 							game.battle.decaystep=20;
 							game.battle.timerhplose=25;
 							break;
-						case 1.5: 			//facile
+						case 1.5:
 							game.stats.maxpv=100;
 							game.stats.maxtimer=600;
 							game.battle.rangemin=5;
@@ -1919,7 +1910,7 @@ function loopAnimation() {
 							game.battle.decaystep=20;
 							game.battle.timerhplose=25;
 							break;
-						case 1: 			//normal
+						case 1:
 							game.stats.maxpv=100;
 							game.stats.maxtimer=540;
 							game.battle.rangemin=7;
@@ -1931,7 +1922,7 @@ function loopAnimation() {
 							game.battle.decaystep=30;
 							game.battle.timerhplose=50;
 							break;
-						case 0.7: 			//difficile
+						case 0.7:
 							game.stats.maxpv=100;
 							game.stats.maxtimer=480;
 							game.battle.rangemin=9;
@@ -2080,7 +2071,7 @@ function loopAnimation() {
 					break;
 				}
 				
-				if (key.space) {
+				if (key.space&&game.mainevent!="gameover"&&game.mainevent!="wait") {
 					game.mainevent="wait";
 					game.event="calc";
 				}
@@ -2421,21 +2412,25 @@ function loopAnimation() {
 				c.fillStyle="black";
 				c.globalAlpha = 0.92;
 				c.fillRect(0,0,canvas.width,canvas.height)
+				c.textAlign="center";
 				if (game.inputType=="phone") {
 					c.fillStyle="white";
 					c.globalAlpha = 0.15;
 					c.fillRect(Cw*0.27,Ch*0.145,Cw*0.08,Ch*0.11)
 					c.fillRect(Cw*0.65,Ch*0.145,Cw*0.08,Ch*0.11)
 					c.fillRect(Cw*0.77,Ch*0.15,Cw*0.2,Ch*0.1)
-					c.font = '26px monospace';
-					c.textAlign="center";
-					c.globalAlpha=1;
-					c.fillText("Retour",Cw*0.87,Ch*0.22)
 				}
-				c.globalAlpha=1;
+				else {
+					c.globalAlpha=1;
+					c.fillStyle="yellow";
+					c.font = '22px monospace';
+					c.fillText("D",Cw*0.78,Ch*0.2)
+				}
+				c.font = '26px monospace';
 				c.fillStyle="white";
+				c.globalAlpha=1;
+				c.fillText("Retour",Cw*0.87,Ch*0.22)
 				c.font = '32px monospace';
-				c.textAlign="center";
 				c.fillText("Statistiques de performance",Cw*0.5,Ch*0.125)
 				movemenu()
 				switch(game.event){
@@ -3042,7 +3037,7 @@ function loopAnimation() {
 				default:
 					break;
 				}
-				if (key.space) {
+				if (key.space&&game.mainevent!="gameover"&&game.mainevent!="wait") {
 					game.mainevent="wait";
 					game.event="calc";
 				}
@@ -3531,21 +3526,25 @@ function loopAnimation() {
 				c.fillStyle="black";
 				c.globalAlpha = 0.92;
 				c.fillRect(0,0,canvas.width,canvas.height)
+				c.textAlign="center";
 				if (game.inputType=="phone") {
 					c.fillStyle="white";
 					c.globalAlpha = 0.15;
 					c.fillRect(Cw*0.27,Ch*0.145,Cw*0.08,Ch*0.11)
 					c.fillRect(Cw*0.65,Ch*0.145,Cw*0.08,Ch*0.11)
 					c.fillRect(Cw*0.77,Ch*0.15,Cw*0.2,Ch*0.1)
-					c.font = '26px monospace';
-					c.textAlign="center";
-					c.globalAlpha=1;
-					c.fillText("Retour",Cw*0.87,Ch*0.22)
 				}
-				c.globalAlpha=1;
+				else {
+					c.globalAlpha=1;
+					c.fillStyle="yellow";
+					c.font = '22px monospace';
+					c.fillText("D",Cw*0.78,Ch*0.2)
+				}
+				c.font = '26px monospace';
 				c.fillStyle="white";
+				c.globalAlpha=1;
+				c.fillText("Retour",Cw*0.87,Ch*0.22)
 				c.font = '32px monospace';
-				c.textAlign="center";
 				c.fillText("Statistiques de performance",Cw*0.5,Ch*0.125)
 				movemenu()
 				switch(game.event){
@@ -3915,22 +3914,22 @@ function loopAnimation() {
 					game.stats.vies=0;
 					game.stats.timer=0;
 					switch (game.setbtl.dif){
-					case 2:
+					case 2: 			//très facile
 						game.stats.maxvies=5;
 						game.stats.maxtimer=960;
 						game.battle.arcade.level=0;
 						break;
-					case 1.5:
+					case 1.5: 			//facile
 						game.stats.maxvies=5;
 						game.stats.maxtimer=840;
 						game.battle.arcade.level=0;
 						break;
-					case 1:
+					case 1: 			//normal
 						game.stats.maxvies=5;
 						game.stats.maxtimer=720;
 						game.battle.arcade.level=1;
 						break;
-					case 0.7:
+					case 0.7: 			//difficile
 						game.stats.maxvies=5;
 						game.stats.maxtimer=720;
 						game.battle.arcade.level=2;
@@ -4097,7 +4096,7 @@ function loopAnimation() {
 					game.event="begin";
 					game.timer=100;
 				}
-				if (key.space) {
+				if (key.space&&game.mainevent!="gameover"&&game.mainevent!="wait") {
 					game.mainevent="wait";
 					game.event="calc";
 				}
@@ -4399,21 +4398,25 @@ function loopAnimation() {
 				c.fillStyle="black";
 				c.globalAlpha = 0.92;
 				c.fillRect(0,0,canvas.width,canvas.height)
+				c.textAlign="center";
 				if (game.inputType=="phone") {
 					c.fillStyle="white";
 					c.globalAlpha = 0.15;
 					c.fillRect(Cw*0.27,Ch*0.145,Cw*0.08,Ch*0.11)
 					c.fillRect(Cw*0.65,Ch*0.145,Cw*0.08,Ch*0.11)
 					c.fillRect(Cw*0.77,Ch*0.15,Cw*0.2,Ch*0.1)
-					c.font = '26px monospace';
-					c.textAlign="center";
-					c.globalAlpha=1;
-					c.fillText("Retour",Cw*0.87,Ch*0.22)
 				}
-				c.globalAlpha=1;
+				else {
+					c.globalAlpha=1;
+					c.fillStyle="yellow";
+					c.font = '22px monospace';
+					c.fillText("D",Cw*0.78,Ch*0.2)
+				}
+				c.font = '26px monospace';
 				c.fillStyle="white";
+				c.globalAlpha=1;
+				c.fillText("Retour",Cw*0.87,Ch*0.22)
 				c.font = '32px monospace';
-				c.textAlign="center";
 				c.fillText("Statistiques de performance",Cw*0.5,Ch*0.125)
 				movemenu()
 				switch(game.event){
@@ -4670,6 +4673,7 @@ function loopAnimation() {
 	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
 	c.textAlign="end";
 	c.fillText("Version "+version, Cw*0.99, Ch*0.99);
+
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
