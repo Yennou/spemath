@@ -29,7 +29,7 @@ const key = {
 	cooldownmax : 1,
 	pausecooldown : 0
 };
-const version="BETA-1.4.0";
+const version="BETA-1.4.1";
 const Cw= canvas.width, Ch= canvas.height;
 const game = {
 	screen : "loading",
@@ -169,6 +169,10 @@ const anim = {
 	graph:{
 		init:0,
 		step:25
+	},
+	pause:{
+		colorGB:127,
+		opa:0,
 	}
 }
 let input = 0;
@@ -202,6 +206,7 @@ const menu_arcade= new Image();
 const menu_time= new Image();
 const menu_life= new Image();
 const menu_opt= new Image();
+const menu_record= new Image();
 const txt_perfect= new Image();
 const txt_perfect1= new Image();
 const txt_perfect2= new Image();
@@ -251,9 +256,11 @@ menu_arcade.src = directory+"menu_arcade.png";
 menu_time.src = directory+"menu_time.png";
 menu_life.src = directory+"menu_life.png";
 menu_opt.src = directory+"menu_options.png";
+menu_record.src = directory+"menu_record.png";
 txt_perfect.src = directory+"txt_perfect.png";
 txt_perfect1.src = directory+"txt_perfect_layer1.png";
 txt_perfect2.src = directory+"txt_perfect_layer2.png";
+
 ui_hpbar.src = directory+"UI_hpbar.png";
 ui_timerbar.src = directory+"UI_timerbar.png";
 ui_timerbarprogress.src = directory+"UI_timerbarprogress.png";
@@ -267,11 +274,14 @@ ui_lifebar7.src = directory+"UI_lifebar7.png";
 ui_lifebar10.src = directory+"UI_lifebar10.png";
 ui_lifebar20.src = directory+"UI_lifebar20.png";
 ui_progressbar.src = directory+"UI_progressbar.png";
+
 btn_enter.src = directory+"btn_enter.png";
 btn_return.src = directory+"btn_return.png";
 btn_plusmoins.src = directory+"btn_plusmoins.png";
+
 frame_stats.src = directory+"frame_stats.png";
 frame_graph.src = directory+"frame_graph.png";
+
 lvlmap_level.src = directory+"lvlmap_level.png";
 lvlmap_levelP.src = directory+"lvlmap_levelP.png";
 lvlmap_center.src = directory+"lvlmap_center.png";
@@ -280,6 +290,7 @@ lvlmap_select.src = directory+"lvlmap_select.png";
 function loopAnimation() {
 	if (key.cooldown>0) {key.cooldown--}
 	if (game.timer>0) {game.timer--}
+	if (key.pausecooldown>0) key.pausecooldown--;
 	c.fillStyle="black";
 	c.globalAlpha = 1;
 	c.fillRect(0,0,canvas.width,canvas.height)
@@ -301,10 +312,76 @@ function loopAnimation() {
 				c.closePath()
 				c.stroke()
 			} else {
+				optionsLoad()
 				if (localStorage.getItem("version")==null) {
 					localStorage.setItem("version",version)
 				}
-				game.screen="title";
+				if (localStorage.getItem("version")!=version) {
+					game.screen="maj";
+					game.event="choix";
+					setmenu(2,"lr",0.17,0.71,0.31,0);
+				} else {
+					loadSave()
+					game.screen="title";
+					setmenu(2,"ud",0.3,0.47,0,0.09);
+				}
+			}
+			break;
+		case "maj":
+			showbackground()
+			c.globalAlpha=1;
+			c.fillStyle="white";
+			c.textAlign="center";
+			c.font = '48px monospace';
+			c.fillText("- Mise à jour -",Cw*0.5,Ch*0.14)
+			game.inputType=="phone" ? c.font = '20px monospace': c.font = '21px monospace';
+			c.fillText("Une version plus récente du jeu a été mise en ligne.",Cw*0.5,Ch*0.27)
+			c.fillText("Les données sauvegardé actuelle que vous avez peuvent",Cw*0.5,Ch*0.34)
+			c.fillText("être conserver en ajoutant celle de la mise à jour.",Cw*0.5,Ch*0.41)
+			c.font = '22px monospace';
+			
+			switch(game.event){
+			case "choix":
+				c.textAlign="center";
+				c.font = '26px monospace';
+				c.fillText("Que faire des données actuelle ?",Cw*0.5,Ch*0.6)
+				c.font = '22px monospace';
+				c.fillText("Conserver",Cw*0.33,Ch*0.75)
+				c.fillText("Réinitialiser",Cw*0.66,Ch*0.75)
+				if (game.inputType=="phone") {
+					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.18,Ch*0.68,Cw*0.3,Ch*0.11)
+					c.fillRect(Cw*0.51,Ch*0.68,Cw*0.3,Ch*0.11)
+				}
+				else {
+					c.textAlign="start";
+					c.fillText("Contrôles :",Cw*0.12,Ch*0.85)
+					c.fillStyle="yellow";
+					c.fillText("Espace/ Entrée",Cw*0.1,Ch*0.90)
+					c.fillText("Touche directionnel",Cw*0.1,Ch*0.96)
+					c.fillStyle="white";
+					c.fillText("- Valider/ Suivant",Cw*0.5,Ch*0.90)
+					c.fillText("- Se déplacer",Cw*0.5,Ch*0.96)
+					movemenu()
+					showcursor()
+				}
+				if (key.space) {
+					switch(game.menu.target){
+					case 1:
+						majSave()
+						localStorage.setItem("version",version)
+						game.screen="title";
+						setmenu(2,"ud",0.3,0.47,0,0.09)
+						break;
+					case 2:
+						resetSave();
+						localStorage.setItem("version",version)
+						game.screen="title";
+						setmenu(2,"ud",0.3,0.47,0,0.09)
+						break;
+					}
+				}
+				break;
 			}
 			break;
 		case "title" :
@@ -317,8 +394,13 @@ function loopAnimation() {
 					c.font = '50px monospace';
 					c.fillText("Spé Maths",Cw*0.5,Ch*0.35)
 					if (game.inputType=="keyboard") {
+						c.font = '28px monospace';
+						c.fillText("Commencer",Cw*0.5,Ch*0.52)
+						c.fillStyle="grey";
+						c.font = '20px monospace';
+						c.fillText("Réinitialiser sauv.",Cw*0.5,Ch*0.6)
+						c.fillStyle="white";
 						c.font = '22px monospace';
-						c.fillText("Commencer",Cw*0.5,Ch*0.58)
 						c.fillText("Contrôles :",Cw*0.2,Ch*0.66)
 						c.fillStyle="yellow";
 						c.textAlign="start";
@@ -333,16 +415,63 @@ function loopAnimation() {
 						c.fillText("- Symbole négatif (-)",Cw*0.5,Ch*0.84)
 						c.fillText("- Saisir chiffre",Cw*0.5,Ch*0.90)
 						c.fillText("- Se déplacer",Cw*0.5,Ch*0.96)
+						movemenu()
 						showcursor()
 					}else {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.3,Ch*0.78,Cw*0.4,Ch*0.12)
+						c.globalAlpha=1;
 						c.font = '30px monospace';
 						c.fillText("Cliquez pour jouer",Cw*0.5,Ch*0.60)
+						c.fillStyle="grey";
+						c.font = '22px monospace';
+						c.fillText("Réinitialiser sauv.",Cw*0.5,Ch*0.85)
 					}
 					if (key.space) {
 						if(game.menu.target==1){
 							setmenu(5,"lr",0,0,0,0);
 							game.screen="hub";
 						}
+						if(game.menu.target==2){
+							game.mainevent="reset";
+							setmenu(2,"lr",0.17,0.71,0.31,0);
+						}
+					}
+					break;
+				case "reset" : 
+					c.globalAlpha=1;
+					c.textAlign="center";
+					c.font = '26px monospace';
+					c.fillText("Réinitialiser la sauvegarde ?!",Cw*0.5,Ch*0.6)
+					c.font = '22px monospace';
+					c.fillText("Conserver",Cw*0.33,Ch*0.75)
+					c.fillText("Réinitialiser",Cw*0.66,Ch*0.75)
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.18,Ch*0.68,Cw*0.3,Ch*0.11)
+						c.fillRect(Cw*0.51,Ch*0.68,Cw*0.3,Ch*0.11)
+					}
+					else {
+						movemenu()
+						showcursor()
+					}
+					if (key.space) {
+						switch(game.menu.target){
+						case 1:
+							majSave()
+							game.mainevent="mainmenu";
+							setmenu(2,"ud",0.3,0.47,0,0.09)
+							break;
+						case 2:
+							resetSave();
+							game.mainevent="mainmenu";
+							setmenu(2,"ud",0.3,0.47,0,0.09)
+							break;
+						}
+					}
+					else if (key.d) {
+						game.mainevent="mainmenu";
+						setmenu(2,"ud",0.3,0.47,0,0.09)
 					}
 					break;
 				default : 
@@ -618,6 +747,7 @@ function loopAnimation() {
 						game.screen="hub";
 						game.mainevent="";
 						game.event="";
+						optionsUpdate()
 						break;
 					}
 				}
@@ -626,6 +756,7 @@ function loopAnimation() {
 					game.screen="hub";
 					game.mainevent="";
 					game.event="";
+					optionsUpdate()
 				}
 				break;
 			case "select":
@@ -747,6 +878,7 @@ function loopAnimation() {
 					game.battle.mode="hard";
 					break;
 				}
+				
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
 					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
@@ -816,6 +948,7 @@ function loopAnimation() {
 					c.fillText("12 sec.",Cw*0.72,Ch*0.37)
 					break;
 				}
+				
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
 				c.font = '42px monospace';
@@ -830,6 +963,7 @@ function loopAnimation() {
 			c.globalAlpha=1;
 			c.textAlign="start";
 			c.font = '22px monospace';
+			
 			c.globalAlpha=0.6;
 			if (game.inputType=="keyboard") {
 				c.fillText("- Valider",Cw*0.32,Ch*0.9)
@@ -1579,7 +1713,6 @@ function loopAnimation() {
 				c.globalAlpha=0.15;
 				c.fillRect(Cw*0.07,Ch*0.81,Cw*0.22,Ch*0.13)
 				c.fillRect(Cw*0.34,Ch*0.82,Cw*0.32,Ch*0.14)
-				//c.fillRect(Cw*0.7,Ch*0.81,Cw*0.23,Ch*0.13)
 				if (game.menu.target>1) {
 					c.fillRect(Cw*0.25,Ch*0.34,Cw*0.12,Ch*0.2)
 				}
@@ -1593,7 +1726,6 @@ function loopAnimation() {
 			c.fillText("Jouer",Cw*0.5,Ch*0.92)
 			c.font = '30px monospace';
 			c.fillText("Retour",Cw*0.18,Ch*0.9)
-			//c.fillText("Détails",Cw*0.82,Ch*0.9)
 			c.font = '24px monospace';
 			c.textAlign="start";
 			c.fillText("Record :",Cw*0.05,Ch*0.65)
@@ -1828,12 +1960,15 @@ function loopAnimation() {
 			c.font = '20px monospace';
 			c.textAlign="center";
 			c.fillText("Correct",Cw*0.5,Ch*0.08)
-			c.globalAlpha=0.15;
+			c.globalAlpha=0.15+anim.pause.opa/50;
+			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/420))+","+(255*(1-key.pausecooldown/420))+")";
+			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/420),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
-			c.globalAlpha=0.6;
+			c.globalAlpha=0.6+anim.pause.opa/50;
 			c.font = '26px monospace';
 			c.fillText("Pause",Cw*0.125,Ch*0.94)
 			c.globalAlpha=1;
+			c.fillStyle="white";
 			c.font = '40px monospace';
 			c.fillText(game.stats.clear,Cw*0.5,Ch*0.17)
 			c.font = '30px monospace';
@@ -2028,10 +2163,15 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "play":
@@ -2076,10 +2216,15 @@ function loopAnimation() {
 					game.event="calc";
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "wait":
@@ -2127,10 +2272,15 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "pause":
@@ -2159,7 +2309,8 @@ function loopAnimation() {
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					key.p=false;
-					key.space=false
+					key.space=false;
+					key.pausecooldown=420
 				}
 				if (key.d) {
 					game.mainevent="exit";
@@ -2371,7 +2522,7 @@ function loopAnimation() {
 									game.mainevent="stats";
 									game.event="global";
 									setmenu(game.stats.level.length,"ud",0,0,0,0);
-									game.menu.target=game.stats.level.length;
+									anim.graph.init=0;
 									break;
 								}
 							}
@@ -2507,7 +2658,11 @@ function loopAnimation() {
 						c.lineWidth=3;
 						c.globalAlpha=1;
 						c.beginPath()
-						c.lineTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].HPleft/maxHP))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].HPleft/maxHP))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].HPleft/maxHP))
@@ -2580,7 +2735,12 @@ function loopAnimation() {
 						c.globalAlpha=1;
 						c.strokeStyle="rgb(38, 183, 255)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].maxtimer/maxTimer))
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].maxtimer/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].maxtimer/maxTimer))
@@ -2590,7 +2750,11 @@ function loopAnimation() {
 						c.stroke()
 						c.strokeStyle="rgb(80, 80, 255)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].timerB/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.51*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timerB/maxTimer))
@@ -2599,7 +2763,11 @@ function loopAnimation() {
 						c.stroke()
 						c.strokeStyle="rgb(75, 214, 71)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timeResp/maxTimer))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].timeResp/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timeResp/maxTimer))
@@ -2719,12 +2887,15 @@ function loopAnimation() {
 			c.font = '20px monospace';
 			c.textAlign="center";
 			c.fillText("Restant",Cw*0.5,Ch*0.08)
-			c.globalAlpha=0.15;
+			c.globalAlpha=0.15+anim.pause.opa/50;
+			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/420))+","+(255*(1-key.pausecooldown/420))+")";
+			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/420),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
-			c.globalAlpha=0.6;
+			c.globalAlpha=0.6+anim.pause.opa/50;
 			c.font = '26px monospace';
 			c.fillText("Pause",Cw*0.125,Ch*0.94)
 			c.globalAlpha=1;
+			c.fillStyle="white";
 			c.font = '40px monospace';
 			c.fillText(game.battle.left,Cw*0.5,Ch*0.17)
 			c.font = '30px monospace';
@@ -2932,10 +3103,15 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "play":
@@ -3042,10 +3218,15 @@ function loopAnimation() {
 					game.event="calc";
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "wait":
@@ -3075,10 +3256,15 @@ function loopAnimation() {
 					}
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "pause":
@@ -3107,7 +3293,8 @@ function loopAnimation() {
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					key.p=false;
-					key.space=false
+					key.space=false;
+					key.pausecooldown=420
 				}
 				if (key.d) {
 					game.mainevent="exit";
@@ -3288,7 +3475,7 @@ function loopAnimation() {
 								game.mainevent="stats";
 								game.event="global";
 								setmenu(game.stats.level.length,"ud",0,0,0,0);
-								game.menu.target=game.stats.level.length;
+								anim.graph.init=0;
 								break;
 							}
 						}
@@ -3490,7 +3677,7 @@ function loopAnimation() {
 								game.mainevent="stats";
 								game.event="global";
 								setmenu(game.stats.level.length,"ud",0,0,0,0);
-								game.menu.target=game.stats.level.length;
+								anim.graph.init=0;
 								break;
 							}
 						}
@@ -3621,7 +3808,11 @@ function loopAnimation() {
 						c.lineWidth=3;
 						c.globalAlpha=1;
 						c.beginPath()
-						c.lineTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].HPleft/maxHP))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].HPleft/maxHP))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].HPleft/maxHP))
@@ -3694,7 +3885,12 @@ function loopAnimation() {
 						c.globalAlpha=1;
 						c.strokeStyle="rgb(38, 183, 255)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].maxtimer/maxTimer))
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].maxtimer/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].maxtimer/maxTimer))
@@ -3704,7 +3900,11 @@ function loopAnimation() {
 						c.stroke()
 						c.strokeStyle="rgb(80, 80, 255)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].timerB/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.51*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timerB/maxTimer))
@@ -3713,7 +3913,11 @@ function loopAnimation() {
 						c.stroke()
 						c.strokeStyle="rgb(75, 214, 71)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timeResp/maxTimer))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].timeResp/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timeResp/maxTimer))
@@ -3813,6 +4017,8 @@ function loopAnimation() {
 				anim.regenbar.time=50;
 			}
 			if (anim.regenbar.time==0||anim.regenbar.time==50) anim.regenbar.invert=!anim.regenbar.invert;
+
+			if (anim.pause.opa>0) anim.pause.opa--;
 			c.fillStyle="white";
 			c.globalAlpha=1;
 			c.font = '26px monospace';
@@ -3822,10 +4028,11 @@ function loopAnimation() {
 			c.textAlign="center";
 			game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
 			game.battle.arcade.phase=="normal"?c.fillText("Correct",Cw*0.5,Ch*0.08):c.fillText("Bonus",Cw*0.5,Ch*0.08);
-			c.globalAlpha=0.15;
-			c.fillStyle="white";
+			c.globalAlpha=0.15+anim.pause.opa/50;
+			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/420))+","+(255*(1-key.pausecooldown/420))+")";
+			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/420),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
-			c.globalAlpha=0.6;
+			c.globalAlpha=0.6+anim.pause.opa/50;
 			c.font = '26px monospace';
 			c.fillText("Pause",Cw*0.125,Ch*0.94)
 			c.globalAlpha=1;
@@ -3914,22 +4121,22 @@ function loopAnimation() {
 					game.stats.vies=0;
 					game.stats.timer=0;
 					switch (game.setbtl.dif){
-					case 2: 			//très facile
+					case 2:
 						game.stats.maxvies=5;
 						game.stats.maxtimer=960;
 						game.battle.arcade.level=0;
 						break;
-					case 1.5: 			//facile
+					case 1.5:
 						game.stats.maxvies=5;
 						game.stats.maxtimer=840;
 						game.battle.arcade.level=0;
 						break;
-					case 1: 			//normal
+					case 1:
 						game.stats.maxvies=5;
 						game.stats.maxtimer=720;
 						game.battle.arcade.level=1;
 						break;
-					case 0.7: 			//difficile
+					case 0.7:
 						game.stats.maxvies=5;
 						game.stats.maxtimer=720;
 						game.battle.arcade.level=2;
@@ -4013,10 +4220,15 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "switchmode":
@@ -4066,10 +4278,15 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "play":
@@ -4101,10 +4318,15 @@ function loopAnimation() {
 					game.event="calc";
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "wait":
@@ -4138,10 +4360,15 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "pause":
@@ -4171,6 +4398,7 @@ function loopAnimation() {
 					game.prevevent="";
 					key.p=false;
 					key.space=false
+					key.pausecooldown=420;
 				}
 				if (key.d) {
 					game.mainevent="exit";
@@ -4357,7 +4585,7 @@ function loopAnimation() {
 									game.mainevent="stats";
 									game.event="global";
 									setmenu(game.stats.level.length,"ud",0,0,0,0);
-									game.menu.target=game.stats.level.length;
+									anim.graph.init=0;
 									break;
 								}
 							}
@@ -4378,7 +4606,7 @@ function loopAnimation() {
 						c.globalAlpha=1;
 						c.fillRect(0,0,Cw,Ch)
 						if (game.timer==0) {
-							setmenu(6,"lr",0,0,0,0,2);
+							setmenu(5,"lr",0,0,0,0,2);
 							game.screen="hub";
 							game.mainevent="";
 							game.event="fadeout";
@@ -4493,7 +4721,11 @@ function loopAnimation() {
 						c.lineWidth=3;
 						c.globalAlpha=1;
 						c.beginPath()
-						c.lineTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].HPleft/maxHP))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].HPleft/maxHP))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].HPleft/maxHP))
@@ -4566,7 +4798,12 @@ function loopAnimation() {
 						c.globalAlpha=1;
 						c.strokeStyle="rgb(38, 183, 255)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].maxtimer/maxTimer))
+						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].maxtimer/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].maxtimer/maxTimer))
@@ -4576,7 +4813,11 @@ function loopAnimation() {
 						c.stroke()
 						c.strokeStyle="rgb(80, 80, 255)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].timerB/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.51*(game.stats.level[anim.graph.init].timerB/maxTimer))
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timerB/maxTimer))
@@ -4585,7 +4826,11 @@ function loopAnimation() {
 						c.stroke()
 						c.strokeStyle="rgb(75, 214, 71)";
 						c.beginPath()
-						c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init].timeResp/maxTimer))
+						if (anim.graph.init!=0){
+							c.moveTo(Cw*0.09,Ch*0.8-Ch*0.515*(game.stats.level[anim.graph.init-1].timeResp/maxTimer))
+						} else {
+							c.moveTo(Cw*0.09,Ch*0.8)
+						}
 						for (let i = anim.graph.init; i < anim.graph.init+anim.graph.step; i++) {
 							if (i>=0&&i<game.stats.level.length) {
 								c.lineTo(Cw*0.09+(Cw*0.85/anim.graph.step)*(i+1-anim.graph.init),Ch*0.8-Ch*0.515*(game.stats.level[i].timeResp/maxTimer))
@@ -4677,5 +4922,4 @@ function loopAnimation() {
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
-
 chargement++

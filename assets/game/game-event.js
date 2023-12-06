@@ -159,6 +159,8 @@ canvas.addEventListener('touchmove', function(event){
 		mouse.hasmove=true;
 		switch(game.screen){
 		case "survival":
+		case "level":
+		case "arcade":
 			switch(game.mainevent){
 			case "stats":
 				switch(game.event){
@@ -181,9 +183,11 @@ canvas.addEventListener('touchmove', function(event){
 						if (mouse.range<-1) {
 							mouse.range++;
 							anim.graph.init--;
+							game.menu.target--
 						} else if (mouse.range>1) {
 							mouse.range--;
 							anim.graph.init++;
+							game.menu.target++
 						}
 					}
 					if (anim.graph.init<0) {
@@ -192,84 +196,8 @@ canvas.addEventListener('touchmove', function(event){
 					else if (anim.graph.init>game.menu.options-1){
 						anim.graph.init=game.menu.options-1
 					}
-					break;
-				}
-				break;
-			}
-			break;
-		case "level":
-			switch(game.mainevent){
-			case "stats":
-				switch(game.event){
-				case "global":
-					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
-						mouse.range+=(mouse.prey-mouse.y)/10;
-						if (mouse.range<-1) {
-							mouse.range++;
-							game.menu.target--;
-						} else if (mouse.range>1) {
-							mouse.range--;
-							game.menu.target++;
-						}
-					}
-					break;
-				case "vies":
-				case "temps":
-					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
-						mouse.range+=(mouse.prex-mouse.x)/10;
-						if (mouse.range<-1) {
-							mouse.range++;
-							anim.graph.init--;
-						} else if (mouse.range>1) {
-							mouse.range--;
-							anim.graph.init++;
-						}
-					}
-					if (anim.graph.init<0) {
-						anim.graph.init=0;
-					}
-					else if (anim.graph.init>game.menu.options-1){
-						anim.graph.init=game.menu.options-1
-					}
-					break;
-				}
-				break;
-			}
-			break;
-		case "arcade":
-			switch(game.mainevent){
-			case "stats":
-				switch(game.event){
-				case "global":
-					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
-						mouse.range+=(mouse.prey-mouse.y)/10;
-						if (mouse.range<-1) {
-							mouse.range++;
-							game.menu.target--;
-						} else if (mouse.range>1) {
-							mouse.range--;
-							game.menu.target++;
-						}
-					}
-					break;
-				case "vies":
-				case "temps":
-					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
-						mouse.range+=(mouse.prex-mouse.x)/10;
-						if (mouse.range<-1) {
-							mouse.range++;
-							anim.graph.init--;
-						} else if (mouse.range>1) {
-							mouse.range--;
-							anim.graph.init++;
-						}
-					}
-					if (anim.graph.init<0) {
-						anim.graph.init=0;
-					}
-					else if (anim.graph.init>game.menu.options-1){
-						anim.graph.init=game.menu.options-1
-					}
+					if (game.menu.target<1) game.menu.target=1;
+					if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
 					break;
 				}
 				break;
@@ -288,13 +216,51 @@ canvas.addEventListener("touchend", function(event){
 		if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
 	}
 })
+
 function clicEvent(){
 	switch(game.screen){
+		case "maj":
+			switch(game.event){
+			case "choix":
+				if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.18+Cw*0.3 && mouse.y <= Ch*0.68+Ch*0.11) {
+					majSave()
+					localStorage.setItem("version",version)
+					game.screen="title";
+					setmenu(2,"ud",0.3,0.47,0,0.09)
+				}
+				if (mouse.x >= Cw*0.51 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.51+Cw*0.3 && mouse.y <= Ch*0.68+Ch*0.11) {
+					resetSave();
+					localStorage.setItem("version",version)
+					game.screen="title";
+					setmenu(2,"ud",0.3,0.47,0,0.09)
+				}
+				break;
+			}
+			break;
 		case "title":
 			switch(game.mainevent){
 			case "mainmenu":
-				setmenu(5,"lr",0,0,0,0);
-				game.screen="hub";
+				if (mouse.x >= Cw*0.3 && mouse.y >= Ch*0.78 && mouse.x <= Cw*0.3+Cw*0.4 && mouse.y <= Ch*0.78+Ch*0.12) {
+					game.mainevent="reset";
+					setmenu(2,"lr",0.17,0.71,0.31,0);
+				}
+				else {
+					setmenu(5,"lr",0,0,0,0);
+					game.screen="hub";
+				}
+				break;
+			case "reset":
+				if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.18+Cw*0.3 && mouse.y <= Ch*0.68+Ch*0.11) {
+					majSave()
+					game.mainevent="mainmenu";
+					setmenu(2,"ud",0.3,0.47,0,0.09)
+				}
+				if (mouse.x >= Cw*0.51 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.51+Cw*0.3 && mouse.y <= Ch*0.68+Ch*0.11) {
+					resetSave();
+					game.mainevent="mainmenu";
+					setmenu(2,"ud",0.3,0.47,0,0.09)
+				}
+				break;
 			default:
 				break;
 			}
@@ -370,7 +336,9 @@ function clicEvent(){
 				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.74 && mouse.x <= Cw*0.07+Cw*0.2 && mouse.y <= Ch*0.74+Ch*0.08) {
 					setmenu(5,"lr",0,0,0,0,6);
 					game.screen="hub";
-					game.mainevent=""
+					game.mainevent="";
+					game.event="";
+					optionsUpdate()
 				}
 				break;
 			case "select":
@@ -618,10 +586,15 @@ function clicEvent(){
 			case "play":
 			case "wait":
 				if (mouse.x >= Cw*0.035 && mouse.y >= Ch*0.875 && mouse.x <= Cw*0.035+120 && mouse.y <= Ch*0.875+40) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "pause":
@@ -631,12 +604,12 @@ function clicEvent(){
 				}
 				else {
 					game.mainevent=game.prevevent;
-					if (game.mainevent=="play") IGTtimer();
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					RTAtimer()
 					key.p=false;
 					key.space=false;
+					key.pausecooldown=420
 				}
 				break;
 			case "exit":
@@ -675,7 +648,7 @@ function clicEvent(){
 						game.mainevent="stats";
 						game.event="global";
 						setmenu(game.stats.level.length,"ud",0,0,0,0);
-						game.menu.target=game.stats.level.length
+						anim.graph.init=0;
 					}
 					break;
 				default:
@@ -734,10 +707,15 @@ function clicEvent(){
 			case "play":
 			case "wait":
 				if (mouse.x >= Cw*0.035 && mouse.y >= Ch*0.875 && mouse.x <= Cw*0.035+120 && mouse.y <= Ch*0.875+40) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "pause":
@@ -747,12 +725,12 @@ function clicEvent(){
 				}
 				else {
 					game.mainevent=game.prevevent;
-					if (game.mainevent=="play") IGTtimer();
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					RTAtimer()
 					key.p=false;
 					key.space=false;
+					key.pausecooldown=420
 				}
 				break;
 			case "exit":
@@ -783,7 +761,7 @@ function clicEvent(){
 						game.prevevent="gameover";
 						game.event="global";
 						setmenu(game.stats.level.length,"ud",0,0,0,0);
-						game.menu.target=game.stats.level.length
+						anim.graph.init=0;
 					}
 					break;
 				default:
@@ -850,7 +828,7 @@ function clicEvent(){
 						game.prevevent="finish";
 						game.event="global";
 						setmenu(game.stats.level.length,"ud",0,0,0,0);
-						game.menu.target=game.stats.level.length
+						anim.graph.init=0;
 					}
 					break;
 				default:
@@ -867,10 +845,15 @@ function clicEvent(){
 			case "play":
 			case "wait":
 				if (mouse.x >= Cw*0.035 && mouse.y >= Ch*0.875 && mouse.x <= Cw*0.035+120 && mouse.y <= Ch*0.875+40) {
-					game.prevevent=game.mainevent;
-					game.mainevent="pause";
-					game.prevtimer=game.timer;
-					game.timer=40;
+					if (key.pausecooldown==0) {
+						game.prevevent=game.mainevent;
+						game.mainevent="pause";
+						game.prevtimer=game.timer;
+						game.timer=40;
+					}
+					else {
+						anim.pause.opa=20;
+					}
 				}
 				break;
 			case "pause":
@@ -880,12 +863,12 @@ function clicEvent(){
 				}
 				else {
 					game.mainevent=game.prevevent;
-					if (game.mainevent=="play") IGTtimer();
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					RTAtimer()
 					key.p=false;
 					key.space=false;
+					key.pausecooldown=420
 				}
 				break;
 			case "exit":
@@ -916,7 +899,7 @@ function clicEvent(){
 						game.prevevent="gameover";
 						game.event="global";
 						setmenu(game.stats.level.length,"ud",0,0,0,0);
-						game.menu.target=game.stats.level.length
+						anim.graph.init=0;
 					}
 					break;
 				default:
@@ -962,31 +945,6 @@ function clicEvent(){
 						game.menu.target=Math.floor((mouse.x-Cw*0.09)/(Cw*0.85)*anim.graph.step)+anim.graph.init;
 						if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
 					}
-					break;
-				}
-				break;
-			case "finish":
-				switch(game.event){
-				case "finpop":
-					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
-						game.mainevent="starting";
-						game.event="set";
-						game.timer=20;
-						resetStats()
-					}
-					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
-						game.event="transition2";
-						game.timer=50;
-					}
-					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
-						game.mainevent="stats";
-						game.prevevent="finish";
-						game.event="global";
-						setmenu(game.stats.level.length,"ud",0,0,0,0);
-						game.menu.target=game.stats.level.length
-					}
-					break;
-				default:
 					break;
 				}
 				break;

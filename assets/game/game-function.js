@@ -1,4 +1,3 @@
-
 function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
 	game.menu.options = numoption;
 	game.menu.direction = direction;
@@ -42,7 +41,6 @@ function showcursor(cursortype=0){
 	c.fillStyle = "white";
 	c.fillRect(Cw*game.menu.posx,Ch*game.menu.posy,20,20)
 }
-
 function inputPlayer(){
 	c.globalAlpha=game.option.inputOpacity/100;
 	c.fillStyle="white";
@@ -122,7 +120,6 @@ function resetInput(inputName){
 		setTimeout(resetInput,2,inputName)
 	}
 }
-
 function resetStats(){
 	game.stats.score = 0;
 	game.stats.clear = 0;
@@ -148,7 +145,6 @@ function resetStats(){
 	input=0;
 	pass=false;
 }
-
 function RTAtimer(){
 	if (game.mainevent=="play"||game.mainevent=="wait") {
 		game.stats.timeTot++;
@@ -164,7 +160,6 @@ function ShowTimerRes(temps){
 	let sec = Math.floor(temps/60);
 	return sec+"."+milisec
 }
-
 function generatePuzzleMode1() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
@@ -233,7 +228,6 @@ function generatePuzzleMode2() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
 	if (game.battle.sub) tabsymb.push("moins");
-	//if (game.battle.mult) tabsymb.push("mult");
 	game.stats.timeRep=0;
 	if (pass) {
 		if (game.battle.symb=="plus") {
@@ -400,6 +394,7 @@ function generatePuzzleArcade() {
 
 function validatePuzzle() {
 	let validate = false;
+	let maxtimer = get_maxtimerdecay(game.stats.maxtimer,game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))));
 	let result = 0;
 	let dmg=0;
 	let bonustime=0;
@@ -456,7 +451,7 @@ function validatePuzzle() {
 		game.stats.timeRep/60,
 		dmg*-1,
 		get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),
-		get_maxtimerdecay(game.stats.maxtimer,game.stats.maxtimer*(0.33*(game.stats.clear/200*(game.setbtl.dif/1)))),
+		maxtimer,
 		timerB,
 		get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),
 		bonustime/60,
@@ -467,6 +462,7 @@ function validatePuzzle() {
 }
 function validatePuzzle2() {
 	let validate = false;
+	let maxtimer = get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay);
 	let result = 0;
 	let dmg=0;
 	let timerB=0;
@@ -530,11 +526,12 @@ function validatePuzzle2() {
 		game.battle.score=0;
 	}
 	game.stats.timer=game.stats.maxtimer-game.stats.timerDecay;
-	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay),timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),0,(validate?game.stats.clear:game.stats.clear+1),validate))
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),0,(validate?game.stats.clear:game.stats.clear+1),validate))
 	return validate
 }
 function validatePuzzlelvl() {
 	let validate = false;
+	let maxtimer = get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay);
 	let result = 0;
 	let dmg=0
 	let bonustime=0;
@@ -615,11 +612,12 @@ function validatePuzzlelvl() {
 	}
 	bonustime=game.stats.maxtimer-game.stats.timerDecay;
 	game.stats.timer=bonustime;
-	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay),timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),(game.stats.maxtimer>0?bonustime/60:-1),(validate?game.stats.clear:game.stats.clear+1),validate))
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),(game.stats.maxtimer>0?bonustime/60:-1),(validate?game.stats.clear:game.stats.clear+1),validate))
 	return validate
 }
 function validatePuzzleArcade() {
 	let validate = false;
+	let maxtimer = get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay);
 	let result = 0;
 	let dmg=0;
 	let bonustime=0;
@@ -693,7 +691,7 @@ function validatePuzzleArcade() {
 		game.stats.timeRep/60,
 		dmg*-1,
 		get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),
-		get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay),
+		maxtimer,
 		timerB,
 		get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),
 		bonustime/60,
@@ -1129,12 +1127,45 @@ class statsoperation{
 		this.valide = valide;
 	}
 }
+function majSave(){
+	let actualSave = JSON.parse(localStorage.save.toString());
+	let lvlcount = 1;
+	let count = [];
+	for (lvlcount; lvlcount <10; lvlcount++) {
+		if (actualSave.levels[lvlcount]!==undefined){
+			for (let i = 1; i <100; i++) {
+				if (actualSave.levels[lvlcount][i]!==undefined) count[lvlcount-1]=i;
+			}
+		}else {
+			break;
+		}
+	}
+	for (let i = 0;i<count.length;i++){
+		if (count[i]<levels[i+1].nblvl) {
+			let addlvl = levels[i+1].nblvl-count[i];
+			console.log(addlvl)
+			for (let j=0; j < addlvl; j++) {
+				actualSave.levels[i+1][count[i]+j+1]= {
+					score:0,
+					perfect:false,
+					clear: false,
+				}
+			}
+		}
+	}
+	saves = actualSave
+}
 
 function saveUpdate(){
 	localStorage.setItem("save",JSON.stringify(saves))
 }
 function optionsUpdate(){
 	localStorage.setItem("option",JSON.stringify(game.option))
+}
+function optionsLoad(){
+	if (localStorage.getItem("option")!==null) {
+		game.option=JSON.parse(localStorage.option.toString());
+	}
 }
 
 function mirrorDraw(img,initx,inity,cropx,cropy,posx,posy,width,height){
