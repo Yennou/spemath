@@ -216,7 +216,6 @@ canvas.addEventListener("touchend", function(event){
 		if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
 	}
 })
-
 function clicEvent(){
 	switch(game.screen){
 		case "maj":
@@ -630,7 +629,7 @@ function clicEvent(){
 						switch (game.battle.gamemode) {
 						case "survival-timer":
 							game.mainevent="starting";
-							game.event="transition";
+							game.event="set";
 							game.timer=20;
 							break;
 						case "survival-life":

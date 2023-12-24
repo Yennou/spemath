@@ -209,6 +209,15 @@ main {
 	width: 410px;
 	margin: 0 2px; 
 }
+.error{
+	width: 100%;
+	background-color: rgb(220, 200, 200);
+	padding: 3px 5px 3px 12px;
+	color: rgb(180,0,0);
+	border: solid rgb(220,0,0) 2px;
+	border-radius: 5px;
+	font-size: 18px;
+}
 
 footer {
 	display: flex;
@@ -424,18 +433,23 @@ footer ul li a {
 }
 .btn-game-menu {
 	position: absolute;
-	padding:12px 0 0 8px;
+	padding:11px 0 0 7px;
 	font-size: 24px;
 	font-weight: bolder;
 	bottom: 156px;
 	width: 50px;
+	opacity: 60%;
 	height: 50px;
-	border: white solid 1px;
+	border: white solid 2px;
 	border-radius: 50% 50% 0 0;
 	background-color: rgba(0, 0, 0, 0.5);
 }
+.btn-game-menu:hover {
+	opacity: 100%;
+}
 .btn-game-menu-active {
 	bottom:156px;
+	opacity: 100%;
 	background-color: rgba(255, 255, 255, 0.3);
 }
 .btn-game-off {
@@ -603,13 +617,13 @@ footer ul li a {
 	}
 	.btn-game-menu {
 		position: absolute;
-		padding:12px 0 0 8px;
+		padding:11px 0 0 7px;
 		font-size: 24px;
 		font-weight: bolder;
 		bottom: 149px;
 		width: 50px;
 		height: 50px;
-		border: white solid 1px;
+		border: white solid 2px;
 		border-radius: 50% 50% 0 0;
 		background-color: rgba(0, 0, 0, 0.5);
 	}
@@ -640,13 +654,13 @@ footer ul li a {
 	}
 	.btn-game-menu {
 		position: absolute;
-		padding:12px 0 0 8px;
+		padding:11px 0 0 7px;
 		font-size: 24px;
 		font-weight: bolder;
 		bottom: 71px;
 		width: 50px;
 		height: 50px;
-		border: white solid 1px;
+		border: white solid 2px;
 		border-radius: 50% 50% 0 0;
 		background-color: rgba(0, 0, 0, 0.5);
 	}

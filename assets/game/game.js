@@ -1,12 +1,9 @@
 const directory="assets/game/assets/";
-
-
 const canvas = document.getElementById("canvas1");
 const c = canvas.getContext("2d");
 canvas.width = 650;
 canvas.height = 450;
 let canvasPosition = canvas.getBoundingClientRect();
-
 const mouse = {
 	x: canvas.width/2,
 	y: canvas.height/2,
@@ -29,7 +26,7 @@ const key = {
 	cooldownmax : 1,
 	pausecooldown : 0
 };
-const version="BETA-1.4.1";
+const version="BETA-1.4.2";
 const Cw= canvas.width, Ch= canvas.height;
 const game = {
 	screen : "loading",
@@ -38,13 +35,14 @@ const game = {
 	inputType:"keyboard",
 	prevevent : "",
 	prevtimer : 0,
-
 	option : {
 		music : 100,
 		sound : 100,
 		inputOpacity: 60,
 		bckgrndOpacity: 100,
+		animation:"alt"
 	},
+	nosave:false,
 	menu : {
 		options : 3,
 		target : 1,
@@ -162,7 +160,7 @@ const anim = {
 		invert:false,
 	},
 	background:{
-		type:3,
+		type:Math.floor(Math.random()*4),
 		stock:[],
 		timer:0,
 	},
@@ -297,6 +295,7 @@ function loopAnimation() {
 	switch (game.screen) {
 		case "loading":
 			if (chargement!=4) {
+				hideErrorMsg()
 				c.fillStyle="black";
 				c.fillRect(0,0,canvas.width,canvas.height)
 				c.textAlign="center";
@@ -311,16 +310,30 @@ function loopAnimation() {
 				c.rect(canvas.width*0.275,canvas.height*0.833,canvas.width*0.45,canvas.height*0.02)
 				c.closePath()
 				c.stroke()
-			} else {
-				optionsLoad()
-				if (localStorage.getItem("version")==null) {
-					localStorage.setItem("version",version)
+				game.prevtimer++;
+				if (game.prevtimer>1200) {
+					setErrorMsg("ERREUR 1 : Un des fichiers du jeu n'a pas été correctement chargé, actualisez la page en vidant le cache du navigateur si le problème persiste.")
 				}
-				if (localStorage.getItem("version")!=version) {
+			} else {
+				game.prevtimer=0;
+				hideErrorMsg()
+				let Maj = checkSave()
+				if (localStorage.getItem("version")==null) {
+					game.screen="init";
+					game.event="choix";
+					setmenu(2,"lr",0.2,0.71,0.31,0);
+				}
+				else if (localStorage.getItem("version")!=null&&Maj==2) {
+					game.screen="init";
+					game.event="choix";
+					setmenu(2,"lr",0.22,0.71,0.31,0);
+				}
+				else if (localStorage.getItem("version")!=version||Maj==1) {
 					game.screen="maj";
 					game.event="choix";
 					setmenu(2,"lr",0.17,0.71,0.31,0);
 				} else {
+					optionsLoad()
 					loadSave()
 					game.screen="title";
 					setmenu(2,"ud",0.3,0.47,0,0.09);
@@ -334,7 +347,7 @@ function loopAnimation() {
 			c.textAlign="center";
 			c.font = '48px monospace';
 			c.fillText("- Mise à jour -",Cw*0.5,Ch*0.14)
-			game.inputType=="phone" ? c.font = '20px monospace': c.font = '21px monospace';
+			game.inputType=="phone" ? c.font = '19px monospace': c.font = '21px monospace';
 			c.fillText("Une version plus récente du jeu a été mise en ligne.",Cw*0.5,Ch*0.27)
 			c.fillText("Les données sauvegardé actuelle que vous avez peuvent",Cw*0.5,Ch*0.34)
 			c.fillText("être conserver en ajoutant celle de la mise à jour.",Cw*0.5,Ch*0.41)
@@ -366,6 +379,8 @@ function loopAnimation() {
 					showcursor()
 				}
 				if (key.space) {
+					game.option.animation="alt";
+					optionsUpdate()
 					switch(game.menu.target){
 					case 1:
 						majSave()
@@ -374,8 +389,67 @@ function loopAnimation() {
 						setmenu(2,"ud",0.3,0.47,0,0.09)
 						break;
 					case 2:
-						resetSave();
+						resetSave()
 						localStorage.setItem("version",version)
+						game.screen="title";
+						setmenu(2,"ud",0.3,0.47,0,0.09)
+						break;
+					}
+				}
+				break;
+			}
+			break;
+		case "init":
+			showbackground()
+			c.globalAlpha=1;
+			c.fillStyle="white";
+			c.textAlign="center";
+			c.font = '48px monospace';
+			c.fillText("- Initialisation -",Cw*0.5,Ch*0.14)
+			game.inputType=="phone" ? c.font = '19px monospace': c.font = '21px monospace';
+			c.fillText("Ce jeu utilise le Stockage Locale de votre navigateur",Cw*0.5,Ch*0.27)
+			c.fillText("pour enregistrer les données de progression.",Cw*0.5,Ch*0.34)
+			c.fillText("Aucune données personnels ne sera récolter.",Cw*0.5,Ch*0.41)
+			c.font = '22px monospace';
+			switch(game.event){
+			case "choix":
+				c.textAlign="center";
+				c.font = '26px monospace';
+				c.fillText("Activer ce système de sauvegarde ?",Cw*0.5,Ch*0.6)
+				c.font = '22px monospace';
+				c.fillText("Oui",Cw*0.33,Ch*0.75)
+				c.fillText("Non",Cw*0.66,Ch*0.75)
+				if (game.inputType=="phone") {
+					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.18,Ch*0.68,Cw*0.3,Ch*0.11)
+					c.fillRect(Cw*0.51,Ch*0.68,Cw*0.3,Ch*0.11)
+				}
+				else {
+					c.textAlign="start";
+					c.fillText("Contrôles :",Cw*0.12,Ch*0.85)
+					c.fillStyle="yellow";
+					c.fillText("Espace/ Entrée",Cw*0.1,Ch*0.90)
+					c.fillText("Touche directionnel",Cw*0.1,Ch*0.96)
+					c.fillStyle="white";
+					c.fillText("- Valider/ Suivant",Cw*0.5,Ch*0.90)
+					c.fillText("- Se déplacer",Cw*0.5,Ch*0.96)
+					movemenu()
+					showcursor()
+				}
+				if (key.space) {
+					game.option.animation="alt";
+					switch(game.menu.target){
+					case 1:
+						majSave()
+						saveUpdate()
+						optionsUpdate()
+						localStorage.setItem("version",version)
+						game.screen="title";
+						setmenu(2,"ud",0.3,0.47,0,0.09)
+						break;
+					case 2:
+						game.nosave=true;
+						majSave()
 						game.screen="title";
 						setmenu(2,"ud",0.3,0.47,0,0.09)
 						break;
@@ -399,6 +473,10 @@ function loopAnimation() {
 						c.fillStyle="grey";
 						c.font = '20px monospace';
 						c.fillText("Réinitialiser sauv.",Cw*0.5,Ch*0.6)
+						if (game.nosave) {
+							c.fillStyle="red";
+							c.fillText("Sauvegarde désactivé !",Cw*0.5,Ch*0.05)
+						}
 						c.fillStyle="white";
 						c.font = '22px monospace';
 						c.fillText("Contrôles :",Cw*0.2,Ch*0.66)
@@ -442,7 +520,9 @@ function loopAnimation() {
 					c.globalAlpha=1;
 					c.textAlign="center";
 					c.font = '26px monospace';
-					c.fillText("Réinitialiser la sauvegarde ?!",Cw*0.5,Ch*0.6)
+					c.fillText("Réinitialiser la sauvegarde ?!",Cw*0.5,Ch*0.5)
+					c.font = '20px monospace';
+					c.fillText("Attention : Ce choix n'est pas réverssible !",Cw*0.5,Ch*0.6)
 					c.font = '22px monospace';
 					c.fillText("Conserver",Cw*0.33,Ch*0.75)
 					c.fillText("Réinitialiser",Cw*0.66,Ch*0.75)
@@ -481,6 +561,13 @@ function loopAnimation() {
 			break;
 		case "hub":
 			showbackground()
+			c.globalAlpha=0.5;
+			if (game.nosave) {
+				c.textAlign="center";
+				c.font = '20px monospace';
+				c.fillStyle="red";
+				c.fillText("Sauvegarde désactivé !",Cw*0.5,Ch*0.05)
+			}
 			c.fillStyle="white";
 			if (game.inputType=="phone") {
 				c.globalAlpha=0.15;
@@ -618,7 +705,7 @@ function loopAnimation() {
 			c.fillText("Aperçu :",Cw*0.05,Ch*0.32)
 			c.fillText("Opacité Aide",Cw*0.1,Ch*0.5)
 			c.fillText("Opacité fond",Cw*0.1,Ch*0.6)
-			c.fillText("Animation chrono",Cw*0.1,Ch*0.7)
+			c.fillText("Animations",Cw*0.1,Ch*0.7)
 			c.fillText("Retour",Cw*0.1,Ch*0.8)
 			c.textAlign="center";
 			c.fillRect(Cw*0.628,Ch*0.465,Cw*0.244*(game.option.inputOpacity/100),Ch*0.04)
@@ -628,7 +715,7 @@ function loopAnimation() {
 			if (game.inputType=="keyboard") {
 				movemenu()
 			}
-			switch (anim.lowtimer.mode){
+			switch (game.option.animation){
 			case "alt":
 				c.fillText("Alterné",Cw*0.75,Ch*0.7)
 				break;
@@ -686,7 +773,7 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.textAlign="start";
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
-				c.fillText("Mode d'animation pour le chronomètre.",Cw*0.1,Ch*0.9)
+				c.fillText("Mode d'affichage des animations du jeu.",Cw*0.1,Ch*0.9)
 				c.fillText("",Cw*0.1,Ch*0.95)
 				break;
 			case "back":
@@ -806,14 +893,12 @@ function loopAnimation() {
 					}
 					switch (game.menu.target) {
 					case 1:
-						anim.lowtimer.mode="fix";
-						anim.decaybar.mode="fix";
-						anim.regenbar.mode="fix";
+						game.option.animation="fix";
+						setAnimationOptions(game.option.animation)
 						break;
 					case 2:
-						anim.lowtimer.mode="alt";
-						anim.decaybar.mode="alt";
-						anim.regenbar.mode="alt";
+						game.option.animation="alt";
+						setAnimationOptions(game.option.animation)
 						break;
 					}
 					if (key.d||key.space) {
@@ -827,6 +912,9 @@ function loopAnimation() {
 				errormsg("Mainevent error !")
 				break;
 			}
+			break;
+		case "scoreboard":
+
 			break;
 		case "modeArcade":
 			showbackground()
@@ -1713,6 +1801,7 @@ function loopAnimation() {
 				c.globalAlpha=0.15;
 				c.fillRect(Cw*0.07,Ch*0.81,Cw*0.22,Ch*0.13)
 				c.fillRect(Cw*0.34,Ch*0.82,Cw*0.32,Ch*0.14)
+				//c.fillRect(Cw*0.7,Ch*0.81,Cw*0.23,Ch*0.13)
 				if (game.menu.target>1) {
 					c.fillRect(Cw*0.25,Ch*0.34,Cw*0.12,Ch*0.2)
 				}
@@ -1726,6 +1815,7 @@ function loopAnimation() {
 			c.fillText("Jouer",Cw*0.5,Ch*0.92)
 			c.font = '30px monospace';
 			c.fillText("Retour",Cw*0.18,Ch*0.9)
+			//c.fillText("Détails",Cw*0.82,Ch*0.9)
 			c.font = '24px monospace';
 			c.textAlign="start";
 			c.fillText("Record :",Cw*0.05,Ch*0.65)
@@ -1952,6 +2042,7 @@ function loopAnimation() {
 			}else {
 				anim.lowtimer.time=30;
 			}
+			if (anim.pause.opa>0) anim.pause.opa--;
 			c.fillStyle="white";
 			c.globalAlpha=1;
 			c.font = '26px monospace';
@@ -1984,8 +2075,8 @@ function loopAnimation() {
 			}
 			c.globalAlpha=1;
 			c.fillStyle="white";
-			c.drawImage(ui_timer,Cw*0.01,Ch*0.09,60,60)
-			c.drawImage(ui_timerbar,Cw*0.11,Ch*0.09,202,72)
+			c.drawImage(ui_timer,Cw*0.01,Ch*0.091,60,60)
+			c.drawImage(ui_timerbar,Cw*0.11,Ch*0.091,202,72)
 			c.textAlign="end";
 			c.fillText(ShowTimer(game.stats.timer),Cw*0.4,Ch*0.226)
 			c.globalAlpha = 0.2;
@@ -2390,7 +2481,7 @@ function loopAnimation() {
 					c.fillRect(0,0,Cw,Ch)
 					if (game.timer==0) {
 						resetStats()
-						setmenu(6,"lr",0,0,0,0,3);
+						setmenu(5,"lr",0,0,0,0,3);
 						game.screen="hub";
 						game.mainevent="";
 						game.event="fadeout";
@@ -2879,6 +2970,7 @@ function loopAnimation() {
 			}else {
 				anim.lowtimer.time=30;
 			}
+			if (anim.pause.opa>0) anim.pause.opa--;
 			c.fillStyle="white";
 			c.globalAlpha=1;
 			c.font = '26px monospace';
@@ -4109,7 +4201,6 @@ function loopAnimation() {
 			c.font = '28px monospace';
 			c.textAlign="start";
 			if (game.stats.combo>4) c.fillText("COMBO "+game.stats.combo,Cw*0.11,Ch*0.35);
-			if (game.stats.combo>9) c.fillText("x "+checkCombo(game.stats.combo),Cw*0.115,Ch*0.4);
 
 			switch (game.mainevent){
 			case "starting":
@@ -4478,7 +4569,7 @@ function loopAnimation() {
 					c.fillRect(0,0,Cw,Ch)
 					if (game.timer==0) {
 						resetStats()
-						setmenu(6,"lr",0,0,0,0,2);
+						setmenu(5,"lr",0,0,0,0,2);
 						game.screen="hub";
 						game.mainevent="";
 						game.event="fadeout";
@@ -4922,4 +5013,5 @@ function loopAnimation() {
 	requestAnimationFrame(loopAnimation)
 }
 loopAnimation()
+
 chargement++

@@ -11,7 +11,6 @@
 		let chargement=0;
 	</script>
 </head>
-<!-- Oui tout est en Français, flemme de faire les traductions en Anglais + ratio + golem + koubeh + tg + ça arriveras quand j'aurais décidé que ça arrivera xD -->
 <body style="background-color: black;">
 	<main>
 		<h1>Spé Maths</h1>
@@ -20,13 +19,13 @@
 			<div>
 				<a href="#Description">Description</a>
 				<a href="#CommentJouer">Comment jouer</a>
-				<a href="#NDLR">Note du créateur</a>
 				<a href="#retour">Laisser un avis</a>
 				<a href="#changelog">Changelog</a>
 			</div>
 		</div>
 		<div id="game">
 			<canvas id="canvas1"></canvas>
+			<p class="error" id="game-error">EEREUR 0 : Une option de votre navigateur semble bloquer l'execution de fichier Javascript.</p>
 			<div class="btn-game-controler-box" id="controler">
 				<div class="btn-game-controler-row">
 					<button onclick="inputPlayerPhone(7)"> 7 </button>
@@ -73,33 +72,33 @@
 		<hr>
 		<article class="desc-game" id="Description">
 			<h2>Description</h2>
-			<p>Marre de se taper des sales notes en Mathématique ? J'ai la solution ! Venez vous entrainer quand vous voulez en calcul mental avec ce jeu !
+			<p>Marre de se taper des sales notes en Mathématique ? Voilà la solution ! Venez vous entrainer quand vous voulez en calcul mental avec ce jeu !
 				<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7...</p>
-			<p>Créez vos programmes d'entrainement personnel et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre record ?</p>
+			<p>Créez vos programmes d'entrainement personnalisé ou jouez niveaux à thème et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre record ?</p>
 			<br>
 		</article>
 		<article class="desc-game" id="CommentJouer">
 			<h2>Comment jouer ?</h2>
 			<p>Avant de commencer, il est important de verrouiller la fenêtre de jeu en appuyant sur le bouton comme indiqué sur l'image ci-dessous afin d'éviter que la page bouge pendant que vous jouez.</p>
-			<img src="assets/img/tuto1.png">
+			<img src="assets/img/tuto1.png" loading="lazy">
 			<p>Si vous jouez sur un <b>smartphone</b> ou une <b>tablette</b>, cliquez sur le bouton comme indiqué sur l'image ci-dessous pour afficher les contrôles tactiles.</p>
-			<img src="assets/img/tuto1-2.png">
+			<img src="assets/img/tuto1-2.png" loading="lazy">
 
 			<h3>Les commandes</h3>
-			<img src="assets/img/controles.png">
+			<img src="assets/img/controles.png" loading="lazy">
 			<p>Précision : la touche <b>Q</b> permet d'alterner entre une entrée <i>positif</i> et <i>négatif</i> pendant l'opération en cours. Il repasse automatiquement en positif à la prochaine opération !</p>
 
 			<h3>Créer son programme d'entraînement</h3>
-			<img src="assets/img/tuto2.png">
+			<img src="assets/img/tuto2.png" loading="lazy">
 			<ul>
 				<li><h4>1. Choisir ses modes</h4><span>Dans cette première section vous allez pouvoir choisir les différentes opérations que vous souhaitez avoir dans votre entraînement. Vous devez en sélectionner au moins 1 pour passer à l'étape suivante.</span></li>
 				<li><h4>2. Format</h4><span>Dans cette deuxième section, vous allez définir le nombre de chiffre qui composeront les calculs qui apparaitront pendant votre session de jeu.</span></li>
 				<li><h4>3. Difficulté</h4><span>Ici, vous choisirez la difficulté de l'entrainement qui jouera grandement sur le <b>temps maximum</b> qui vous sera donner pour effectuer vos opérations.</span></li>
 			</ul>
-			<img src="assets/img/tuto2-2.png">
+			<img src="assets/img/tuto2-2.png" loading="lazy">
 			<p>Vous aurez également la possibilité de vous mesurer à  des niveaux à thème et tenter de réaliser des <b>Sans-Fautes</b> sur tous les niveaux proposés</p>
 			<h3>Ecran de jeu</h3>
-			<img src="assets/img/tuto3.png">
+			<img src="assets/img/tuto3.png" loading="lazy">
 			<ul>
 				<li>
 					<h4>1. Mode / Niveau</h4>
@@ -107,7 +106,7 @@
 				</li>
 				<li>
 					<h4>2. Chronomètre</h4>
-					<span>Ce chronomètre indique le temps restant pour donner une réponse avant de subir un contrecoup. S'il atteint zéro il peut soit vous mettre hors jeu soit vous faire perdre des points vies en fonction du mode de jeu.</span>
+					<span>Ce chronomètre indique le temps restant pour donner une réponse avant de subir un contrecoup. S'il atteint zéro il peut soit vous mettre hors jeu soit vous faire perdre des points de vies en fonction du mode de jeu.</span>
 				</li>
 				<li>
 					<h4>3. Sablier</h4>
@@ -131,7 +130,7 @@
 				</li>
 				<li>
 					<h4>8. Jauge de vie</h4>
-					<span>Indique votre niveau de vie sur le niveau en cours, s'il atteint 0 vous perdez la partie.</span>
+					<span>Indique votre niveau de vie sur le niveau en cours, <b>s'il atteint 0 vous perdez la partie</b>.</span>
 				</li>
 				<li>
 					<h4>9. Combo</h4>
@@ -140,13 +139,6 @@
 			</ul>
 			<br>
 			<p>Voilà vous avez maintenant toute les clés en main pour jouer à ce jeu. En espérant qu'il vous plaira et que vous vous amuserez dessus !</p>
-		</article>
-		<article class="desc-game" id="NDLR">
-			<h2>Note de l'auteur</h2>
-			<cite>"Je ne pensais pas du tout créer un jeu éducatif en si peu de temps. Bien évidement, il y a beaucoup d'amélioration à faire, d'options à ajouter, de mécanique à intégrer, bruitages et musiques, etc.
-				<br>Mais c'est déjà un bon début, je pense que ça aidera beaucoup de gens à s'entrainer en s'amusant à faire des Mathématiques."
-			</cite>
-			<p>Yenseng - 19/07/2023</p>
 		</article>
 		<article class="desc-game" id="retour">
 			<h2>Laisser un avis</h2>
@@ -159,6 +151,14 @@
 
 		<article class="desc-game" id="changelog">
 			<h2>Changelog</h2>
+			<h3>BETA 1.4.2 - 21/12/2023</h3>
+			<ul>
+				<li>Ajustement dans le mode arcade des points données, retrait des bonus de score lié aux combos et du temps minimum donné en cas de mauvaise réponse.</li>
+				<li>Bug majeur corrigé dans le mode survi temps qui empêche de réintialiser la partie lorsque l'on sélectionne le bouton "rejouer" sur la version téléphone</li>
+				<li>Bug corrigé d'une option qui n'était pas reconnu par le jeu. (n'affecte pas la sauvegarde)</li>
+				<li>Bug corrigé de l'animation du bouton pause dans les niveaux et les modes survies.</li>
+				<li>Bug corrigé de l'écran de fin du mode survi temps et survi PV qui ramène au menu principale avec une option vide en trop.</li>
+			</ul>
 			<h3>BETA 1.4.1 - 06/12/2023</h3>
 			<ul>
 				<li>Ajout de 6 Nouveaux niveaux difficile.</li>
@@ -259,7 +259,6 @@
 			<div>
 				<a href="#Description">Description</a>
 				<a href="#CommentJouer">Comment jouer</a>
-				<a href="#NDLR">Note du créateur</a>
 				<a href="#retour">Laisser un avis</a>
 				<a href="#changelog">Changelog</a>
 			</div>

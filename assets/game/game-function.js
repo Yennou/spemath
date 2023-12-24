@@ -1,3 +1,4 @@
+//fonction d'initialisation d'un menu
 function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
 	game.menu.options = numoption;
 	game.menu.direction = direction;
@@ -17,6 +18,7 @@ function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
 	key.d=false;
 	key.space=false
 }
+//fonction de déplacement dans les menus
 function movemenu(){
 	if (game.menu.direction=="ud"||game.menu.direction=="all") {
 		if (key.up) {game.menu.posy -= game.menu.pady; game.menu.target--;key.up=false}
@@ -41,6 +43,7 @@ function showcursor(cursortype=0){
 	c.fillStyle = "white";
 	c.fillRect(Cw*game.menu.posx,Ch*game.menu.posy,20,20)
 }
+
 function inputPlayer(){
 	c.globalAlpha=game.option.inputOpacity/100;
 	c.fillStyle="white";
@@ -120,6 +123,7 @@ function resetInput(inputName){
 		setTimeout(resetInput,2,inputName)
 	}
 }
+
 function resetStats(){
 	game.stats.score = 0;
 	game.stats.clear = 0;
@@ -145,6 +149,7 @@ function resetStats(){
 	input=0;
 	pass=false;
 }
+
 function RTAtimer(){
 	if (game.mainevent=="play"||game.mainevent=="wait") {
 		game.stats.timeTot++;
@@ -160,6 +165,7 @@ function ShowTimerRes(temps){
 	let sec = Math.floor(temps/60);
 	return sec+"."+milisec
 }
+
 function generatePuzzleMode1() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
@@ -228,6 +234,7 @@ function generatePuzzleMode2() {
 	let tabsymb= [];
 	if (game.battle.add) tabsymb.push("plus");
 	if (game.battle.sub) tabsymb.push("moins");
+	//if (game.battle.mult) tabsymb.push("mult");
 	game.stats.timeRep=0;
 	if (pass) {
 		if (game.battle.symb=="plus") {
@@ -239,6 +246,27 @@ function generatePuzzleMode2() {
 	}
 	game.battle.num2= Math.floor(Math.random()*game.battle.rangemax+game.battle.rangemin);
 	game.battle.symb= tabsymb[Math.floor(Math.random()*tabsymb.length)];
+	/*if (game.battle.symb=="mult"&& game.battle.numopp>=2) {
+		if (game.battle.numopp>=2&&game.battle.mode=="normal"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*20)+5;
+			game.battle.num2= Math.floor(Math.random()*20)+5;
+		}
+		if (game.battle.numopp==2&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*40)+5;
+			game.battle.num2= Math.floor(Math.random()*12)+5;
+		}
+		if (game.battle.numopp==3&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*70)+5;
+			game.battle.num2= Math.floor(Math.random()*12)+5;
+		}
+		else if (game.battle.numopp==3&&game.battle.mode=="hard") {
+			game.battle.num1= Math.floor(Math.random()*20)+5;
+			game.battle.num2= Math.floor(Math.random()*20)+5;
+		} else {
+			game.battle.num1= Math.floor(Math.random()*12);
+			game.battle.num2= Math.floor(Math.random()*12);
+		}
+	}*/
 	game.battle.negat=false;
 }
 function generatePuzzleModelvl() {
@@ -529,7 +557,7 @@ function validatePuzzle2() {
 	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/60,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),0,(validate?game.stats.clear:game.stats.clear+1),validate))
 	return validate
 }
-function validatePuzzlelvl() {
+function validatePuzzlelvl() {				//A modifier
 	let validate = false;
 	let maxtimer = get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay);
 	let result = 0;
@@ -565,6 +593,8 @@ function validatePuzzlelvl() {
 		if (game.battle.decaystep>0){
 			if (game.stats.clear%game.battle.decaystep==0 && game.stats.timerDecay<game.stats.maxtimer*0.5) game.stats.timerDecay+=game.battle.decaytimer;
 		}
+/*		if (game.stats.clear%game.battle.regenstep==0 && game.stats.pv<game.stats.maxpv) game.stats.pv+=game.battle.regen;
+		if (game.stats.pv>game.stats.maxpv) game.stats.pv=game.stats.maxpv;*/
 		game.battle.rangemin+=game.battle.rangeminstep;
 		game.battle.rangemax+=game.battle.rangemaxstep;
 	} else {
@@ -644,9 +674,8 @@ function validatePuzzleArcade() {
 		game.stats.clear++;
 		game.battle.arcade.clear++;
 		
-		let score = 200-game.stats.timeRep/(3+game.battle.arcade.level/5);
-		if (score<50) score=50;
-		score = Math.floor(score*checkCombo(game.stats.combo))
+		let score = Math.floor((200-game.stats.timeRep/3)*((game.battle.arcade.level+1)/3));
+		if (score<30) score=30;
 		game.stats.score+= score;
 		game.battle.score= score;
 
@@ -674,12 +703,17 @@ function validatePuzzleArcade() {
 		game.battle.arcade.phase=="normal"? bonustime = Math.floor(game.battle.arcade.gaintimer/200*game.stats.maxtimer): bonustime = game.stats.maxtimer-game.stats.timerDecay;
 
 		game.stats.timer+=bonustime;
+		if (game.stats.timer<game.stats.maxtimer*0.33) game.stats.timer=Math.floor(game.stats.maxtimer*0.33);
 		if (game.stats.timer>game.stats.maxtimer) game.stats.timer=game.stats.maxtimer;
 		if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 		game.stats.combo=0;
 		game.battle.score=0;
 
-		if(game.battle.arcade.phase=="normal"){ game.stats.vies--}else {game.mainevent="switchmode";game.event="tonormal"}
+		if(game.battle.arcade.phase=="normal"){game.stats.vies--}
+		else {
+			game.mainevent="switchmode";
+			game.event="tonormal"
+		}
 	}
 
 	game.stats.level.push(new statsoperation(
@@ -1127,8 +1161,44 @@ class statsoperation{
 		this.valide = valide;
 	}
 }
+function checkSave(){
+	let update =false;
+	var actualSave;
+	if (localStorage.getItem("save")!=null) {
+		actualSave = JSON.parse(localStorage.save.toString());
+		let lvlcount = 0;
+		let count = [];
+		for (lvlcount; lvlcount <10; lvlcount++) {
+			if (actualSave.levels[lvlcount+1]!==undefined){
+				for (let i = 1; i <100; i++) {
+					if (actualSave.levels[lvlcount+1][i]!==undefined) count[lvlcount]=i;
+				}
+			} else {
+				break;
+			}
+		}
+		for (let i = 0;i<count.length;i++){
+			if (count[i]<levels[i+1].nblvl) {
+				let addlvl = levels[i+1].nblvl-count[i];
+				console.log(addlvl)
+				if (addlvl>0) update=true;
+			}
+		}
+		if(update){ return 1 }
+		else {return 0}
+	}
+	else {
+		return 2
+	}
+}
 function majSave(){
-	let actualSave = JSON.parse(localStorage.save.toString());
+	var actualSave;
+	if (localStorage.getItem("save")!=null) {
+		actualSave = JSON.parse(localStorage.save.toString());
+	}
+	else {
+		actualSave={levels:{}};
+	}
 	let lvlcount = 1;
 	let count = [];
 	for (lvlcount; lvlcount <10; lvlcount++) {
@@ -1140,8 +1210,13 @@ function majSave(){
 			break;
 		}
 	}
-	for (let i = 0;i<count.length;i++){
-		if (count[i]<levels[i+1].nblvl) {
+	if (count[0]==null) {
+		count[0]=0
+	}
+	for (let i = 0;i<levels.nblvl;i++){
+		console.log(actualSave.levels[i+1])
+			if (actualSave.levels[i+1]==null) (actualSave.levels[i+1]={})
+			if (count[i]<levels[i+1].nblvl) {
 			let addlvl = levels[i+1].nblvl-count[i];
 			console.log(addlvl)
 			for (let j=0; j < addlvl; j++) {
@@ -1157,15 +1232,25 @@ function majSave(){
 }
 
 function saveUpdate(){
-	localStorage.setItem("save",JSON.stringify(saves))
+	if (!game.nosave) {
+		localStorage.setItem("save",JSON.stringify(saves))
+	}
 }
 function optionsUpdate(){
-	localStorage.setItem("option",JSON.stringify(game.option))
+	if (!game.nosave) {
+		localStorage.setItem("option",JSON.stringify(game.option))
+	}
 }
 function optionsLoad(){
 	if (localStorage.getItem("option")!==null) {
 		game.option=JSON.parse(localStorage.option.toString());
 	}
+	setAnimationOptions(game.option.animation)
+}
+function setAnimationOptions(opt){
+	anim.decaybar.mode=opt;
+	anim.lowtimer.mode=opt;
+	anim.regenbar.mode=opt
 }
 
 function mirrorDraw(img,initx,inity,cropx,cropy,posx,posy,width,height){
@@ -1175,7 +1260,6 @@ function mirrorDraw(img,initx,inity,cropx,cropy,posx,posy,width,height){
 	c.drawImage(img,initx,inity,cropx,cropy,-posx,posy,width,height)
 	c.restore()
 }
-
 function errormsg(txt) {
 	c.fillStyle="white";
 	c.globalAlpha=1;

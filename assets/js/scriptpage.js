@@ -58,7 +58,6 @@ function zoomin() {
 	var height=target.height;
 	width*=zoom/2;
 	height*=zoom/2;
-	// console.log("hauteur:"+height+" / largeur:"+width)
 	target.style.width=width+"px";
 	target.style.height=height+"px";
 	if (zoom==zoommax) {
@@ -80,7 +79,6 @@ function zoomout() {
 	var height=target.height;	
 	width*=zoom/2;
 	height*=zoom/2;
-	// console.log("hauteur:"+height+" / largeur:"+width)
 	target.style.width=width+"px";
 	target.style.height=height+"px";
 	if (zoom==zoommin) {
@@ -125,4 +123,15 @@ function phone(btn) {
 		game.inputType="phone";
 		controler.style.display="flex";
 	}
+}
+
+function hideErrorMsg(){
+	document.getElementById("game-error").style.display="none";
+}
+function showErrorMsg(){
+	document.getElementById("game-error").style.display="block";
+}
+function setErrorMsg(txt){
+	document.getElementById("game-error").innerHTML=txt;
+	showErrorMsg()
 }

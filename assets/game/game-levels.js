@@ -1,4 +1,5 @@
 const levels = {
+	nblvl:1,
 	1: {
 		nblvl:22,
 		1: {
@@ -1456,131 +1457,23 @@ let saves = {};
 
 function loadSave(){
 	if (localStorage.getItem("save")!=null) {
-		saves=JSON.parse(localStorage.save.toString())
+		let load = checkSave()
+		if (load==0) {
+			saves = JSON.parse(localStorage.save.toString());
+		} else {
+			game.screen="maj";
+			game.event="choix";
+			setmenu(2,"lr",0.17,0.71,0.31,0);
+		}
 	}
 	else {
-		resetSave()
+		majSave()
 	}
 }
 function resetSave(){
-	saves = {
-		levels : {
-			1: {
-				1:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				2:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				3:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				4:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				5:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				6:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				7:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				8:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				9:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				10:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				11:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				12:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				13:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				14:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				15:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				16:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				17:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				18:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				19:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				20:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				21:{
-					score:0,
-					perfect:false,
-					clear: false,
-				},
-				22:{
-					score:0,
-					perfect:false,
-					clear: false,
-				}
-			}
-		}
-	}
+	saves = {};
+	majSave()
 }
-
 function randomNum(range,min=0){
 	return Math.floor(Math.random()*range+min)
 }
