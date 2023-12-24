@@ -1214,11 +1214,9 @@ function majSave(){
 		count[0]=0
 	}
 	for (let i = 0;i<levels.nblvl;i++){
-		console.log(actualSave.levels[i+1])
 			if (actualSave.levels[i+1]==null) (actualSave.levels[i+1]={})
 			if (count[i]<levels[i+1].nblvl) {
 			let addlvl = levels[i+1].nblvl-count[i];
-			console.log(addlvl)
 			for (let j=0; j < addlvl; j++) {
 				actualSave.levels[i+1][count[i]+j+1]= {
 					score:0,
