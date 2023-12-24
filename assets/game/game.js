@@ -409,7 +409,7 @@ function loopAnimation() {
 			game.inputType=="phone" ? c.font = '19px monospace': c.font = '21px monospace';
 			c.fillText("Ce jeu utilise le Stockage Locale de votre navigateur",Cw*0.5,Ch*0.27)
 			c.fillText("pour enregistrer les données de progression.",Cw*0.5,Ch*0.34)
-			c.fillText("Aucune données personnels ne sera récolter.",Cw*0.5,Ch*0.41)
+			c.fillText("Aucune données personnels ne sera récoltées.",Cw*0.5,Ch*0.41)
 			c.font = '22px monospace';
 			switch(game.event){
 			case "choix":
