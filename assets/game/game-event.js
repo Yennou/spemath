@@ -218,6 +218,26 @@ canvas.addEventListener("touchend", function(event){
 })
 function clicEvent(){
 	switch(game.screen){
+		case "init":
+			switch(game.event){
+			case "choix":
+				if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.18+Cw*0.3 && mouse.y <= Ch*0.68+Ch*0.11) {
+					majSave()
+					saveUpdate()
+					optionsUpdate()
+					localStorage.setItem("version",version)
+					game.screen="title";
+					setmenu(2,"ud",0.3,0.47,0,0.09)
+				}
+				if (mouse.x >= Cw*0.51 && mouse.y >= Ch*0.68 && mouse.x <= Cw*0.51+Cw*0.3 && mouse.y <= Ch*0.68+Ch*0.11) {
+					game.nosave=true;
+					majSave()
+					game.screen="title";
+					setmenu(2,"ud",0.3,0.47,0,0.09)
+				}
+				break;
+			}
+			break;
 		case "maj":
 			switch(game.event){
 			case "choix":
