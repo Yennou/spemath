@@ -1,9 +1,12 @@
 const directory="assets/game/assets/";
+
+
 const canvas = document.getElementById("canvas1");
 const c = canvas.getContext("2d");
 canvas.width = 650;
 canvas.height = 450;
 let canvasPosition = canvas.getBoundingClientRect();
+
 const mouse = {
 	x: canvas.width/2,
 	y: canvas.height/2,
@@ -26,8 +29,25 @@ const key = {
 	cooldownmax : 1,
 	pausecooldown : 0
 };
-const version="BETA-1.4.2";
+const tile = {
+	tx:141,
+	ty:144,	
+	tw:46,
+	th:48
+}
+const tilenum = {
+	tx:188,
+	ty:192,
+	tw:47,
+	th:48
+}
+const spritefont = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!","?"];
+const numfont = ["0","1","2","3","4","5","6","7","8","9",".","-","+","x"];
+
+const version="BETA-1.5.0";
 const Cw= canvas.width, Ch= canvas.height;
+
+let msPrev = window.performance.now()
 const game = {
 	screen : "loading",
 	mainevent : "mainmenu",
@@ -35,12 +55,16 @@ const game = {
 	inputType:"keyboard",
 	prevevent : "",
 	prevtimer : 0,
+	fps:60,
+	msPerFrame: 1000/60,
 	option : {
 		music : 100,
 		sound : 100,
 		inputOpacity: 60,
 		bckgrndOpacity: 100,
-		animation:"alt"
+		animation:"alt",
+		font:"all",
+		showfps:false
 	},
 	nosave:false,
 	menu : {
@@ -141,27 +165,35 @@ const anim = {
 		mode:"alt"
 	},
 	perfect:{
-		globalOp:0,
+		globalOp:2000,
 		whitescreen:0,
-		layer1pos:0,
-		layer2opacity:0,
+		txtsize:348,
+		posy:700,
+		posx:0,
+		posx2:0,
+		wline:0,
+		phase:0,
 		transition:0,
 		ratio:1
 	},
 	lvlselect:{
-		time:59,
+		time:1000,
 		invert:false,
 	},
 	lvltransition:{
 		time:100,
 	},
 	operation:{
-		time:59,
+		time:1000,
 		invert:false,
+		size:150,
+		opacity:200,
+		phase:0
 	},
 	background:{
 		type:Math.floor(Math.random()*4),
 		stock:[],
+		speed:1,
 		timer:0,
 	},
 	graph:{
@@ -171,6 +203,25 @@ const anim = {
 	pause:{
 		colorGB:127,
 		opa:0,
+	},
+	combocolor:0,
+	entity:{
+		phase:0,
+		size:200,
+		rotation:0,
+		opacity:100
+	},
+	burst:{
+		phase:0,
+		opacity1:100,
+		opacity2:100,
+		opacity3:100,
+		rotation1:0,
+		rotation2:90,
+		rotation3:220,
+		opacity:100,
+		ratio:0.5,
+		timer:0,
 	}
 }
 let input = 0;
@@ -180,39 +231,28 @@ let prev = {
 	num2:0
 }
 let pass= false;
+let lang={};
 
+const entity= new Image();
+const blast= new Image();
+const burst= new Image();
 const btl_plus= new Image();
 const btl_moins= new Image();
 const btl_mult= new Image();
 const inputframe= new Image();
-const icon_plus= new Image();
-const icon_moins= new Image();
-const icon_mult= new Image();
-const icon_plusON= new Image();
-const icon_moinsON= new Image();
-const icon_multON= new Image();
-const icon_timer= new Image();
-const icon_lesson= new Image();
-const icon_life= new Image();
 const icon_operation= new Image();
-const icon_lt_life= new Image();
-const icon_lt_timer= new Image();
-const icon_lt_time= new Image();
-const icon_lt_op= new Image();
-const menu_lvl= new Image();
-const menu_arcade= new Image();
-const menu_time= new Image();
-const menu_life= new Image();
-const menu_opt= new Image();
+const icons_lt= new Image();
+
+const icons_menu= new Image();
 const txt_perfect= new Image();
 const txt_perfect1= new Image();
 const txt_perfect2= new Image();
 const ui_hpbar= new Image();
 const ui_timerbar= new Image();
 const ui_timerbarprogress= new Image();
-const ui_timer= new Image();
-const ui_time= new Image();
-const ui_regen= new Image();
+
+const ui_icons = new Image();
+
 const ui_lifebar1= new Image();
 const ui_lifebar3= new Image();
 const ui_lifebar5= new Image();
@@ -229,30 +269,21 @@ const lvlmap_center= new Image();
 const lvlmap_select= new Image();
 const frame_graph= new Image();
 const frame_stats= new Image();
+const font= new Image();
+const font_num= new Image();
+const cursor= new Image();
 
+entity.src = directory+"entity.png";
+blast.src = directory+"blast.png";
+burst.src = directory+"burst.png";
 btl_plus.src = directory+"plus.png";
 btl_moins.src = directory+"moins.png";
 btl_mult.src = directory+"mult.png";
-inputframe.src = directory+"input.png"
-icon_plus.src = directory+"icon_plus.png";
-icon_moins.src = directory+"icon_moins.png";
-icon_mult.src = directory+"icon_mult.png";
-icon_plusON.src = directory+"icon_plusON.png";
-icon_moinsON.src = directory+"icon_moinsON.png";
-icon_multON.src = directory+"icon_multON.png";
-icon_timer.src = directory+"icon_timer.png";
-icon_lesson.src = directory+"icon_lesson.png";
-icon_life.src = directory+"icon_life.png";
+inputframe.src = directory+"input.png";
+icons_lt.src = directory+"icons_lt.png";
+
 icon_operation.src = directory+"icon_operation.png";
-icon_lt_life.src = directory+"icon_lt_life.png";
-icon_lt_timer.src = directory+"icon_lt_timer.png";
-icon_lt_time.src = directory+"icon_lt_time.png";
-icon_lt_op.src = directory+"icon_lt_operation.png";
-menu_lvl.src = directory+"menu_level.png";
-menu_arcade.src = directory+"menu_arcade.png";
-menu_time.src = directory+"menu_time.png";
-menu_life.src = directory+"menu_life.png";
-menu_opt.src = directory+"menu_options.png";
+icons_menu.src = directory+"icons_menu.png";
 txt_perfect.src = directory+"txt_perfect.png";
 txt_perfect1.src = directory+"txt_perfect_layer1.png";
 txt_perfect2.src = directory+"txt_perfect_layer2.png";
@@ -260,9 +291,8 @@ txt_perfect2.src = directory+"txt_perfect_layer2.png";
 ui_hpbar.src = directory+"UI_hpbar.png";
 ui_timerbar.src = directory+"UI_timerbar.png";
 ui_timerbarprogress.src = directory+"UI_timerbarprogress.png";
-ui_timer.src = directory+"UI_timer.png";
-ui_time.src = directory+"UI_time.png";
-ui_regen.src = directory+"UI_regen.png";
+ui_icons.src = directory+"UI_icons.png";
+
 ui_lifebar1.src = directory+"UI_lifebar1.png";
 ui_lifebar3.src = directory+"UI_lifebar3.png";
 ui_lifebar5.src = directory+"UI_lifebar5.png";
@@ -283,10 +313,30 @@ lvlmap_levelP.src = directory+"lvlmap_levelP.png";
 lvlmap_center.src = directory+"lvlmap_center.png";
 lvlmap_select.src = directory+"lvlmap_select.png";
 
+font.src = directory+"font.png";
+font_num.src = directory+"font_numbers.png";
+cursor.src = directory+"cursor.png";
+
+let frameRate=0;
+let frames=0;
+let tstart=Date.now();
+let msPassed=0;
+let t=0;
+let delta=0;
+
 function loopAnimation() {
-	if (key.cooldown>0) {key.cooldown--}
-	if (game.timer>0) {game.timer--}
-	if (key.pausecooldown>0) key.pausecooldown--;
+	requestAnimationFrame(loopAnimation)
+	const msNow=window.performance.now()
+	msPassed=msNow-msPrev;
+	const excessTime=msPassed%game.msPerFrame;
+	msPrev=msNow-excessTime;
+	msPassed-=excessTime;
+
+	if (key.cooldown>0) key.cooldown--;
+	if (game.timer>0) game.timer-=msPassed;
+	if(game.timer<0) game.timer=0;
+	if (key.pausecooldown>0) key.pausecooldown-=msPassed;
+	if (key.pausecooldown<0) key.pausecooldown=0;
 	c.fillStyle="black";
 	c.globalAlpha = 1;
 	c.fillRect(0,0,canvas.width,canvas.height)
@@ -309,7 +359,7 @@ function loopAnimation() {
 				c.closePath()
 				c.stroke()
 				game.prevtimer++;
-				if (game.prevtimer>1200) {
+				if (game.prevtimer>6000) {
 					setErrorMsg("ERREUR 1 : Un des fichiers du jeu n'a pas été correctement chargé, actualisez la page en vidant le cache du navigateur si le problème persiste.")
 				}
 			} else {
@@ -463,8 +513,7 @@ function loopAnimation() {
 					c.fillStyle="white";
 					c.globalAlpha=1;
 					c.textAlign="center";
-					c.font = '50px monospace';
-					c.fillText("Spé Maths",Cw*0.5,Ch*0.35)
+					textfillplace(Cw*0.5,Ch*0.24,"SPEMATHS",64,true,"white",5)
 					if (game.inputType=="keyboard") {
 						c.font = '28px monospace';
 						c.fillText("Commencer",Cw*0.5,Ch*0.52)
@@ -516,6 +565,7 @@ function loopAnimation() {
 					break;
 				case "reset" : 
 					c.globalAlpha=1;
+					c.fillStyle="white";
 					c.textAlign="center";
 					c.font = '26px monospace';
 					c.fillText("Réinitialiser la sauvegarde ?!",Cw*0.5,Ch*0.5)
@@ -569,20 +619,20 @@ function loopAnimation() {
 			c.fillStyle="white";
 			if (game.inputType=="phone") {
 				c.globalAlpha=0.15;
-				c.fillRect(Cw*0.18,Ch*0.39,Cw*0.14,Ch*0.2)
-				c.fillRect(Cw*0.34,Ch*0.47,Cw*0.32,Ch*0.11)
-				c.fillRect(Cw*0.68,Ch*0.39,Cw*0.14,Ch*0.2)
+				c.fillRect(Cw*0.08,Ch*0.39,Cw*0.14,Ch*0.2)
+				c.fillRect(Cw*0.24,Ch*0.42,Cw*0.52,Ch*0.17)
+				c.fillRect(Cw*0.78,Ch*0.39,Cw*0.14,Ch*0.2)
 			}
 			c.globalAlpha=1;
 			c.textAlign="center";
 			c.font = '100px monospace';
-			c.fillText("<",Cw*0.25,Ch*0.55)
-			c.fillText(">",Cw*0.75,Ch*0.55)
+			showicons(Cw*0.5,Ch*0.25,150,"menu",game.menu.target-1)
+			c.fillText("<",Cw*0.15,Ch*0.55)
+			c.fillText(">",Cw*0.85,Ch*0.55)
 			game.inputType=="phone" ? c.font = '32px monospace': c.font = '36px monospace';
 			switch (game.menu.target){
 			case 1:
-				c.drawImage(menu_lvl,Cw*0.5-75,Ch*0.25-75,150,150)
-				c.fillText("Niveaux",Cw*0.5,Ch*0.55)
+				textfillplace(Cw*0.5,Ch*0.48,"NIVEAUX",36,true,"black",4)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
@@ -593,8 +643,7 @@ function loopAnimation() {
 				c.fillText("",Cw*0.05,Ch*0.89)
 				break;
 			case 2:
-				c.drawImage(menu_arcade,Cw*0.5-75,Ch*0.25-75,150,150)
-				c.fillText("Arcade",Cw*0.5,Ch*0.55)
+				textfillplace(Cw*0.5,Ch*0.48,"ARCADE",36,true,"black",4)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
@@ -604,8 +653,7 @@ function loopAnimation() {
 				c.fillText("de points.",Cw*0.05,Ch*0.80)
 				break;
 			case 3:
-				c.drawImage(menu_time,Cw*0.5-75,Ch*0.25-75,150,150)
-				c.fillText("Survi Temps",Cw*0.5,Ch*0.55)
+				textfillplace(Cw*0.5,Ch*0.48,"SURVI TEMPS",36,true,"black",4)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
@@ -616,8 +664,7 @@ function loopAnimation() {
 				c.fillText("Idéal pour faire une partie personnalisée.",Cw*0.05,Ch*0.89)
 				break;
 			case 4:
-				c.drawImage(menu_life,Cw*0.5-75,Ch*0.25-75,150,150)
-				c.fillText("Survi Vies",Cw*0.5,Ch*0.55)
+				textfillplace(Cw*0.5,Ch*0.48,"SURVI VIES",36,true,"black",4)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
@@ -628,8 +675,7 @@ function loopAnimation() {
 				c.fillText("Un bon entrainement pour garder le fil.",Cw*0.05,Ch*0.89)
 				break;
 			case 5:
-				c.drawImage(menu_opt,Cw*0.5-75,Ch*0.25-75,150,150)
-				c.fillText("Options",Cw*0.5,Ch*0.55)
+				textfillplace(Cw*0.5,Ch*0.48,"OPTIONS",36,true,"black",4)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.textAlign="start";
 				c.fillStyle="white";
@@ -641,13 +687,14 @@ function loopAnimation() {
 			}
 			switch (game.event){
 			case "fadeout":
-				anim.lvltransition.time--;
-					c.fillStyle="black";
-					c.globalAlpha=anim.lvltransition.time/50;
-					c.fillRect(0,0,Cw,Ch)
-					if (anim.lvltransition.time<=0) {
-						game.event="";
-					}
+				anim.lvltransition.time-=msPassed;
+				if (anim.lvltransition.time<=0) {
+					anim.lvltransition.time=0;
+					game.event=""
+				}
+				c.fillStyle="black";
+				c.globalAlpha=anim.lvltransition.time/1600;
+				c.fillRect(0,0,Cw,Ch)
 				break;
 			default:
 				if (game.inputType=="keyboard") {
@@ -681,7 +728,7 @@ function loopAnimation() {
 						if (game.battle.mult) {game.battle.mult=false;game.battle.symbnum--}
 						break;				
 					case 5:
-						setmenu(4,"ud",0.045,0.46,0,0.1,4);
+						setmenu(6,"ud",0.045,0.26,0,0.1,6);
 						game.screen="options";
 						game.mainevent="menu";
 						game.event="back";
@@ -697,82 +744,89 @@ function loopAnimation() {
 			c.globalAlpha=1;
 			c.textAlign="center";
 			c.font = '30px monospace';
-			c.fillText("> Options <",Cw*0.5,Ch*0.15)
+			textfillplace(Cw*0.5,Ch*0.12,"OPTIONS",30,true,"black",5)
 			game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 			c.textAlign="start";
-			c.fillText("Aperçu :",Cw*0.05,Ch*0.32)
-			c.fillText("Opacité Aide",Cw*0.1,Ch*0.5)
-			c.fillText("Opacité fond",Cw*0.1,Ch*0.6)
-			c.fillText("Animations",Cw*0.1,Ch*0.7)
+			c.fillText("Opacité Aide",Cw*0.1,Ch*0.3)
+			c.fillText("Opacité fond",Cw*0.1,Ch*0.4)
+			c.fillText("Animations",Cw*0.1,Ch*0.5)
+			c.fillText("Font personnalisé",Cw*0.1,Ch*0.6)
+			c.fillText("Afficher FPS",Cw*0.1,Ch*0.7)
 			c.fillText("Retour",Cw*0.1,Ch*0.8)
 			c.textAlign="center";
-			c.fillRect(Cw*0.628,Ch*0.465,Cw*0.244*(game.option.inputOpacity/100),Ch*0.04)
-			c.drawImage(ui_progressbar,Cw*0.62,Ch*0.462,Cw*0.26,Ch*0.05)
-			c.fillRect(Cw*0.628,Ch*0.565,Cw*0.244*(game.option.bckgrndOpacity/100),Ch*0.04)
-			c.drawImage(ui_progressbar,Cw*0.62,Ch*0.562,Cw*0.26,Ch*0.05)
+			c.fillRect(Cw*0.628,Ch*0.264,Cw*0.244*(game.option.inputOpacity/100),Ch*0.04)
+			c.drawImage(ui_progressbar,Cw*0.62,Ch*0.261,Cw*0.26,Ch*0.05)
+			c.fillRect(Cw*0.628,Ch*0.364,Cw*0.244*(game.option.bckgrndOpacity/100),Ch*0.04)
+			c.drawImage(ui_progressbar,Cw*0.62,Ch*0.361,Cw*0.26,Ch*0.05)
+			numfillplace(Cw*0.5,Ch*0.26,game.option.inputOpacity,24,"center",0,"black")
+			numfillplace(Cw*0.5,Ch*0.36,game.option.bckgrndOpacity,24,"center",0,"black")
 			if (game.inputType=="keyboard") {
 				movemenu()
 			}
 			switch (game.option.animation){
 			case "alt":
-				c.fillText("Alterné",Cw*0.75,Ch*0.7)
+				c.fillText("Alterné",Cw*0.75,Ch*0.5)
 				break;
 			case "fix":
-				c.fillText("Fixe",Cw*0.75,Ch*0.7)
+				c.fillText("Fixe",Cw*0.75,Ch*0.5)
+				break;
+			}
+			switch (game.option.showfps){
+			case false:
+				c.fillText("Non",Cw*0.75,Ch*0.7)
+				break;
+			case true:
+				c.fillText("Oui",Cw*0.75,Ch*0.7)
+				break;
+			}
+			switch(game.option.font){
+			case "none":
+				c.fillText("Non",Cw*0.75,Ch*0.6)
+				break;
+			case "num":
+				c.fillText("chiffre seul",Cw*0.75,Ch*0.6)
+				break;
+			case "txt":
+				c.fillText("texte seul",Cw*0.75,Ch*0.6)
+				break;
+			case "all":
+				c.fillText("Tout",Cw*0.75,Ch*0.6)
 				break;
 			}
 			switch (game.event) {
 			case "opa.input":
-				c.globalAlpha=game.option.inputOpacity/100;
-				c.drawImage(inputframe,Cw*0.29,Ch*0.2,100,80)
-				c.drawImage(inputframe,Cw*0.45,Ch*0.2,100,80)
-				c.drawImage(inputframe,Cw*0.61,Ch*0.2,100,80)
-				c.drawImage(btn_enter,Cw*0.32,Ch*0.225,60,60)
-				c.drawImage(btn_plusmoins,Cw*0.48,Ch*0.23,60,60)
-				c.drawImage(btn_return,Cw*0.64,Ch*0.23,60,60)
-				c.globalAlpha=1;
-				c.font = '26px monospace';
-				if (game.inputType=="phone") {c.fillStyle="red";c.fillText("Ne s'affiche pas en mode téléphone !",Cw*0.5,Ch*0.43);c.fillStyle="white";}
+				numfillplace(Cw*0.5,Ch*0.26,game.option.inputOpacity,24,"center",0,"white")
+				if (game.inputType=="phone") {c.fillStyle="red";c.fillText("Ne s'affiche pas en mode téléphone !",Cw*0.5,Ch*0.225);c.fillStyle="white";}
 				c.textAlign="start";
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Opacité de l'aide montré en jeu pour ",Cw*0.1,Ch*0.9)
 				c.fillText("rappeler les contrôles.",Cw*0.1,Ch*0.95)
 				break;
 			case "opa.bckgrnd":
-				c.globalAlpha=1;
-				c.font = '26px monospace';
+				numfillplace(Cw*0.5,Ch*0.36,game.option.bckgrndOpacity,24,"center",0,"white")
 				c.textAlign="start";
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Opacité des décors animées en fond.",Cw*0.1,Ch*0.9)
 				c.fillText("",Cw*0.1,Ch*0.95)
 				break;
 			case "animchrono":
-				if (anim.lowtimer.mode=="alt") {
-					anim.lowtimer.time>0 ? anim.lowtimer.time--:anim.lowtimer.time=30;
-				}else {
-					anim.lowtimer.time=30
-				}
-				if (anim.decaybar.mode=="alt") {
-					anim.decaybar.invert ? anim.decaybar.time++:anim.decaybar.time--;
-				}else {
-					anim.decaybar.time=39;
-				}
-				if (anim.decaybar.time==0||anim.decaybar.time==40) anim.decaybar.invert=!anim.decaybar.invert;
-				c.fillRect(Cw*0.35,Ch*0.285,Cw*0.5*0.12,Ch*0.113)
-				c.fillStyle="red"
-				c.globalAlpha=0.2+anim.lowtimer.time/50;
-				c.fillRect(Cw*0.35,Ch*0.285,Cw*0.5*0.12,Ch*0.113)
-				c.globalAlpha=1;
-				c.fillStyle="red";
-				c.globalAlpha=0.3+anim.decaybar.time/80;
-				c.fillRect(Cw*0.577,Ch*0.285,Cw*0.07,Ch*0.072)
-				c.globalAlpha=1;
-				c.drawImage(ui_timerbar,Cw*0.5-101,Ch*0.275,202,72)
-				c.fillStyle="white";
 				c.textAlign="start";
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Mode d'affichage des animations du jeu.",Cw*0.1,Ch*0.9)
 				c.fillText("",Cw*0.1,Ch*0.95)
+				break;
+			case "customtext":
+				c.fillStyle="white";
+				c.textAlign="start";
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
+				c.fillText("Choix d'affichage de la police d'écriture",Cw*0.1,Ch*0.9)
+				c.fillText("créé pour le jeu.",Cw*0.1,Ch*0.95)
+				break;
+			case "fps":
+				c.fillStyle="white";
+				c.textAlign="start";
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
+				c.fillText("Affichage du nombre d'image par secondes.",Cw*0.1,Ch*0.9)
 				break;
 			case "back":
 				c.fillStyle="white";
@@ -785,6 +839,8 @@ function loopAnimation() {
 			case "menu":
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
+					c.fillRect(Cw*0.07,Ch*0.24,Cw*0.48,Ch*0.08)
+					c.fillRect(Cw*0.07,Ch*0.34,Cw*0.48,Ch*0.08)
 					c.fillRect(Cw*0.07,Ch*0.44,Cw*0.48,Ch*0.08)
 					c.fillRect(Cw*0.07,Ch*0.54,Cw*0.48,Ch*0.08)
 					c.fillRect(Cw*0.07,Ch*0.64,Cw*0.48,Ch*0.08)
@@ -803,6 +859,12 @@ function loopAnimation() {
 					game.event="animchrono";
 					break;
 				case 4:
+					game.event="customtext";
+					break;
+				case 5:
+					game.event="fps";
+					break;
+				case 6:
 					game.event="back";
 					break;
 				}
@@ -828,6 +890,34 @@ function loopAnimation() {
 						game.mainevent="select";
 						break;
 					case 4:
+						switch(game.option.font){
+						case "none":
+							setmenu(4,"lr",0,0,0,0,1);
+							break;
+						case "num":
+							setmenu(4,"lr",0,0,0,0,2);
+							break;
+						case "txt":
+							setmenu(4,"lr",0,0,0,0,3);
+							break;
+						case "all":
+							setmenu(4,"lr",0,0,0,0,4);
+							break;
+						}
+						game.mainevent="select";
+						break;
+					case 5:
+						switch(game.option.showfps){
+						case true:
+							setmenu(2,"lr",0,0,0,0,2);
+							break;
+						case false:
+							setmenu(2,"lr",0,0,0,0,1);
+							break;
+						}
+						game.mainevent="select";
+						break;
+					case 6:
 						setmenu(5,"lr",0,0,0,0,5);
 						game.screen="hub";
 						game.mainevent="";
@@ -851,43 +941,43 @@ function loopAnimation() {
 				game.inputType=="keyboard" ?c.font = '30px monospace': c.font = '42px monospace';
 				switch (game.event) {
 				case "opa.input":
-					c.fillText("<",Cw*0.59,Ch*0.51)
-					c.fillText(">",Cw*0.91,Ch*0.51)
+					c.fillText("<",Cw*0.59,Ch*0.305)
+					c.fillText(">",Cw*0.91,Ch*0.305)
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.24,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.24,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.24,Cw*0.075,Ch*0.1)
+					}
+					game.option.inputOpacity=(game.menu.target-1)*10;
+					if (key.d||key.space) {
+						setmenu(6,"ud",0.045,0.26,0,0.1,1);
+						game.mainevent="menu";
+					}
+					break;
+				case "opa.bckgrnd":
+					c.fillText("<",Cw*0.59,Ch*0.405)
+					c.fillText(">",Cw*0.91,Ch*0.405)
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.34,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.34,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.34,Cw*0.075,Ch*0.1)
+					}
+					game.option.bckgrndOpacity=(game.menu.target-1)*10;
+					if (key.d||key.space) {
+						setmenu(6,"ud",0.045,0.26,0,0.1,2);
+						game.mainevent="menu";
+					}
+					break;
+				case "animchrono":
+					c.fillText("<",Cw*0.59,Ch*0.505)
+					c.fillText(">",Cw*0.91,Ch*0.505)
 					if (game.inputType=="phone") {
 						c.globalAlpha=0.15;
 						c.fillRect(Cw*0.07,Ch*0.44,Cw*0.47,Ch*0.1)
 						c.fillRect(Cw*0.55,Ch*0.44,Cw*0.075,Ch*0.1)
 						c.fillRect(Cw*0.875,Ch*0.44,Cw*0.075,Ch*0.1)
-					}
-					game.option.inputOpacity=(game.menu.target-1)*10;
-					if (key.d||key.space) {
-						setmenu(4,"ud",0.045,0.46,0,0.1,1);
-						game.mainevent="menu";
-					}
-					break;
-				case "opa.bckgrnd":
-					c.fillText("<",Cw*0.59,Ch*0.61)
-					c.fillText(">",Cw*0.91,Ch*0.61)
-					if (game.inputType=="phone") {
-						c.globalAlpha=0.15;
-						c.fillRect(Cw*0.07,Ch*0.54,Cw*0.47,Ch*0.1)
-						c.fillRect(Cw*0.55,Ch*0.54,Cw*0.075,Ch*0.1)
-						c.fillRect(Cw*0.875,Ch*0.54,Cw*0.075,Ch*0.1)
-					}
-					game.option.bckgrndOpacity=(game.menu.target-1)*10;
-					if (key.d||key.space) {
-						setmenu(4,"ud",0.045,0.46,0,0.1,2);
-						game.mainevent="menu";
-					}
-					break;
-				case "animchrono":
-					c.fillText("<",Cw*0.59,Ch*0.71)
-					c.fillText(">",Cw*0.91,Ch*0.71)
-					if (game.inputType=="phone") {
-						c.globalAlpha=0.15;
-						c.fillRect(Cw*0.07,Ch*0.64,Cw*0.47,Ch*0.1)
-						c.fillRect(Cw*0.55,Ch*0.64,Cw*0.075,Ch*0.1)
-						c.fillRect(Cw*0.875,Ch*0.64,Cw*0.075,Ch*0.1)
 					}
 					switch (game.menu.target) {
 					case 1:
@@ -900,7 +990,57 @@ function loopAnimation() {
 						break;
 					}
 					if (key.d||key.space) {
-						setmenu(4,"ud",0.045,0.46,0,0.1,3);
+						setmenu(6,"ud",0.045,0.26,0,0.1,3);
+						game.mainevent="menu";
+					}
+					break;
+				case "customtext":
+					c.fillText("<",Cw*0.59,Ch*0.605)
+					c.fillText(">",Cw*0.91,Ch*0.605)
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.54,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.54,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.54,Cw*0.075,Ch*0.1)
+					}
+					switch (game.menu.target) {
+					case 1:
+						game.option.font="none";
+						break;
+					case 2:
+						game.option.font="num";
+						break;
+					case 3:
+						game.option.font="txt";
+						break;
+					case 4:
+						game.option.font="all";
+						break;
+					}
+					if (key.d||key.space) {
+						setmenu(6,"ud",0.045,0.26,0,0.1,4);
+						game.mainevent="menu";
+					}
+					break;
+				case "fps":
+					c.fillText("<",Cw*0.59,Ch*0.705)
+					c.fillText(">",Cw*0.91,Ch*0.705)
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.64,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.64,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.64,Cw*0.075,Ch*0.1)
+					}
+					switch (game.menu.target) {
+					case 1:
+						game.option.showfps=false;
+						break;
+					case 2:
+						game.option.showfps=true;
+						break;
+					}
+					if (key.d||key.space) {
+						setmenu(6,"ud",0.045,0.26,0,0.1,5);
 						game.mainevent="menu";
 					}
 					break;
@@ -911,25 +1051,19 @@ function loopAnimation() {
 				break;
 			}
 			break;
-		case "scoreboard":
-
-			break;
 		case "modeArcade":
 			showbackground()
 			c.fillStyle="white";
 			c.globalAlpha=1;
-			c.textAlign="center";
-			c.font = '30px monospace';
-			c.fillText("> Mode Arcade <",Cw*0.5,Ch*0.15)
+			textfillplace(Cw*0.5,Ch*0.12,"MODE ARCADE",30,true,"black",5)
 			if (game.inputType=="keyboard") {
 				movemenu()
 			} else {
 				c.globalAlpha=0.15;
-				c.fillRect(Cw*0.01,Ch*0.02,Cw*0.285,Ch*0.1)
+				c.fillRect(Cw*0.005,Ch*0.007,Cw*0.4,Ch*0.08)
 				c.globalAlpha=1;
 				c.textAlign="start";
-				c.font = '20px monospace';
-				c.fillText("Retour au menu",Cw*0.02,Ch*0.08)
+				textfillplace(Cw*0.02,Ch*0.02,"MENU PRINCIPAL",24,false,"black",6)
 			}
 			switch (game.mainevent){
 			case "first":
@@ -938,28 +1072,28 @@ function loopAnimation() {
 				c.fillText("Difficulté :",Cw*0.15,Ch*0.45)
 				c.textAlign="center";
 				c.font = '80px monospace';
-				c.fillText("<",Cw*0.3,Ch*0.62)
-				c.fillText(">",Cw*0.7,Ch*0.62)
+				c.fillText("<",Cw*0.25,Ch*0.62)
+				c.fillText(">",Cw*0.75,Ch*0.62)
 				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
-				if (game.inputType=="phone") c.fillText("Suiv.",Cw*0.86,Ch*0.6);
+				if (game.inputType=="phone") textfillplace(Cw*0.5,Ch*0.67,"SUIVANT",32,true,"white",6);
 				switch (game.menu.target) {
 				case 1:
-					c.fillText("Très facile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"TRES FACILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=2;
 					game.battle.mode="very-easy";
 					break;
 				case 2:
-					c.fillText("Facile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"FACILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=1.5;
 					game.battle.mode="easy";
 					break;
 				case 3:
-					c.fillText("Normal",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"NORMAL",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=1;
 					game.battle.mode="normal";
 					break;
 				case 4:
-					c.fillText("Difficile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"DIFFICILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=0.7;
 					game.battle.mode="hard";
 					break;
@@ -967,9 +1101,9 @@ function loopAnimation() {
 				
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
-					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.64,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.76,Ch*0.535,Cw*0.2,Ch*0.1)
+					c.fillRect(Cw*0.195,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.695,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.352,Ch*0.645,Cw*0.3,Ch*0.12)
 				}
 				if (key.d) {
 					setmenu(5,"lr",0,0,0,0,2);
@@ -1005,21 +1139,21 @@ function loopAnimation() {
 				c.fillText("Difficulté :",Cw*0.03,Ch*0.37)
 				switch (game.setbtl.dif) {
 				case 2:
-					c.fillText("Très facile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"TRES FACILE",24,false,"black",6)
 					break;
 				case 1.5:
-					c.fillText("facile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"FACILE",24,false,"black",6)
 					break;
 				case 1:
-					c.fillText("Normal",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"NORMAL",24,false,"black",6)
 					break;
 				case 0.7:
-					c.fillText("Difficile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"DIFFICILE",24,false,"black",6)
 					break;
 				}
-				c.drawImage(icon_lt_life,Cw*0.6,Ch*0.195,50,50)
+				showicons(Cw*0.65,Ch*0.25,50,"lt",3)
+				showicons(Cw*0.65,Ch*0.345,50,"lt",4)
 				c.fillText("5 vies",Cw*0.72,Ch*0.27)
-				c.drawImage(icon_lt_timer,Cw*0.6,Ch*0.29,50,50)
 				switch (game.battle.mode){
 				case "very-easy":
 					c.fillText("16 sec.",Cw*0.72,Ch*0.37)
@@ -1037,10 +1171,8 @@ function loopAnimation() {
 				
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
-				c.font = '42px monospace';
-				c.fillText("Jouer",Cw*0.5,Ch*0.65)
-				c.font = '30px monospace';
-				c.fillText("Retour",Cw*0.18,Ch*0.65)
+				textfillplace(Cw*0.5,Ch*0.59,"JOUER",36,true,"white",6)
+				textfillplace(Cw*0.18,Ch*0.6,"RETOUR",26,true,"white",6)
 				break;
 			default:
 				errormsg("Mainevent error")
@@ -1090,7 +1222,7 @@ function loopAnimation() {
 						break;
 					case 2:
 						game.event="transition";
-						game.timer=7;
+						game.timer=130;
 						break;
 					}
 				}
@@ -1098,33 +1230,37 @@ function loopAnimation() {
 			case "transition":
 				c.fillStyle="rgb(240,240,240)";
 				c.globalAlpha=0.7;
-				c.fillRect(Cw*0.5-Cw*(0.5*((7-game.timer)/7)),Ch*0.5,Cw*((7-game.timer)/7),5)
-				if (game.timer==0) {
+				c.fillRect(Cw*0.5-Cw*(0.5*((133-game.timer)/133)),Ch*0.43,Cw*((133-game.timer)/133),5)
+				if (game.timer<=0) {
 					game.event="transition2";
-					game.timer=25;
+					game.timer=400;
+					anim.entity.phase=-1;
 				}
+				drawEntity()
 				break;
 			case "transition2":
 				c.fillStyle="rgb(240,240,240)";
-				c.globalAlpha=0.7+0.3*((25-game.timer)/25);
-				c.fillRect(0,Ch*0.5-Ch*(0.5*(25-game.timer)/25),Cw,5+Ch*((25-game.timer)/25))
-				if (game.timer==0) {
+				c.globalAlpha=0.7+0.3*((400-game.timer)/400);
+				c.fillRect(0,Ch*0.43-Ch*(0.57*(400-game.timer)/400),Cw,5+Ch*1.17*((400-game.timer)/400))
+				if (game.timer<=0) {
 					game.event="transition3";
-					game.timer=30;
+					game.timer=500;
+					anim.entity.phase=0;
 				}
+				drawEntity()
 				break;
 			case "transition3":
 				c.globalAlpha=1;;
 				c.fillStyle="rgb(240,240,240)";
 				c.fillRect(0,0,Cw,Ch)
-				if (game.timer==0) {
+				if (game.timer<=0) {
 					game.screen="arcade";
 					game.battle.gamemode="arcade";
 					game.mainevent="starting";
 					game.event="set";
-					game.timer=60;
+					game.timer=1000;
 					anim.background.type=Math.floor(Math.random()*4);
-					anim.lvltransition.time=100;
+					anim.lvltransition.time=1600;
 					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
 				}
 				break;
@@ -1140,23 +1276,17 @@ function loopAnimation() {
 			let multd = 1;
 			c.fillStyle="white";
 			c.globalAlpha=1;
-			c.textAlign="center";
-			c.font = '30px monospace';
-			c.fillText("> Mode Temps <",Cw*0.5,Ch*0.15)
+			textfillplace(Cw*0.5,Ch*0.12,"MODE TEMPS",30,true,"black",5)
 			if (game.inputType=="keyboard") {
 				movemenu()
 			} else {
 				c.globalAlpha=0.15;
-				c.fillRect(Cw*0.01,Ch*0.02,Cw*0.285,Ch*0.1)
+				c.fillRect(Cw*0.005,Ch*0.007,Cw*0.4,Ch*0.08)
 				c.globalAlpha=1;
-				c.textAlign="start";
-				c.font = '20px monospace';
-				c.fillText("Retour au menu",Cw*0.02,Ch*0.08)
+				textfillplace(Cw*0.02,Ch*0.02,"MENU PRINCIPAL",24,false,"black",6)
 			}
 			switch (game.mainevent){
 			case "first":
-				c.textAlign="center";
-				c.font = '24px monospace';
 				game.battle.add ? c.globalAlpha=1: c.globalAlpha=0.4;
 				c.drawImage(btl_plus,Cw*0.12,Ch*0.28,100,100)
 				game.battle.sub ? c.globalAlpha=1: c.globalAlpha=0.4;
@@ -1164,16 +1294,16 @@ function loopAnimation() {
 				game.battle.mult ? c.globalAlpha=1: c.globalAlpha=0.4;
 				c.drawImage(btl_mult,Cw*0.72,Ch*0.28,100,100)
 				c.globalAlpha=1;
-				game.battle.add ? c.fillText("Actif",Cw*0.20,Ch*0.6): c.fillText("désact.",Cw*0.20,Ch*0.6);
-				game.battle.sub ? c.fillText("Actif",Cw*0.50,Ch*0.6): c.fillText("désact.",Cw*0.50,Ch*0.6);
-				game.battle.mult ? c.fillText("Actif",Cw*0.80,Ch*0.6): c.fillText("désact.",Cw*0.80,Ch*0.6);
-				c.fillText("Suivant",Cw*0.5,Ch*0.72)
+				game.battle.add ? textfillplace(Cw*0.2,Ch*0.56,"ACTIF",26,true,"white",6):textfillplace(Cw*0.2,Ch*0.56,"DESACT",26,true,"black",6);
+				game.battle.sub ? textfillplace(Cw*0.5,Ch*0.56,"ACTIF",26,true,"white",6):textfillplace(Cw*0.5,Ch*0.56,"DESACT",26,true,"black",6);
+				game.battle.mult ? textfillplace(Cw*0.8,Ch*0.56,"ACTIF",26,true,"white",6):textfillplace(Cw*0.8,Ch*0.56,"DESACT",26,true,"black",6);
+				textfillplace(Cw*0.5,Ch*0.67,"SUIVANT",32,true,"white",6);
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
 					c.fillRect(Cw*0.1,Ch*0.23,Cw*0.195,Ch*0.32)
 					c.fillRect(Cw*0.4,Ch*0.23,Cw*0.195,Ch*0.32)
 					c.fillRect(Cw*0.7,Ch*0.23,Cw*0.195,Ch*0.32)
-					c.fillRect(Cw*0.4,Ch*0.645,130,50)
+					c.fillRect(Cw*0.35,Ch*0.645,Cw*0.305,Ch*0.12)
 				}
 				else {
 					switch (game.menu.target){
@@ -1187,7 +1317,7 @@ function loopAnimation() {
 						c.drawImage(inputframe,Cw*0.7,Ch*0.26,Cw*0.195,Ch*0.26)
 						break;
 					case 4:
-						c.drawImage(inputframe,Cw*0.4,Ch*0.655,Cw*0.2,Ch*0.1)
+						c.drawImage(inputframe,Cw*0.35,Ch*0.655,Cw*0.3,Ch*0.1)
 						break;
 					}
 				}
@@ -1239,45 +1369,43 @@ function loopAnimation() {
 				c.textAlign="start";
 				game.inputType=="phone"? c.font = '24px monospace':c.font = '26px monospace';
 				c.fillText("Types :",Cw*0.03,Ch*0.27)
-				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
-				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
-				game.battle.mult ? c.drawImage(icon_multON,Cw*0.4,Ch*0.2,50,50): c.drawImage(icon_mult,Cw*0.4,Ch*0.2,50,50);
-				game.inputType=="phone"? c.font = '27px monospace':c.font = '30px monospace';
+				game.battle.add ? showicons(Cw*0.2384,Ch*0.2555,50,"lt",0,1): showicons(Cw*0.2384,Ch*0.2555,50,"lt",0);
+				game.battle.sub ? showicons(Cw*0.3384,Ch*0.2555,50,"lt",1,1): showicons(Cw*0.3384,Ch*0.2555,50,"lt",1);
+				game.battle.mult ? showicons(Cw*0.4384,Ch*0.2555,50,"lt",2,1): showicons(Cw*0.4384,Ch*0.2555,50,"lt",2);
+				if(game.inputType=="phone") {textfillplace(Cw*0.5,Ch*0.68,"SUIVANT",32,true,"white",6);textfillplace(Cw*0.18,Ch*0.7,"RETOUR",26,true,"white",6)}
 				c.fillText("Format :",Cw*0.15,Ch*0.45)
 				c.textAlign="center";
 				c.font = '80px monospace';
-				c.fillText("<",Cw*0.3,Ch*0.62)
-				c.fillText(">",Cw*0.7,Ch*0.62)
-				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
-				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.14,Ch*0.6);c.fillText("Suiv.",Cw*0.86,Ch*0.6)}
+				c.fillText("<",Cw*0.26,Ch*0.62)
+				c.fillText(">",Cw*0.74,Ch*0.62)
 				switch (game.menu.target) {
 				case 1:
-					c.fillText("1 + 1",Cw*0.5,Ch*0.6)
+					numfillplace(Cw*0.5,Ch*0.54,"1 + 1",30,"center",6,(game.inputType=="phone"?"black":"white"))
 					game.setbtl.chif=0.66;
 					game.battle.numopp=1;
 					break;
 				case 2:
-					c.fillText("12 + 12",Cw*0.5,Ch*0.6)
+					numfillplace(Cw*0.5,Ch*0.54,"12 + 12",30,"center",6,(game.inputType=="phone"?"black":"white"))
 					game.setbtl.chif=1;
 					game.battle.numopp=2;
 					break;
 				case 3:
-					c.fillText("123 + 123",Cw*0.5,Ch*0.6)
+					numfillplace(Cw*0.5,Ch*0.54,"123 + 123",30,"center",6,(game.inputType=="phone"?"black":"white"))
 					game.setbtl.chif=1.5;
 					game.battle.numopp=3;
 					break;
 				case 4:
-					c.fillText("1234 + 1234",Cw*0.5,Ch*0.6)
+					numfillplace(Cw*0.5,Ch*0.54,"1234 + 1234",30,"center",6,(game.inputType=="phone"?"black":"white"))
 					game.setbtl.chif=1.9;
 					game.battle.numopp=4;
 					break;
 				}
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
-					c.fillRect(Cw*0.04,Ch*0.535,Cw*0.2,Ch*0.1)
-					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.64,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.76,Ch*0.535,Cw*0.2,Ch*0.1)
+					c.fillRect(Cw*0.07,Ch*0.675,Cw*0.23,Ch*0.1)
+					c.fillRect(Cw*0.205,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.685,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.35,Ch*0.655,Cw*0.305,Ch*0.12)
 				}
 				if (key.d) {
 					setmenu(4,"lr",0.065,0.43,0.23,0);
@@ -1292,9 +1420,9 @@ function loopAnimation() {
 				c.textAlign="start";
 				game.inputType=="phone"? c.font = '24px monospace':c.font = '26px monospace';
 				c.fillText("Types :",Cw*0.03,Ch*0.27)
-				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
-				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
-				game.battle.mult ? c.drawImage(icon_multON,Cw*0.4,Ch*0.2,50,50): c.drawImage(icon_mult,Cw*0.4,Ch*0.2,50,50);
+				game.battle.add ? showicons(Cw*0.2384,Ch*0.2555,50,"lt",0,1): showicons(Cw*0.2384,Ch*0.2555,50,"lt",0);
+				game.battle.sub ? showicons(Cw*0.3384,Ch*0.2555,50,"lt",1,1): showicons(Cw*0.3384,Ch*0.2555,50,"lt",1);
+				game.battle.mult ? showicons(Cw*0.4384,Ch*0.2555,50,"lt",2,1): showicons(Cw*0.4384,Ch*0.2555,50,"lt",2);
 				c.fillText("Format :",Cw*0.6,Ch*0.27)
 				switch (game.battle.numopp) {
 				case 1:
@@ -1311,31 +1439,30 @@ function loopAnimation() {
 					break;
 				}
 				game.inputType=="phone"? c.font = '27px monospace':c.font = '30px monospace';
+				if(game.inputType=="phone") {textfillplace(Cw*0.5,Ch*0.68,"SUIVANT",32,true,"white",6);textfillplace(Cw*0.18,Ch*0.7,"RETOUR",26,true,"white",6)}
 				c.fillText("Difficulté :",Cw*0.15,Ch*0.45)
 				c.textAlign="center";
 				c.font = '80px monospace';
-				c.fillText("<",Cw*0.3,Ch*0.62)
-				c.fillText(">",Cw*0.7,Ch*0.62)
-				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
-				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.14,Ch*0.6);c.fillText("Suiv.",Cw*0.86,Ch*0.6)}
+				c.fillText("<",Cw*0.26,Ch*0.62)
+				c.fillText(">",Cw*0.74,Ch*0.62)
 				switch (game.menu.target) {
 				case 1:
-					c.fillText("Très facile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"TRES FACILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=2;
 					game.battle.mode="very-easy";
 					break;
 				case 2:
-					c.fillText("Facile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"FACILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=1.5;
 					game.battle.mode="easy";
 					break;
 				case 3:
-					c.fillText("Normal",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"NORMAL",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=1;
 					game.battle.mode="normal";
 					break;
 				case 4:
-					c.fillText("Difficile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"DIFFICILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=0.7;
 					game.battle.mode="hard";
 					break;
@@ -1343,10 +1470,10 @@ function loopAnimation() {
 				
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
-					c.fillRect(Cw*0.04,Ch*0.535,Cw*0.2,Ch*0.1)
-					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.64,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.76,Ch*0.535,Cw*0.2,Ch*0.1)
+					c.fillRect(Cw*0.07,Ch*0.675,Cw*0.23,Ch*0.1)
+					c.fillRect(Cw*0.205,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.685,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.35,Ch*0.655,Cw*0.305,Ch*0.12)
 				}
 				if (key.d) {
 					setmenu(4,"lr",0.3,0.56,0,0,game.battle.numopp);
@@ -1362,9 +1489,9 @@ function loopAnimation() {
 				c.textAlign="start";
 				game.inputType=="phone"? c.font = '24px monospace':c.font = '26px monospace';
 				c.fillText("Types :",Cw*0.03,Ch*0.27)
-				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
-				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
-				game.battle.mult ? c.drawImage(icon_multON,Cw*0.4,Ch*0.2,50,50): c.drawImage(icon_mult,Cw*0.4,Ch*0.2,50,50);
+				game.battle.add ? showicons(Cw*0.2384,Ch*0.2555,50,"lt",0,1): showicons(Cw*0.2384,Ch*0.2555,50,"lt",0);
+				game.battle.sub ? showicons(Cw*0.3384,Ch*0.2555,50,"lt",1,1): showicons(Cw*0.3384,Ch*0.2555,50,"lt",1);
+				game.battle.mult ? showicons(Cw*0.4384,Ch*0.2555,50,"lt",2,1): showicons(Cw*0.4384,Ch*0.2555,50,"lt",2);
 				c.fillText("Format :",Cw*0.6,Ch*0.27)
 				switch (game.battle.numopp) {
 				case 1:
@@ -1380,29 +1507,27 @@ function loopAnimation() {
 					c.fillText(">4<",Cw*0.8,Ch*0.27)
 					break;
 				}
-				c.fillText("Difficulté :",Cw*0.03,Ch*0.37)
+				c.fillText("Difficulté :",Cw*0.03,Ch*0.38)
 				switch (game.setbtl.dif) {
 				case 2:
-					c.fillText("Très facile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"TRES FACILE",24,false,"black",6)
 					break;
 				case 1.5:
-					c.fillText("facile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"FACILE",24,false,"black",6)
 					break;
 				case 1:
-					c.fillText("Normal",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"NORMAL",24,false,"black",6)
 					break;
 				case 0.7:
-					c.fillText("Difficile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"DIFFICILE",24,false,"black",6)
 					break;
 				}
-				c.drawImage(icon_lt_timer,Cw*0.6,Ch*0.29,50,50)
-					c.fillText((Math.floor(20*game.setbtl.mode*game.setbtl.chif*game.setbtl.dif))+" sec. MAX",Cw*0.72,Ch*0.37)
+				showicons(Cw*0.65,Ch*0.345,50,"lt",4)
+				c.fillText((Math.floor(20*game.setbtl.mode*game.setbtl.chif*game.setbtl.dif))+" sec. MAX",Cw*0.72,Ch*0.37)
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
-				c.font = '42px monospace';
-				c.fillText("Jouer",Cw*0.5,Ch*0.65)
-				c.font = '30px monospace';
-				c.fillText("Retour",Cw*0.18,Ch*0.65)
+				textfillplace(Cw*0.5,Ch*0.59,"JOUER",36,true,"white",6)
+				textfillplace(Cw*0.18,Ch*0.6,"RETOUR",26,true,"white",6)
 				break;
 			default:
 				errormsg("Mainevent error")
@@ -1461,7 +1586,7 @@ function loopAnimation() {
 						break;
 					case 2:
 						game.event="transition";
-						game.timer=7;
+						game.timer=130;
 						break;
 					}
 				}
@@ -1469,26 +1594,30 @@ function loopAnimation() {
 			case "transition":
 				c.fillStyle="rgb(240,240,240)";
 				c.globalAlpha=0.7;
-				c.fillRect(Cw*0.5-Cw*(0.5*((7-game.timer)/7)),Ch*0.5,Cw*((7-game.timer)/7),5)
-				if (game.timer==0) {
+				c.fillRect(Cw*0.5-Cw*(0.5*((133-game.timer)/133)),Ch*0.43,Cw*((133-game.timer)/133),5)
+				if (game.timer<=0) {
 					game.event="transition2";
-					game.timer=25;
+					game.timer=400;
+					anim.entity.phase=-1;
 				}
+				drawEntity()
 				break;
 			case "transition2":
 				c.fillStyle="rgb(240,240,240)";
-				c.globalAlpha=0.7+0.3*((25-game.timer)/25);
-				c.fillRect(0,Ch*0.5-Ch*(0.5*(25-game.timer)/25),Cw,5+Ch*((25-game.timer)/25))
-				if (game.timer==0) {
+				c.globalAlpha=0.7+0.3*((400-game.timer)/400);
+				c.fillRect(0,Ch*0.43-Ch*(0.57*(400-game.timer)/400),Cw,5+Ch*1.17*((400-game.timer)/400))
+				if (game.timer<=0) {
 					game.event="transition3";
-					game.timer=30;
+					game.timer=500;
+					anim.entity.phase=0;
 				}
+				drawEntity()
 				break;
 			case "transition3":
 				c.globalAlpha=1;;
 				c.fillStyle="rgb(240,240,240)";
 				c.fillRect(0,0,Cw,Ch)
-				if (game.timer==0) {
+				if (game.timer<=0) {
 					mult=game.setbtl.mode;
 					multn=game.setbtl.chif;
 					multd=game.setbtl.dif;
@@ -1496,10 +1625,10 @@ function loopAnimation() {
 					game.mainevent="starting";
 					game.event="fadeout";
 					game.battle.gamemode="survival-timer";
-					game.stats.maxtimer=(Math.floor(20*mult*multn*multd))*60;
-					game.timer=60;
+					game.stats.maxtimer=(Math.floor(20*mult*multn*multd))*1000;
+					game.timer=1000;
 					anim.background.type=Math.floor(Math.random()*4);
-					anim.lvltransition.time=100;
+					anim.lvltransition.time=1666;
 					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
 				}
 				break;
@@ -1514,17 +1643,16 @@ function loopAnimation() {
 			c.globalAlpha=1;
 			c.textAlign="center";
 			c.font = '30px monospace';
-			c.fillText("> Mode vies <",Cw*0.5,Ch*0.15)
+			textfillplace(Cw*0.5,Ch*0.12,"MODE VIES",30,true,"black",5)
 			c.font = '22px monospace';
 			c.textAlign="start";
 			if (game.inputType=="keyboard") {
 				movemenu()
 			} else {
 				c.globalAlpha=0.15;
-				c.fillRect(Cw*0.01,Ch*0.02,Cw*0.285,Ch*0.1)
+				c.fillRect(Cw*0.005,Ch*0.007,Cw*0.4,Ch*0.08)
 				c.globalAlpha=1;
-				c.font = '20px monospace';
-				c.fillText("Retour au menu",Cw*0.02,Ch*0.08)
+				textfillplace(Cw*0.02,Ch*0.02,"MENU PRINCIPAL",24,false,"black",6)
 			}
 			switch (game.mainevent){
 			case "first":
@@ -1535,14 +1663,14 @@ function loopAnimation() {
 				game.battle.sub ? c.globalAlpha=1: c.globalAlpha=0.4;
 				c.drawImage(btl_moins,Cw*0.57,Ch*0.28,100,100)
 				c.globalAlpha=1;
-				game.battle.add ? c.fillText("Actif",Cw*0.35,Ch*0.6): c.fillText("désact.",Cw*0.35,Ch*0.6);
-				game.battle.sub ? c.fillText("Actif",Cw*0.65,Ch*0.6): c.fillText("désact.",Cw*0.65,Ch*0.6);
-				c.fillText("Suivant",Cw*0.5,Ch*0.72)
+				game.battle.add ? textfillplace(Cw*0.35,Ch*0.56,"ACTIF",26,true,"white",6):textfillplace(Cw*0.35,Ch*0.56,"DESACT",26,true,"black",6);
+				game.battle.sub ? textfillplace(Cw*0.65,Ch*0.56,"ACTIF",26,true,"white",6):textfillplace(Cw*0.65,Ch*0.56,"DESACT",26,true,"black",6);
+				textfillplace(Cw*0.5,Ch*0.67,"SUIVANT",32,true,"white",6);
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
 					c.fillRect(Cw*0.25,Ch*0.23,Cw*0.195,Ch*0.32)
 					c.fillRect(Cw*0.55,Ch*0.23,Cw*0.195,Ch*0.32)
-					c.fillRect(Cw*0.4,Ch*0.645,130,50)
+					c.fillRect(Cw*0.35,Ch*0.645,Cw*0.305,Ch*0.12)
 				}
 				else {
 					switch (game.menu.target){
@@ -1553,7 +1681,7 @@ function loopAnimation() {
 						c.drawImage(inputframe,Cw*0.55,Ch*0.26,Cw*0.195,Ch*0.26)
 						break;
 					case 3:
-						c.drawImage(inputframe,Cw*0.4,Ch*0.655,Cw*0.2,Ch*0.1)
+						c.drawImage(inputframe,Cw*0.35,Ch*0.655,Cw*0.3,Ch*0.1)
 						break;
 					}
 				}
@@ -1597,34 +1725,33 @@ function loopAnimation() {
 				c.textAlign="start";
 				game.inputType=="phone"? c.font = '24px monospace':c.font = '26px monospace';
 				c.fillText("Types :",Cw*0.03,Ch*0.27)
-				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
-				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
+				game.battle.add ? showicons(Cw*0.2384,Ch*0.2555,50,"lt",0,1): showicons(Cw*0.2384,Ch*0.2555,50,"lt",0);
+				game.battle.sub ? showicons(Cw*0.3384,Ch*0.2555,50,"lt",1,1): showicons(Cw*0.3384,Ch*0.2555,50,"lt",1);
 				game.inputType=="phone"? c.font = '27px monospace':c.font = '30px monospace';
 				c.fillText("Difficulté :",Cw*0.15,Ch*0.45)
 				c.textAlign="center";
 				c.font = '80px monospace';
-				c.fillText("<",Cw*0.3,Ch*0.62)
-				c.fillText(">",Cw*0.7,Ch*0.62)
-				game.inputType=="phone"? c.font = '26px monospace':c.font = '28px monospace';
-				if (game.inputType=="phone") {c.fillText("Retour",Cw*0.14,Ch*0.6);c.fillText("Suiv.",Cw*0.86,Ch*0.6)}
+				c.fillText("<",Cw*0.26,Ch*0.62)
+				c.fillText(">",Cw*0.74,Ch*0.62)
+				if(game.inputType=="phone") {textfillplace(Cw*0.5,Ch*0.68,"SUIVANT",32,true,"white",6);textfillplace(Cw*0.18,Ch*0.7,"RETOUR",26,true,"white",6)}
 				switch (game.menu.target) {
 				case 1:
-					c.fillText("Très facile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"TRES FACILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=2;
 					game.battle.mode="very-easy";
 					break;
 				case 2:
-					c.fillText("Facile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"FACILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=1.5;
 					game.battle.mode="easy";
 					break;
 				case 3:
-					c.fillText("Normal",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"NORMAL",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=1;
 					game.battle.mode="normal";
 					break;
 				case 4:
-					c.fillText("Difficile",Cw*0.5,Ch*0.6)
+					textfillplace(Cw*0.5,Ch*0.54,"DIFFICILE",30,true,(game.inputType=="phone"?"black":"white"),6)
 					game.setbtl.dif=0.7;
 					game.battle.mode="hard";
 					break;
@@ -1640,10 +1767,10 @@ function loopAnimation() {
 				}
 				if (game.inputType=="phone") {
 					c.globalAlpha=0.15;
-					c.fillRect(Cw*0.04,Ch*0.535,Cw*0.2,Ch*0.1)
-					c.fillRect(Cw*0.25,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.64,Ch*0.49,Cw*0.11,Ch*0.17)
-					c.fillRect(Cw*0.76,Ch*0.535,Cw*0.2,Ch*0.1)
+					c.fillRect(Cw*0.07,Ch*0.675,Cw*0.23,Ch*0.1)
+					c.fillRect(Cw*0.205,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.685,Ch*0.49,Cw*0.11,Ch*0.17)
+					c.fillRect(Cw*0.35,Ch*0.655,Cw*0.305,Ch*0.12)
 				}
 				if (key.d) {
 					setmenu(3,"lr",0,0,0,0);
@@ -1659,26 +1786,26 @@ function loopAnimation() {
 				c.textAlign="start";
 				game.inputType=="phone"? c.font = '24px monospace':c.font = '26px monospace';
 				c.fillText("Types :",Cw*0.03,Ch*0.27)
-				game.battle.add ? c.drawImage(icon_plusON,Cw*0.2,Ch*0.2,50,50): c.drawImage(icon_plus,Cw*0.2,Ch*0.2,50,50);
-				game.battle.sub ? c.drawImage(icon_moinsON,Cw*0.3,Ch*0.2,50,50): c.drawImage(icon_moins,Cw*0.3,Ch*0.2,50,50);
+				game.battle.add ? showicons(Cw*0.2384,Ch*0.2555,50,"lt",0,1): showicons(Cw*0.2384,Ch*0.2555,50,"lt",0);
+				game.battle.sub ? showicons(Cw*0.3384,Ch*0.2555,50,"lt",1,1): showicons(Cw*0.3384,Ch*0.2555,50,"lt",1);
 				c.fillText("Difficulté :",Cw*0.03,Ch*0.37)
 				switch (game.setbtl.dif) {
 				case 2:
-					c.fillText("Très facile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"TRES FACILE",24,false,"black",6)
 					break;
 				case 1.5:
-					c.fillText("facile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"FACILE",24,false,"black",6)
 					break;
 				case 1:
-					c.fillText("Normal",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"NORMAL",24,false,"black",6)
 					break;
 				case 0.7:
-					c.fillText("Difficile",Cw*0.3,Ch*0.37)
+					textfillplace(Cw*0.3,Ch*0.33,"DIFFICILE",24,false,"black",6)
 					break;
 				}
-				c.drawImage(icon_lt_life,Cw*0.6,Ch*0.195,50,50)
+				showicons(Cw*0.65,Ch*0.25,50,"lt",3)
+				showicons(Cw*0.65,Ch*0.345,50,"lt",4)
 				c.fillText("100 PV",Cw*0.72,Ch*0.27)
-				c.drawImage(icon_lt_timer,Cw*0.6,Ch*0.29,50,50)
 				switch (game.battle.mode){
 				case "very-easy":
 					c.fillText("10 sec.",Cw*0.72,Ch*0.37)
@@ -1695,10 +1822,8 @@ function loopAnimation() {
 				}
 				c.textAlign="center";
 				c.fillText("Jouer avec ces paramètres ?",Cw*0.5,Ch*0.5)
-				c.font = '42px monospace';
-				c.fillText("Jouer",Cw*0.5,Ch*0.65)
-				c.font = '30px monospace';
-				c.fillText("Retour",Cw*0.18,Ch*0.65)
+				textfillplace(Cw*0.5,Ch*0.59,"JOUER",36,true,"white",6)
+				textfillplace(Cw*0.18,Ch*0.6,"RETOUR",26,true,"white",6)
 				break;
 			default:
 				errormsg("Mainevent error !")
@@ -1747,7 +1872,7 @@ function loopAnimation() {
 						break;
 					case 2:
 						game.event="transition";
-						game.timer=7;
+						game.timer=133;
 						break;
 					}
 				}
@@ -1755,33 +1880,37 @@ function loopAnimation() {
 			case "transition":
 				c.fillStyle="rgb(240,240,240)";
 				c.globalAlpha=0.7;
-				c.fillRect(Cw*0.5-Cw*(0.5*((7-game.timer)/7)),Ch*0.5,Cw*((7-game.timer)/7),5)
-				if (game.timer==0) {
+				c.fillRect(Cw*0.5-Cw*(0.5*((133-game.timer)/133)),Ch*0.43,Cw*((133-game.timer)/133),5)
+				if (game.timer<=0) {
 					game.event="transition2";
-					game.timer=25;
+					game.timer=400;
+					anim.entity.phase=-1;
 				}
+				drawEntity()
 				break;
 			case "transition2":
 				c.fillStyle="rgb(240,240,240)";
-				c.globalAlpha=0.7+0.3*((25-game.timer)/25);
-				c.fillRect(0,Ch*0.5-Ch*(0.5*(25-game.timer)/25),Cw,5+Ch*((25-game.timer)/25))
-				if (game.timer==0) {
+				c.globalAlpha=0.7+0.3*((400-game.timer)/400);
+				c.fillRect(0,Ch*0.43-Ch*(0.57*(400-game.timer)/400),Cw,5+Ch*1.17*((400-game.timer)/400))
+				if (game.timer<=0) {
 					game.event="transition3";
-					game.timer=30;
+					game.timer=500;
+					anim.entity.phase=0;
 				}
+				drawEntity()
 				break;
 			case "transition3":
 				c.globalAlpha=1;;
 				c.fillStyle="rgb(240,240,240)";
 				c.fillRect(0,0,Cw,Ch)
-				if (game.timer==0) {
+				if (game.timer<=0) {
 					game.screen="survival";
 					game.battle.gamemode="survival-life";
 					game.mainevent="starting";
 					game.event="set";
-					game.timer=60;
+					game.timer=1000;
 					anim.background.type=Math.floor(Math.random()*4);
-					anim.lvltransition.time=100;
+					anim.lvltransition.time=1600;
 					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
 				}
 				break;
@@ -1792,14 +1921,15 @@ function loopAnimation() {
 			break;
 		case "level-select":
 			showbackground()
-			anim.lvlselect.invert ? anim.lvlselect.time++:anim.lvlselect.time--;
-			if (anim.lvlselect.time==0||anim.lvlselect.time==60) anim.lvlselect.invert=!anim.lvlselect.invert;
+			anim.lvlselect.invert ? anim.lvlselect.time+=msPassed:anim.lvlselect.time-=msPassed;
+			if ((anim.lvlselect.time<=0&&!anim.lvlselect.invert)||(anim.lvlselect.time>=1000&&anim.lvlselect.invert)) anim.lvlselect.invert=!anim.lvlselect.invert;
+			if(anim.lvlselect.time<0)anim.lvlselect.time=0;
+			if(anim.lvlselect.time>1000)anim.lvlselect.time=1000;
 			c.fillStyle="white";
 			if (game.inputType=="phone") {
 				c.globalAlpha=0.15;
-				c.fillRect(Cw*0.07,Ch*0.81,Cw*0.22,Ch*0.13)
-				c.fillRect(Cw*0.34,Ch*0.82,Cw*0.32,Ch*0.14)
-				//c.fillRect(Cw*0.7,Ch*0.81,Cw*0.23,Ch*0.13)
+				c.fillRect(Cw*0.07,Ch*0.825,Cw*0.23,Ch*0.13)
+				c.fillRect(Cw*0.34,Ch*0.825,Cw*0.32,Ch*0.13)
 				if (game.menu.target>1) {
 					c.fillRect(Cw*0.25,Ch*0.34,Cw*0.12,Ch*0.2)
 				}
@@ -1809,24 +1939,17 @@ function loopAnimation() {
 			}
 			c.globalAlpha = 1;
 			c.textAlign="center";
-			c.font = '42px monospace';
-			c.fillText("Jouer",Cw*0.5,Ch*0.92)
-			c.font = '30px monospace';
-			c.fillText("Retour",Cw*0.18,Ch*0.9)
-			//c.fillText("Détails",Cw*0.82,Ch*0.9)
-			c.font = '24px monospace';
-			c.textAlign="start";
-			c.fillText("Record :",Cw*0.05,Ch*0.65)
-			c.globalAlpha = 0.2;
-			c.font = '28px monospace';
-			c.textAlign="end";
-			c.fillText("00000000",Cw*0.26,Ch*0.72)
+			textfillplace(Cw*0.5,Ch*0.85,"JOUER",36,true,"white",6)
+			textfillplace(Cw*0.18,Ch*0.86,"RETOUR",26,true,"white",6)
+			textfillplace(Cw*0.02,Ch*0.6,"RECORD",28,false,(saves.levels[game.level.world][game.level.stage].perfect?"gold":"black"),5)
+			c.globalAlpha = 0.3;
+			numfillplace(Cw*0.3,Ch*0.67,"00000000",30,"end",8)
 			c.globalAlpha = 1;
-			c.fillText(saves.levels[game.level.world][game.level.stage].score,Cw*0.26,Ch*0.72)
+			numfillplace(Cw*0.3,Ch*0.67,saves.levels[game.level.world][game.level.stage].score,30,"end",8,(saves.levels[game.level.world][game.level.stage].perfect?"gold":"black"))
 			switch (game.mainevent){
 			case "map":
 				c.shadowColor="white";
-				c.shadowBlur=5+anim.lvlselect.time/3;
+				c.shadowBlur=5+anim.lvlselect.time/50;
 				c.drawImage(lvlmap_select,Cw*0.5-75,Ch*0.35,150,150)
 				c.shadowColor="none";
 				c.shadowBlur=0;
@@ -1839,49 +1962,42 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.textAlign="start";
 				if (levels[game.level.world][game.level.stage].time>0) {
-					c.drawImage(icon_lt_time,Cw*0.75-20,Ch*0.6,40,40)
-					c.fillText(ShowTimer(levels[game.level.world][game.level.stage].time)+" s",Cw*0.8,Ch*0.66)
+					showicons(Cw*0.75,Ch*0.645,40,"lt",5)
+					c.fillText(ShowTimer(levels[game.level.world][game.level.stage].time*1000)+" s",Cw*0.8,Ch*0.66)
 				}
 				if (levels[game.level.world][game.level.stage].timer>0) {
-					c.drawImage(icon_lt_timer,Cw*0.75-20,Ch*0.67,40,40)
-					c.fillText(ShowTimer(levels[game.level.world][game.level.stage].timer)+" s",Cw*0.8,Ch*0.73)
+					showicons(Cw*0.75,Ch*0.715,40,"lt",4)
+					c.fillText(ShowTimer(levels[game.level.world][game.level.stage].timer*1000)+" s",Cw*0.8,Ch*0.73)
 				}
 				if (levels[game.level.world][game.level.stage].life>0) {
-					c.drawImage(icon_lt_life,Cw*0.75-20,Ch*0.74,40,40)
+					showicons(Cw*0.75,Ch*0.785,40,"lt",3)
 					c.fillText(levels[game.level.world][game.level.stage].life+" vies",Cw*0.8,Ch*0.8)
 				}
 				if (levels[game.level.world][game.level.stage].hp>0) {
-					c.drawImage(icon_lt_life,Cw*0.75-20,Ch*0.74,40,40)
+					showicons(Cw*0.75,Ch*0.785,40,"lt",3)
 					c.fillText(levels[game.level.world][game.level.stage].hp+" PV",Cw*0.8,Ch*0.8)
 				}
 				c.font = '40px monospace';
 				c.drawImage(icon_operation,Cw*0.4-28,Ch*0.7,56,56)
-				c.fillText(levels[game.level.world][game.level.stage].count,Cw*0.47,Ch*0.795)
-				c.font = '28px monospace';
-				c.textAlign="end";
-				c.globalAlpha = 1;
-				c.fillText(saves.levels[game.level.world][game.level.stage].score,Cw*0.26,Ch*0.72)
+				numfillplace(Cw*0.5,Ch*0.72,levels[game.level.world][game.level.stage].count,40,"center",8,"brillant")
 				switch (game.event){
 				case "fadeout":
 				case "select":
 					for (let i = game.level.stage-1; i <= game.level.stage+1; i++) {
 						if (i>=1&&i<=game.menu.options) {
-							c.font = '40px monospace';
-							c.textAlign="center";
-							c.fillText(i,Cw*0.5+(Cw*0.36)*(i-game.level.stage),Ch*0.35)
-
+							numfillplace(Cw*0.5+(Cw*0.36)*(i-game.level.stage),Ch*0.275,i,40,"center",5,"brillant")
 							switch (levels[game.level.world][i].type){
 							case "lesson":
-								c.drawImage(icon_lesson,Cw*0.5-50+(Cw*0.36)*(i-game.level.stage),Ch*0.05,100,100)
+								showicons(Cw*0.5+(Cw*0.36)*(i-game.level.stage),Ch*0.16,100,"ui",1)
 								break;
 							case "chrono":
-								c.drawImage(icon_timer,Cw*0.5-50+(Cw*0.36)*(i-game.level.stage),Ch*0.05,100,100)
+								showicons(Cw*0.5+(Cw*0.36)*(i-game.level.stage),Ch*0.16,100,"ui",2)
 								break;
 							case "vies":
-								c.drawImage(icon_life,Cw*0.5-50+(Cw*0.36)*(i-game.level.stage),Ch*0.05,100,100)
+								showicons(Cw*0.5+(Cw*0.36)*(i-game.level.stage),Ch*0.16,100,"ui",0)
 								break;
 							case "pv":
-								c.drawImage(icon_life,Cw*0.5-50+(Cw*0.36)*(i-game.level.stage),Ch*0.05,100,100)
+								showicons(Cw*0.5+(Cw*0.36)*(i-game.level.stage),Ch*0.16,100,"ui",0)
 								break;
 							case "boss":
 								break;
@@ -1909,22 +2025,20 @@ function loopAnimation() {
 				case "transition":
 				case "transition2":
 				case "transition3":
-					c.font = '40px monospace';
-					c.textAlign="center";
-					c.fillText(game.level.stage,Cw*0.5,Ch*0.35)
+					numfillplace(Cw*0.5,Ch*0.275,game.level.stage,40,"center",5,"brillant")
 
 					switch (levels[game.level.world][game.level.stage].type){
 					case "lesson":
-						c.drawImage(icon_lesson,Cw*0.5-50,Ch*0.05,100,100)
+						showicons(Cw*0.5,Ch*0.16,100,"ui",1)
 						break;
 					case "chrono":
-						c.drawImage(icon_timer,Cw*0.5-50,Ch*0.05,100,100)
+						showicons(Cw*0.5,Ch*0.16,100,"ui",2)
 						break;
 					case "vies":
-						c.drawImage(icon_life,Cw*0.5-50,Ch*0.05,100,100)
+						showicons(Cw*0.5,Ch*0.16,100,"ui",0)
 						break;
 					case "pv":
-						c.drawImage(icon_life,Cw*0.5-50,Ch*0.05,100,100)
+						showicons(Cw*0.5,Ch*0.16,100,"ui",0)
 						break;
 					case "boss":
 						break;
@@ -1943,13 +2057,14 @@ function loopAnimation() {
 				}
 				switch(game.event){
 				case "fadeout":
-					anim.lvltransition.time--;
-					c.fillStyle="black";
-					c.globalAlpha=anim.lvltransition.time/50;
-					c.fillRect(0,0,Cw,Ch)
+					anim.lvltransition.time-=msPassed;
 					if (anim.lvltransition.time<=0) {
-						game.event="select";
+						anim.lvltransition.time=0;
+						game.event="select"
 					}
+					c.fillStyle="black";
+					c.globalAlpha=anim.lvltransition.time/833;
+					c.fillRect(0,0,Cw,Ch)
 					break;
 				case "select":
 					movemenu()
@@ -1975,7 +2090,8 @@ function loopAnimation() {
 							break;
 						case 2:
 							game.event="transition";
-							game.timer=7;
+							game.timer=133;
+							anim.entity.phase=-3;
 							break;
 						}
 					}
@@ -1987,30 +2103,34 @@ function loopAnimation() {
 				case "transition":
 					c.fillStyle="rgb(240,240,240)";
 					c.globalAlpha=0.7;
-					c.fillRect(Cw*0.5-Cw*(0.5*((7-game.timer)/7)),Ch*0.5,Cw*((7-game.timer)/7),5)
-					if (game.timer==0) {
+					c.fillRect(Cw*0.5-Cw*(0.5*((133-game.timer)/133)),Ch*0.43,Cw*((133-game.timer)/133),5)
+					if (game.timer<=0) {
 						game.event="transition2";
-						game.timer=25;
+						game.timer=400;
+						anim.entity.phase=-1;
 					}
+					drawEntity()
 					break;
 				case "transition2":
 					c.fillStyle="rgb(240,240,240)";
-					c.globalAlpha=0.7+0.3*((25-game.timer)/25);
-					c.fillRect(0,Ch*0.5-Ch*(0.5*(25-game.timer)/25),Cw,5+Ch*((25-game.timer)/25))
-					if (game.timer==0) {
+					c.globalAlpha=0.7+0.3*((400-game.timer)/400);
+					c.fillRect(0,Ch*0.43-Ch*(0.57*(400-game.timer)/400),Cw,5+Ch*1.17*((400-game.timer)/400))
+					if (game.timer<=0) {
 						game.event="transition3";
-						game.timer=30;
+						game.timer=500;
+						anim.entity.phase=0;
 					}
+					drawEntity()
 					break;
 				case "transition3":
 					c.globalAlpha=1;;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.screen="level";
 						game.mainevent="starting";
 						game.event="set";
-						anim.lvltransition.time=100;
-						game.timer=60;
+						anim.lvltransition.time=1600;
+						game.timer=1000;
 						anim.background.type=Math.floor(Math.random()*4);
 						if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
 					}
@@ -2027,60 +2147,60 @@ function loopAnimation() {
 		case "survival":
 			showbackground()
 			RTAtimer()
-			anim.operation.invert ? anim.operation.time++:anim.operation.time--;
-			if (anim.operation.time==0||anim.operation.time==60) anim.operation.invert=!anim.operation.invert;
+			drawEntity()
+			anim.combocolor=(anim.combocolor+msPassed/10)%360;
+			anim.operation.invert ? anim.operation.time+=msPassed:anim.operation.time-=msPassed;
+			if(anim.operation.time<0)anim.operation.time=0;
+			if(anim.operation.time>2000)anim.operation.time=2000;
+			if ((anim.operation.time<=0&&!anim.operation.invert)||(anim.operation.time>=2000&&anim.operation.invert)) anim.operation.invert=!anim.operation.invert;
 			if (anim.decaybar.mode=="alt") {
-				anim.decaybar.invert ? anim.decaybar.time++:anim.decaybar.time--;
+				anim.decaybar.invert ? anim.decaybar.time+=msPassed:anim.decaybar.time-=msPassed;
+				if (anim.decaybar.time>800) anim.decaybar.time=800;
+				if (anim.decaybar.time<0) anim.decaybar.time=0;
 			}else {
-				anim.decaybar.time=40;
+				anim.decaybar.time=666;
 			}
-			if (anim.decaybar.time==0||anim.decaybar.time==40) anim.decaybar.invert=!anim.decaybar.invert;
+			if ((anim.decaybar.time<=0&&!anim.decaybar.invert)||(anim.decaybar.time>=666&&anim.decaybar.invert)) anim.decaybar.invert=!anim.decaybar.invert;
 			if (game.stats.timer<=game.stats.maxtimer*0.2 && anim.lowtimer.mode=="alt") {
-				anim.lowtimer.time>0 ? anim.lowtimer.time--:anim.lowtimer.time=30;
+				anim.lowtimer.time>0 ? anim.lowtimer.time-=msPassed:anim.lowtimer.time=500;
 			}else {
-				anim.lowtimer.time=30;
+				anim.lowtimer.time=500;
 			}
-			if (anim.pause.opa>0) anim.pause.opa--;
+			if (anim.pause.opa>0) anim.pause.opa-=msPassed;
+			if (anim.pause.opa<0) anim.pause.opa=0;
 			c.fillStyle="white";
 			c.globalAlpha=1;
-			c.font = '26px monospace';
-			c.textAlign="start";
-			c.fillText("Score :",Cw*0.03,Ch*0.77)
-			c.font = '20px monospace';
-			c.textAlign="center";
-			c.fillText("Correct",Cw*0.5,Ch*0.08)
-			c.globalAlpha=0.15+anim.pause.opa/50;
-			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/420))+","+(255*(1-key.pausecooldown/420))+")";
-			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/420),40);
+			textfillplace(Cw*0.5,Ch*0.04,"CORRECT",22,true,"black",6)
+			c.globalAlpha=0.15+anim.pause.opa/833;
+			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/7000))+","+(255*(1-key.pausecooldown/7000))+")";
+			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/7000),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
-			c.globalAlpha=0.6+anim.pause.opa/50;
-			c.font = '26px monospace';
-			c.fillText("Pause",Cw*0.125,Ch*0.94)
+			c.globalAlpha=0.6+anim.pause.opa/833;
+			key.pausecooldown==0?textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"black",5):textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"red",5);
 			c.globalAlpha=1;
-			c.fillStyle="white";
-			c.font = '40px monospace';
-			c.fillText(game.stats.clear,Cw*0.5,Ch*0.17)
+			numfillplace(Cw*0.5,Ch*0.12,game.stats.clear,40,"center",6,"brillant")
 			c.font = '30px monospace';
 			c.textAlign="start";
 			c.drawImage(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.timer/game.stats.maxtimer),ui_timerbarprogress.height,Cw*0.119,Ch*0.096,Cw*0.293*(game.stats.timer/game.stats.maxtimer),Ch*0.117)
 			c.fillStyle="red";
-			c.globalAlpha=0.3+anim.decaybar.time/80;
+			c.globalAlpha=0.3+anim.decaybar.time/2000;
 			if (game.battle.gamemode=="survival-timer") c.fillRect(Cw*0.413-Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.1,Cw*0.295*(0.33*(game.stats.clear/200*(game.setbtl.dif/1))),Ch*0.072);
 			if (game.battle.gamemode=="survival-life") c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
 			if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
-				c.globalAlpha=0.2+anim.lowtimer.time/50;
+				c.globalAlpha=0.2+anim.lowtimer.time/1000;
 				c.fillRect(Cw*0.119,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
 			}
 			c.globalAlpha=1;
 			c.fillStyle="white";
-			c.drawImage(ui_timer,Cw*0.01,Ch*0.091,60,60)
+			showicons(Cw*0.055,Ch*0.16,60,"ui",2,0)
 			c.drawImage(ui_timerbar,Cw*0.11,Ch*0.091,202,72)
 			c.textAlign="end";
-			c.fillText(ShowTimer(game.stats.timer),Cw*0.4,Ch*0.226)
-			c.globalAlpha = 0.2;
-			c.fillText("00000000",Cw*0.225,Ch*0.83)
+			numfillplace(Cw*0.4,Ch*0.18,ShowTimer(game.stats.timer),24,"end",3)
+			textfillplace(Cw*0.02,Ch*0.74,"SCORE",26,false,"black",5)
+			c.globalAlpha = 0.3;
+			numfillplace(Cw*0.26,Ch*0.8,"00000000",26,"end",6)
 			c.globalAlpha = 1;
-			c.fillText(game.stats.score,Cw*0.225,Ch*0.83)
+			numfillplace(Cw*0.26,Ch*0.8,game.stats.score,26,"end",6)
 			c.textAlign="start";
 			c.globalAlpha=1;
 			if (game.battle.gamemode=="survival-life") {
@@ -2091,18 +2211,25 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.globalAlpha=1;
 				c.drawImage(ui_hpbar,Cw*0.25,Ch*0.75,Cw*0.5,94)
-				c.fillText(Math.floor(game.stats.pv),Cw*0.412,Ch*0.848)
-				c.fillText("/"+game.stats.maxpv,Cw*0.5,Ch*0.848)
+				numfillplace(Cw*0.485,Ch*0.8,Math.floor(game.stats.pv),24,"end",6)
+				numfillplace(Cw*0.594,Ch*0.8,Math.floor(game.stats.maxpv),24,"end",6)
+				c.fillText("/",Cw*0.492,Ch*0.848)
 			}
 			c.font = '28px monospace';
 			c.textAlign="start";
-			if (game.stats.combo>4) c.fillText("COMBO "+game.stats.combo,Cw*0.11,Ch*0.35);
-			if (game.stats.combo>9) c.fillText("x "+checkCombo(game.stats.combo),Cw*0.115,Ch*0.4);
-
+			if (game.stats.combo>4) {
+				textfillplace(Cw*0.03,Ch*0.325,"COMBO",30,false,colorCombo(game.stats.combo),5);
+				numfillplace(Cw*0.225,Ch*0.325,game.stats.combo,30,"start",7,colorCombo(game.stats.combo));
+			}
+			if (game.stats.combo>9) {
+				textfillplace(Cw*0.08,Ch*0.415,"X",18,false,colorCombo(game.stats.combo),5);
+				numfillplace(Cw*0.1,Ch*0.4,checkCombo(game.stats.combo),24,"start",7,colorCombo(game.stats.combo));
+			}
 			switch (game.mainevent){
 			case "starting":
 				switch (game.event){
 				case "set":
+					anim.entity.phase=0;
 					c.fillStyle="rgb(240,240,240)";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
@@ -2112,7 +2239,7 @@ function loopAnimation() {
 						switch (game.setbtl.dif){
 						case 2:
 							game.stats.maxpv=100;
-							game.stats.maxtimer=600;
+							game.stats.maxtimer=10000;
 							game.battle.rangemin=3;
 							game.battle.rangemax=8;
 							game.battle.rangeminstep=0.3;
@@ -2124,7 +2251,7 @@ function loopAnimation() {
 							break;
 						case 1.5:
 							game.stats.maxpv=100;
-							game.stats.maxtimer=600;
+							game.stats.maxtimer=10000;
 							game.battle.rangemin=5;
 							game.battle.rangemax=15;
 							game.battle.rangeminstep=0.35;
@@ -2136,7 +2263,7 @@ function loopAnimation() {
 							break;
 						case 1:
 							game.stats.maxpv=100;
-							game.stats.maxtimer=540;
+							game.stats.maxtimer=9000;
 							game.battle.rangemin=7;
 							game.battle.rangemax=20;
 							game.battle.rangeminstep=0.6;
@@ -2148,7 +2275,7 @@ function loopAnimation() {
 							break;
 						case 0.7:
 							game.stats.maxpv=100;
-							game.stats.maxtimer=480;
+							game.stats.maxtimer=8000;
 							game.battle.rangemin=9;
 							game.battle.rangemax=25;
 							game.battle.rangeminstep=1.1;
@@ -2161,80 +2288,92 @@ function loopAnimation() {
 						}
 					}
 					else if (game.battle.gamemode=="survival-timer"){
-						game.stats.maxtimer=(Math.floor(20*game.setbtl.mode*game.setbtl.chif*game.setbtl.dif))*60;
+						game.stats.maxtimer=(Math.floor(20*game.setbtl.mode*game.setbtl.chif*game.setbtl.dif))*1000;
 					}
 					game.event="fadeout";
 					break;
 				case "fadeout":
-					anim.lvltransition.time--;
-					c.fillStyle="rgb(240,240,240)";
-					c.globalAlpha=anim.lvltransition.time/100;
-					c.fillRect(0,0,Cw,Ch)
+					anim.entity.phase=0;
+					anim.lvltransition.time-=msPassed;
 					if (anim.lvltransition.time<=0) {
+						anim.lvltransition.time=0;
 						game.event="transition";
-						game.timer=20
+						game.timer=333
+						anim.entity.phase=1;
 					}
+					c.fillStyle="rgb(240,240,240)";
+					c.globalAlpha=anim.lvltransition.time/1666;
+					c.fillRect(0,0,Cw,Ch)
 					break;
 				case "transition":
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						switch (game.battle.gamemode) {
 						case "survival-timer":
-							if (game.stats.timer<game.stats.maxtimer*3/4) {
-								game.stats.timer+=Math.floor((game.stats.maxtimer*3/4)/40);
-							}
+							if (game.stats.timer<game.stats.maxtimer*3/4) game.stats.timer+=Math.floor((game.stats.maxtimer*3/4)/30);
 							else {
 								game.event="attention";
-								game.timer=20
+								game.timer=333;
+								anim.entity.phase=2
 							}
 							break;
 						case "survival-life":
 							if (game.stats.pv<game.stats.maxpv) {
-								game.stats.pv+=game.stats.maxpv/40;
+								game.stats.pv+=game.stats.maxpv/30;
+								if (game.stats.pv>game.stats.maxpv) game.stats.pv=game.stats.maxpv;
 							}
-							if (game.stats.timer<game.stats.maxtimer) {
-								game.stats.timer+=game.stats.maxtimer/40;
-							}
+							if (game.stats.timer<game.stats.maxtimer) game.stats.timer+=game.stats.maxtimer/30;
 							else {
 								game.battle.dmg=0;
 								game.event="attention";
-								game.timer=20
+								game.timer=333;
+								anim.entity.phase=2
 							}
 						}
 					}
 					break;
 				case "attention":
-					c.textAlign="center";
-					c.font = '30px monospace';
-					c.fillText("Prêt ?",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
-					if (game.timer==0) {
-						game.timer=50;
-						game.event="pret"
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*0.5*(1-game.timer/266),Ch*0.45,"PRET?",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=0) {
+						game.timer=1166;
+						game.event="pret";
+						anim.entity.phase=3
 					}
 					break;
 				case "pret":
-					c.textAlign="center";
-					c.font = '30px monospace';
-					c.fillText("Prêt ?",Cw*0.5,Ch*0.5)
-					if (game.timer==0) {
-						game.timer=20;
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*0.5,Ch*0.45,"PRET?",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=300) anim.entity.phase=4;
+					if (game.timer<=0) {
+						game.timer=266;
 						game.event="partez"
 					}
 					break;
 				case "partez":
-					c.textAlign="center";
-					c.font = '30px monospace';
-					c.fillText("Prêt ?",Cw*(0.5+0.6*(1-game.timer/20)),Ch*0.5)
-					c.fillText("PARTEZ !",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
-					if (game.timer==0) {
-						game.timer=20;
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*(0.5+0.6*(1-game.timer/266)),Ch*0.45,"PRET?",36,true,"white",5)
+					textfillplace(Cw*(0.5*(1-game.timer/266)),Ch*0.45,"PARTEZ!",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=0) {
+						game.timer=500;
 						game.event="start"
 					}
 					break;
 				case "start":
-					c.textAlign="center";
-					c.font = '30px monospace';
-					c.fillText("PARTEZ !",Cw*0.5,Ch*0.5)
-					if (game.timer==0) {
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*0.5,Ch*0.45,"PARTEZ!",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
 						switch (game.battle.gamemode){
@@ -2252,36 +2391,28 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "play":
 				if (game.battle.dmg>0) game.battle.dmg--;
-				if (game.stats.timer>0) game.stats.timer--;
-				if (game.stats.time>0) game.stats.time--;
-				game.stats.timeRep++;
+				if (game.stats.timer>0) game.stats.timer-=msPassed;
+				if (game.stats.time>0) game.stats.time-=msPassed;
+				game.stats.timeRep+=msPassed;
 				c.textAlign="center";
 				c.font = '32px monospace';
 				c.fillStyle="white";
 				c.font = '40px monospace';
-				game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+				game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
 				drawPuzzle()
 				inputPlayer()
 				switch (game.battle.gamemode){
 				case "survival-timer":
 					if (game.stats.timer<=0) {
 						game.stats.timer=0;
-						game.mainevent="gameover";
-						game.event="end";
-						game.timer=100;
+						game.mainevent="wait";
+						game.event="calc";
+						game.timer=400;
 					}
 					break;
 				case "survival-life":
@@ -2289,13 +2420,13 @@ function loopAnimation() {
 						game.stats.timer=0;
 						game.mainevent="wait";
 						game.event="calc";
-						game.timer=25;
+						game.timer=400;
 					}
 					if (game.stats.pv<=0) {
 						game.stats.pv=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=100;
+						game.timer=1600;
 					}
 					break;
 				}
@@ -2305,15 +2436,7 @@ function loopAnimation() {
 					game.event="calc";
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "wait":
@@ -2331,28 +2454,34 @@ function loopAnimation() {
 						break;
 					}
 					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
-					c.font = '40px monospace';
-					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					game.event="wait";
-					game.timer=20;
+					game.timer=333;
 					break;
 				case "wait":
 					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
-					c.font = '40px monospace';
-					c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					c.font = '26px monospace';
 					if (pass) c.fillText("+ "+game.battle.score,Cw*0.2,Ch*0.7);
-					if (game.timer==0) {
-						game.event="";
-						game.mainevent="play";
-						input=0;
-						switch (game.battle.gamemode){
-						case "survival-timer":
-							generatePuzzleMode1()
-							break;
-						case "survival-life":
-							generatePuzzleMode2()
-							break;
+					if (game.timer<=0) {
+						if (game.stats.timer<=0) {
+							game.stats.timer=0;
+							game.mainevent="gameover";
+							game.event="end";
+							game.timer=1600;
+						}
+						else {
+							game.event="";
+							game.mainevent="play";
+							input=0;
+							switch (game.battle.gamemode){
+							case "survival-timer":
+								generatePuzzleMode1()
+								break;
+							case "survival-life":
+								generatePuzzleMode2()
+								break;
+							}
 						}
 					}
 					break;
@@ -2361,15 +2490,7 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "pause":
@@ -2380,7 +2501,7 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.textAlign="center";
 				c.font = '38px monospace';
-				c.fillText("PAUSE",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"PAUSE",40,true,"black",5)
 				if (game.inputType=="keyboard") {
 					c.font = '24px monospace';
 					c.fillText("Appuyez sur [Espace] pour reprendre",Cw*0.5,Ch*0.7)
@@ -2393,13 +2514,13 @@ function loopAnimation() {
 					c.fillText("Toucher l'écran pour reprendre",Cw*0.5,Ch*0.7)
 					c.fillText("Quitter la partie",Cw*0.5,Ch*0.85)
 				}
-				if ((key.space||key.p)&& game.timer==0) {
+				if ((key.space||key.p)&& game.timer<=0) {
 					game.mainevent=game.prevevent;
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					key.p=false;
 					key.space=false;
-					key.pausecooldown=420
+					key.pausecooldown=7000
 				}
 				if (key.d) {
 					game.mainevent="exit";
@@ -2442,7 +2563,7 @@ function loopAnimation() {
 					case 2:
 						game.mainevent="exitgame";
 						game.event="transition";
-						game.timer=50;
+						game.timer=833;
 						break;
 					default:
 						break;
@@ -2466,24 +2587,24 @@ function loopAnimation() {
 				switch (game.event){
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha=1-game.timer/50;
+					c.globalAlpha=1-game.timer/833;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="wait";
-						game.timer=20;
+						game.timer=333;
 					}
 					break;
 				case "wait":
 					c.fillStyle="black";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						resetStats()
 						setmenu(5,"lr",0,0,0,0,3);
 						game.screen="hub";
 						game.mainevent="";
 						game.event="fadeout";
-						anim.lvltransition.time=50;
+						anim.lvltransition.time=1600;
 					}
 					break;
 				default:
@@ -2497,39 +2618,35 @@ function loopAnimation() {
 				drawPuzzle()
 				c.shadowColor="black";
 				c.shadowBlur=3;
-				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
-				c.fillStyle="white";
-				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"FIN DE PARTIE!",32,true,"white",5)
 				c.shadowColor="";
 				c.shadowBlur=0;
 				switch (game.event){
 				case "begin":
 					if (game.battle.dmg>20) game.battle.dmg--;
 					if (game.battle.dmg>0) game.battle.dmg--;
-					pass ? c.fillStyle ="green": c.fillStyle="red";
-					c.font = '40px monospace';
-					c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					if (game.battle.dmg==0 && game.timer<=0) {
 						game.event="transition";
-						game.timer=15;
+						game.timer=266;
 					}
 					break;
 				case "end":
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="transition";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha = 0.92*(1-game.timer/50);
+					c.globalAlpha = 0.92*(1-game.timer/833);
 					c.fillRect(0,0,canvas.width,canvas.height)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
-						game.timer=20;
-						setmenu(3,"lr",0.11,0.82,0.25,0);
+						game.timer=333;
+						setmenu(3,"lr",0.11,0.83,0.26,0);
 					}
 					break;
 				case "finpop":
@@ -2539,18 +2656,37 @@ function loopAnimation() {
 					c.globalAlpha = 0.92;
 					c.fillRect(0,0,canvas.width,canvas.height)
 					c.fillStyle="white";
-					c.globalAlpha = 1-game.timer/20;
-					c.textAlign="center";
-					c.font = '38px monospace';
-					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.18)
-					c.font = '30px monospace';
+					switch(game.event){
+					case "finpop":
+						c.globalAlpha = 1-game.timer/333;
+						break;
+					case "transition2":
+					case "transition3":
+						c.globalAlpha = game.timer/833;
+						break;
+					}
+					
+					textfillplace(Cw*0.5,Ch*0.1,"FIN DE PARTIE!",40,true,"black",5)
 					c.textAlign="start";
+					switch (game.setbtl.dif) {
+					case 2:
+						textfillplace(Cw*0.18,Ch*0.23,"TRES FACILE",30,false,"black",7)
+						break;
+					case 1.5:
+						textfillplace(Cw*0.18,Ch*0.23,"FACILE",30,false,"black",7)
+						break;
+					case 1:
+						textfillplace(Cw*0.18,Ch*0.23,"NORMAL",30,false,"black",7)
+						break;
+					case 0.7:
+						textfillplace(Cw*0.18,Ch*0.23,"DIFFICILE",30,false,"black",7)
+						break;
+					}
 					switch (game.battle.gamemode) {
 					case "survival-timer":
-						c.fillText("Mode: "+returnMode(),Cw*0.13,Ch*0.28)
-						game.battle.add? c.drawImage(icon_plusON,Cw*0.6,Ch*0.225,35,35) :c.drawImage(icon_plus,Cw*0.6,Ch*0.225,35,35) ;
-						game.battle.sub? c.drawImage(icon_moinsON,Cw*0.66,Ch*0.225,35,35) :c.drawImage(icon_moins,Cw*0.66,Ch*0.225,35,35) ;
-						game.battle.mult?  c.drawImage(icon_multON,Cw*0.72,Ch*0.225,35,35) :c.drawImage(icon_mult,Cw*0.72,Ch*0.225,35,35) ;
+						game.battle.add? showicons(Cw*0.6,Ch*0.26,40,"lt",0,1):sshowicons(Cw*0.6,Ch*0.26,40,"lt",0,0);
+						game.battle.sub? showicons(Cw*0.68,Ch*0.26,40,"lt",1,1):showicons(Cw*0.68,Ch*0.26,40,"lt",1,0);
+						game.battle.mult? showicons(Cw*0.76,Ch*0.26,40,"lt",2,1):showicons(Cw*0.76,Ch*0.26,40,"lt",2,0);
 						switch (game.battle.numopp){
 						case 1:
 							c.fillText(">1<",Cw*0.8,Ch*0.28);
@@ -2567,30 +2703,30 @@ function loopAnimation() {
 						}
 						break;
 					case "survival-life":
-						c.fillText("Mode: PV "+returnMode(),Cw*0.13,Ch*0.28)
-						game.battle.add? c.drawImage(icon_plusON,Cw*0.66,Ch*0.225,35,35) :c.drawImage(icon_plus,Cw*0.66,Ch*0.225,35,35);
-						game.battle.sub? c.drawImage(icon_moinsON,Cw*0.72,Ch*0.225,35,35) :c.drawImage(icon_moins,Cw*0.72,Ch*0.225,35,35);
+						game.battle.add? showicons(Cw*0.6,Ch*0.26,40,"lt",0,1):sshowicons(Cw*0.6,Ch*0.26,40,"lt",0,0);
+						game.battle.sub? showicons(Cw*0.68,Ch*0.26,40,"lt",1,1):showicons(Cw*0.68,Ch*0.26,40,"lt",1,0);
 						break;
 					}
-					c.font = '36px monospace';
-					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
-					c.font = '30px monospace';
-					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.46)
+					textfillplace(Cw*0.13,Ch*0.32,"SCORE",36,false,"black",5)
+					numfillplace(Cw*0.38,Ch*0.325,game.stats.score,32,"start",5)
+					textfillplace(Cw*0.13,Ch*0.41,"COMBO",32,false,"black",5)
+					textfillplace(Cw*0.34,Ch*0.42,"MAX",26,false,"black",5)
+					numfillplace(Cw*0.46,Ch*0.405,game.stats.maxcombo,32,"start",5)
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.54)
 					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
 					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+" sec",Cw*0.13,Ch*0.68)
 					c.fillText("Durée de la partie : "+ShowTimerRes(game.stats.timeTot)+" sec",Cw*0.13,Ch*0.75)
-					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
-					c.fillText("Continuer",Cw*0.4,Ch*0.86)
-					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
+					textfillplace(Cw*0.25,Ch*0.83,"REJOUER",24,true,"white",5)
+					textfillplace(Cw*0.51,Ch*0.83,"SUIVANT",24,true,"white",5)
+					textfillplace(Cw*0.75,Ch*0.83,"STATS",24,true,"white",5)
 					switch (game.event){
 					case "finpop":
 						if (game.inputType=="phone") {
-							c.globalAlpha = 0.15*(1-game.timer/20);
-							c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
-							c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
-							c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
+							c.globalAlpha = 0.15*(1-game.timer/333);
+							c.fillRect(Cw*0.13,Ch*0.79,Cw*0.24,Ch*0.125)
+							c.fillRect(Cw*0.38,Ch*0.79,Cw*0.26,Ch*0.125)
+							c.fillRect(Cw*0.65,Ch*0.79,Cw*0.24,Ch*0.125)
 						}
 						else {
 							movemenu()
@@ -2601,11 +2737,11 @@ function loopAnimation() {
 									resetStats()
 									game.mainevent="starting";
 									game.event="set";
-									game.timer=20;
+									game.timer=333;
 									break;
 								case 2:
 									game.event="transition2";
-									game.timer=50;
+									game.timer=833;
 									break;
 								case 3:
 									game.mainevent="stats";
@@ -2619,24 +2755,24 @@ function loopAnimation() {
 						break;
 					case "transition2":
 						c.fillStyle="black";
-						c.globalAlpha=1-game.timer/50;
+						c.globalAlpha=1-game.timer/833;
 						c.fillRect(0,0,Cw,Ch)
-						if (game.timer==0) {
+						if (game.timer<=0) {
 							resetStats()
 							game.event="transition3";
-							game.timer=20;
+							game.timer=333;
 						}
 						break;
 					case "transition3":
 						c.fillStyle="black";
 						c.globalAlpha=1;
 						c.fillRect(0,0,Cw,Ch)
-						if (game.timer==0) {
-							setmenu(6,"lr",0,0,0,0,3);
+						if (game.timer<=0) {
+							setmenu(5,"lr",0,0,0,0,3);
 							game.screen="hub";
 							game.mainevent="";
 							game.event="fadeout";
-							anim.lvltransition.time=50;
+							anim.lvltransition.time=833;
 						}
 						break;
 					default:
@@ -2678,7 +2814,7 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<       Global   >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_op,Cw*0.375,Ch*0.16,40,40)
+					showicons(Cw*0.4,Ch*0.195,40,"lt",6,0)
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.textAlign="start";
 					c.fillText("N°    Opération        Résultat       Temps",Cw*0.07,Ch*0.3)
@@ -2697,7 +2833,7 @@ function loopAnimation() {
 								c.fillStyle="white";
 								if (!game.stats.level[i].valide) {
 									c.textAlign="start";
-									c.fillText("->  "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
+									c.fillText("-> "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
 								}
 								c.textAlign="end";
 								c.fillText(Math.floor(game.stats.level[i].timeResp*100)/100+"s",Cw*0.95,Ch*0.43+Ch*0.055*(i-game.menu.target))
@@ -2724,7 +2860,7 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<        Vies    >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_life,Cw*0.375,Ch*0.16,40,40)
+					showicons(Cw*0.4,Ch*0.195,40,"lt",3,0)
 					let maxHP=get_maxhp(game.stats.maxvies,game.stats.maxpv);
 					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
 						anim.graph.init--;
@@ -2801,8 +2937,8 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<       Temps    >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_time,Cw*0.375,Ch*0.16,40,40)
-					let maxTimer=game.stats.maxtimer/60;
+					showicons(Cw*0.4,Ch*0.195,40,"lt",4,0)
+					let maxTimer=game.stats.maxtimer/1000;
 					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
 						anim.graph.init--;
 					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
@@ -2920,7 +3056,7 @@ function loopAnimation() {
 				if (key.d) {
 					game.mainevent="gameover";
 					game.event="finpop";
-					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+					setmenu(3,"lr",0.11,0.83,0.26,0,3);
 				}
 				break;
 			default:
@@ -2955,75 +3091,74 @@ function loopAnimation() {
 		case "level":
 			showbackground()
 			RTAtimer()
-			anim.operation.invert ? anim.operation.time++:anim.operation.time--;
-			if (anim.operation.time==0||anim.operation.time==60) anim.operation.invert=!anim.operation.invert;
+			drawEntity()
+			drawBurst()
+			anim.combocolor=(anim.combocolor+msPassed/10)%360;
+			anim.operation.invert ? anim.operation.time+=msPassed:anim.operation.time-=msPassed;
+			if(anim.operation.time<0)anim.operation.time=0;
+			if(anim.operation.time>2000)anim.operation.time=2000;
+			if ((anim.operation.time<=0&&!anim.operation.invert)||(anim.operation.time>=2000&&anim.operation.invert)) anim.operation.invert=!anim.operation.invert;
 			if (anim.decaybar.mode=="alt") {
-				anim.decaybar.invert ? anim.decaybar.time++:anim.decaybar.time--;
+				anim.decaybar.invert ? anim.decaybar.time+=msPassed:anim.decaybar.time-=msPassed;
+				if (anim.decaybar.time>800) anim.decaybar.time=800;
+				if (anim.decaybar.time<0) anim.decaybar.time=0;
 			}else {
-				anim.decaybar.time=40;
+				anim.decaybar.time=800;
 			}
-			if (anim.decaybar.time==0||anim.decaybar.time==40) anim.decaybar.invert=!anim.decaybar.invert;
-			if ((game.stats.timer<=game.stats.maxtimer*0.2||game.stats.time<=game.stats.maxtime*0.2) && anim.lowtimer.mode=="alt") {
-				anim.lowtimer.time>0 ? anim.lowtimer.time--:anim.lowtimer.time=30;
+			if ((anim.decaybar.time<=0&&!anim.decaybar.invert)||(anim.decaybar.time>=800&&anim.decaybar.invert)) anim.decaybar.invert=!anim.decaybar.invert;
+			if (game.stats.timer<=game.stats.maxtimer*0.2 && anim.lowtimer.mode=="alt") {
+				anim.lowtimer.time>0 ? anim.lowtimer.time-=msPassed:anim.lowtimer.time=700;
 			}else {
-				anim.lowtimer.time=30;
+				anim.lowtimer.time=700;
 			}
-			if (anim.pause.opa>0) anim.pause.opa--;
+			if (anim.pause.opa>0) anim.pause.opa-=msPassed;
+			if (anim.pause.opa<0) anim.pause.opa=0;
 			c.fillStyle="white";
 			c.globalAlpha=1;
-			c.font = '26px monospace';
-			c.textAlign="start";
-			c.fillText("Score :",Cw*0.03,Ch*0.77)
-			c.font = '20px monospace';
-			c.textAlign="center";
-			c.fillText("Restant",Cw*0.5,Ch*0.08)
-			c.globalAlpha=0.15+anim.pause.opa/50;
-			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/420))+","+(255*(1-key.pausecooldown/420))+")";
-			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/420),40);
+			textfillplace(Cw*0.5,Ch*0.04,"RESTANT",22,true,"black",6)
+			c.globalAlpha=0.15+anim.pause.opa/833;
+			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/7000))+","+(255*(1-key.pausecooldown/7000))+")";
+			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/7000),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
-			c.globalAlpha=0.6+anim.pause.opa/50;
-			c.font = '26px monospace';
-			c.fillText("Pause",Cw*0.125,Ch*0.94)
+			c.globalAlpha=0.6+anim.pause.opa/833;
+			key.pausecooldown<=0?textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"black",5):textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"red",5);
 			c.globalAlpha=1;
 			c.fillStyle="white";
-			c.font = '40px monospace';
-			c.fillText(game.battle.left,Cw*0.5,Ch*0.17)
-			c.font = '30px monospace';
-			c.textAlign="start";
+			numfillplace(Cw*0.5,Ch*0.12,game.battle.left,40,"center",6,"brillant")
 			if (game.stats.maxtimer>0) {
 				c.drawImage(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.timer/game.stats.maxtimer),ui_timerbarprogress.height,Cw*0.119,Ch*0.096,Cw*0.293*(game.stats.timer/game.stats.maxtimer),Ch*0.117)
 				c.fillStyle="red";
-				c.globalAlpha=0.3+anim.decaybar.time/80;
+				c.globalAlpha=0.3+anim.decaybar.time/2000;
 				if (game.battle.decaystep>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
 				if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
-					c.globalAlpha=0.2+anim.lowtimer.time/50;
+					c.globalAlpha=0.2+anim.lowtimer.time/1000;
 					c.fillRect(Cw*0.119,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
 				}
 				c.globalAlpha=1;
 				c.fillStyle="white";
-				c.drawImage(ui_timer,Cw*0.01,Ch*0.09,60,60)
+				showicons(Cw*0.055,Ch*0.16,60,"ui",2,0)
 				c.drawImage(ui_timerbar,Cw*0.11,Ch*0.09,202,72)
 			}
 			if (game.stats.maxtime>0) {
 				mirrorDraw(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.time/game.stats.maxtime),ui_timerbarprogress.height,Cw*0.88,Ch*0.096,Cw*0.293*(game.stats.time/game.stats.maxtime),Ch*0.117)
 				c.fillStyle="red";
-				c.globalAlpha=0.3+anim.decaybar.time/80;
+				c.globalAlpha=0.3+anim.decaybar.time/2000;
 				if (game.stats.time<=game.stats.maxtime*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
-					c.globalAlpha=0.2+anim.lowtimer.time/50;
+					c.globalAlpha=0.2+anim.lowtimer.time/1000;
 					c.fillRect(Cw*0.59+Cw*0.29*(1-game.stats.time/game.stats.maxtime),Ch*0.1,Cw*0.289*(game.stats.time/game.stats.maxtime),Ch*0.113)
 				}
 				c.globalAlpha=1;
 				c.fillStyle="white";
-				c.drawImage(ui_time,Cw*0.895,Ch*0.09,60,60)
+				showicons(Cw*0.94,Ch*0.16,60,"ui",3,0)
 				mirrorDraw(ui_timerbar,0,0,ui_timerbar.width,ui_timerbar.height,Cw*0.89,Ch*0.09,202,72)
 			}
-			c.textAlign="end";
-			if (game.stats.maxtimer>0) c.fillText(ShowTimer(game.stats.timer),Cw*0.4,Ch*0.226);
-			if (game.stats.maxtime>0) c.fillText(ShowTimer(game.stats.time),Cw*0.75,Ch*0.226);
-			c.globalAlpha = 0.2;
-			c.fillText("00000000",Cw*0.225,Ch*0.83)
+			if (game.stats.maxtimer>0) numfillplace(Cw*0.4,Ch*0.18,ShowTimer(game.stats.timer),24,"end",3);
+			if (game.stats.maxtime>0) numfillplace(Cw*0.75,Ch*0.18,ShowTimer(game.stats.time),24,"end",3);
+			textfillplace(Cw*0.02,Ch*0.74,"SCORE",26,false,"black",5)
+			c.globalAlpha = 0.3;
+			numfillplace(Cw*0.26,Ch*0.8,"00000000",26,"end",6)
 			c.globalAlpha = 1;
-			c.fillText(game.stats.score,Cw*0.225,Ch*0.83)
+			numfillplace(Cw*0.26,Ch*0.8,game.stats.score,26,"end",6)
 			c.textAlign="start";
 			c.globalAlpha=1;
 			if (game.stats.maxpv>0) {
@@ -3032,10 +3167,12 @@ function loopAnimation() {
 				c.globalAlpha=0.5;
 				c.fillRect(Cw*0.26+Cw*0.48*(game.stats.pv/game.stats.maxpv),Ch*0.865,Cw*0.48*(game.battle.dmg/game.stats.maxpv),Ch*0.08)
 				c.fillStyle="white";
+				c.font = '32px monospace';
 				c.globalAlpha=1;
 				c.drawImage(ui_hpbar,Cw*0.25,Ch*0.75,Cw*0.5,94)
-				c.fillText(Math.floor(game.stats.pv),Cw*0.412,Ch*0.848)
-				c.fillText("/"+game.stats.maxpv,Cw*0.5,Ch*0.848)
+				numfillplace(Cw*0.485,Ch*0.8,Math.floor(game.stats.pv),24,"end",6)
+				numfillplace(Cw*0.594,Ch*0.8,Math.floor(game.stats.maxpv),24,"end",6)
+				c.fillText("/",Cw*0.492,Ch*0.848)
 			}
 			if (game.stats.maxvies>0) {
 				c.fillRect(Cw*0.268,Ch*0.867,Cw*0.474*(game.stats.vies/game.stats.maxvies),Ch*0.08)
@@ -3065,13 +3202,18 @@ function loopAnimation() {
 					break;
 				}
 				c.textAlign="center";
-				c.fillText(Math.floor(game.stats.vies),Cw*0.5,Ch*0.848)
+				numfillplace(Cw*0.5,Ch*0.8,Math.floor(game.stats.vies),26,"center",5)
 			}
 			c.font = '28px monospace';
 			c.textAlign="start";
-			if (game.stats.combo>4) c.fillText("COMBO "+game.stats.combo,Cw*0.11,Ch*0.35);
-			if (game.stats.combo>9) c.fillText("x "+checkCombo(game.stats.combo),Cw*0.115,Ch*0.4);
-
+			if (game.stats.combo>4) {
+				textfillplace(Cw*0.03,Ch*0.325,"COMBO",30,false,colorCombo(game.stats.combo),5);
+				numfillplace(Cw*0.225,Ch*0.325,game.stats.combo,30,"start",7,colorCombo(game.stats.combo));
+			}
+			if (game.stats.combo>9) {
+				textfillplace(Cw*0.08,Ch*0.415,"X",18,false,colorCombo(game.stats.combo),5);
+				numfillplace(Cw*0.1,Ch*0.4,checkCombo(game.stats.combo),24,"start",7,colorCombo(game.stats.combo));
+			}
 			switch (game.mainevent){
 			case "starting":
 				switch (game.event){
@@ -3085,13 +3227,13 @@ function loopAnimation() {
 					game.stats.time=0;
 						game.stats.maxpv=levels[game.level.world][game.level.stage].hp;
 						game.stats.maxvies=levels[game.level.world][game.level.stage].life;
-						game.stats.maxtimer=levels[game.level.world][game.level.stage].timer;
-						game.stats.maxtime=levels[game.level.world][game.level.stage].time;
+						game.stats.maxtimer=levels[game.level.world][game.level.stage].timer*1000;
+						game.stats.maxtime=levels[game.level.world][game.level.stage].time*1000;
 						game.battle.gamemode=levels[game.level.world][game.level.stage].type;
 						game.battle.bossbar=levels[game.level.world][game.level.stage].boss;
-						game.battle.bonustime=levels[game.level.world][game.level.stage].gaintime;
+						game.battle.bonustime=levels[game.level.world][game.level.stage].gaintime*1000;
 						game.battle.decaystep=levels[game.level.world][game.level.stage].decaystep;
-						game.battle.decaytimer=levels[game.level.world][game.level.stage].timerdecay;
+						game.battle.decaytimer=levels[game.level.world][game.level.stage].timerdecay*1000;
 						game.battle.timerhplose=levels[game.level.world][game.level.stage].timerhplose;
 						game.battle.skiptonext=levels[game.level.world][game.level.stage].skiptonext;
 						game.battle.left=levels[game.level.world][game.level.stage].count;
@@ -3100,89 +3242,86 @@ function loopAnimation() {
 					game.event="fadeout";
 					break;
 				case "fadeout":
-					anim.lvltransition.time--;
+					anim.lvltransition.time-=msPassed;
+					if (anim.lvltransition.time<0) anim.lvltransition.time=0;
 					c.fillStyle="rgb(240,240,240)";
-					c.globalAlpha=anim.lvltransition.time/100;
+					c.globalAlpha=anim.lvltransition.time/1666;
 					c.fillRect(0,0,Cw,Ch)
 					if (anim.lvltransition.time<=0) {
 						game.event="transition";
-						game.timer=20
+						game.timer=333;
+						anim.entity.phase=1;
 					}
 					break;
 				case "transition":
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						if (game.stats.pv<game.stats.maxpv) {
-							game.stats.pv+=game.stats.maxpv/40;
+							game.stats.pv+=game.stats.maxpv/30;
 							if (game.stats.pv>game.stats.maxpv) game.stats.pv=game.stats.maxpv;
 						}
 						if (game.stats.vies<game.stats.maxvies) {
-							game.stats.vies+=game.stats.maxvies/40;
+							game.stats.vies+=game.stats.maxvies/30;
 							if (game.stats.vies>game.stats.maxvies) game.stats.vies=game.stats.maxvies;
 						}
 						if (game.stats.timer<game.stats.maxtimer) {
-							game.stats.timer+=game.stats.maxtimer/40;
+							game.stats.timer+=game.stats.maxtimer/30;
 							if (game.stats.timer>game.stats.maxtimer) game.stats.timer=game.stats.maxtimer;
 						}
 						if (game.stats.time<game.stats.maxtime) {
-							game.stats.time+=game.stats.maxtime/40;
+							game.stats.time+=game.stats.maxtime/30;
 							if (game.stats.time>game.stats.maxtime) game.stats.time=game.stats.maxtime;
 						}
-						if (game.stats.pv==game.stats.maxpv&&game.stats.vies==game.stats.maxvies&&game.stats.timer==game.stats.maxtimer) {
+						if (game.stats.pv==game.stats.maxpv&&game.stats.vies==game.stats.maxvies&&game.stats.timer==game.stats.maxtimer&&game.stats.time==game.stats.maxtime) {
 							game.battle.dmg=0;
 							game.event="attention";
-							game.timer=20
+							game.timer=266;
+							anim.entity.phase=2;
 						}
 					}
 					break;
 				case "attention":
-					c.textAlign="center";
-					c.font = '30px monospace';
 					c.shadowColor="black";
 					c.shadowBlur=3;
-					c.fillText("Prêt ?",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
+					textfillplace(Cw*0.5*(1-game.timer/266),Ch*0.45,"PRET?",36,true,"white",5)
 					c.shadowColor="";
 					c.shadowBlur=0;
-					if (game.timer==0) {
-						game.timer=50;
+					if (game.timer<=0) {
+						game.timer=1166;
 						game.event="pret"
 					}
 					break;
 				case "pret":
-					c.textAlign="center";
-					c.font = '30px monospace';
 					c.shadowColor="black";
 					c.shadowBlur=3;
-					c.fillText("Prêt ?",Cw*0.5,Ch*0.5)
+					textfillplace(Cw*0.5,Ch*0.45,"PRET?",36,true,"white",5)
 					c.shadowColor="";
 					c.shadowBlur=0;
-					if (game.timer==0) {
-						game.timer=20;
+					if (game.timer<=300)anim.entity.phase=3;
+					if (game.timer<=0) {
+						game.timer=266;
 						game.event="partez"
+						anim.entity.phase=4;
 					}
 					break;
 				case "partez":
-					c.textAlign="center";
-					c.font = '30px monospace';
 					c.shadowColor="black";
 					c.shadowBlur=3;
-					c.fillText("Prêt ?",Cw*(0.5+0.6*(1-game.timer/20)),Ch*0.5)
-					c.fillText("PARTEZ !",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
+					textfillplace(Cw*(0.5+0.6*(1-game.timer/266)),Ch*0.45,"PRET?",36,true,"white",5)
+					textfillplace(Cw*(0.5*(1-game.timer/266)),Ch*0.45,"PARTEZ!",36,true,"white",5)
 					c.shadowColor="";
 					c.shadowBlur=0;
-					if (game.timer==0) {
-						game.timer=20;
+					if (game.timer<=0) {
+						game.timer=500;
 						game.event="start"
 					}
 					break;
 				case "start":
-					c.textAlign="center";
-					c.font = '30px monospace';
 					c.shadowColor="black";
 					c.shadowBlur=3;
-					c.fillText("PARTEZ !",Cw*0.5,Ch*0.5)
+					textfillplace(Cw*0.5,Ch*0.45,"PARTEZ!",36,true,"white",5)
 					c.shadowColor="";
 					c.shadowBlur=0;
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
 						generatePuzzleModelvl()
@@ -3193,28 +3332,20 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "play":
 				if (game.battle.dmg>0) game.battle.dmg--;
 				if (game.battle.dmg>0) game.battle.dmg--;
-				if (game.stats.timer>0) game.stats.timer--;
-				if (game.stats.time>0) game.stats.time--;
-				game.stats.timeRep++;
+				if (game.stats.timer>0) game.stats.timer-=msPassed;
+				if (game.stats.time>0) game.stats.time-=msPassed;
+				game.stats.timeRep+=msPassed;
 				c.textAlign="center";
 				c.font = '32px monospace';
 				c.fillStyle="white";
 				c.font = '40px monospace';
-				game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+				game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
 				drawPuzzle()
 				inputPlayer()
 				switch (game.battle.gamemode){
@@ -3223,13 +3354,13 @@ function loopAnimation() {
 						game.stats.timer=0;
 						game.mainevent="wait";
 						game.event="calc";
-						game.timer=25;
+						game.timer=400;
 					}
 					if (game.stats.vies<=0 && game.stats.maxvies>0) {
 						game.stats.vies=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "pv":
@@ -3237,13 +3368,13 @@ function loopAnimation() {
 						game.stats.timer=0;
 						game.mainevent="wait";
 						game.event="calc";
-						game.timer=25;
+						game.timer=400;
 					}
 					if (game.stats.pv<=0 && game.stats.maxpv>0) {
 						game.stats.pv=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "boss":
@@ -3251,19 +3382,19 @@ function loopAnimation() {
 						game.stats.timer=0;
 						game.mainevent="wait";
 						game.event="calc";
-						game.timer=25;
+						game.timer=400;
 					}
 					if (game.stats.vies<=0 && game.stats.maxvies>0) {
 						game.stats.vies=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					if (game.stats.pv<=0 && game.stats.maxpv>0) {
 						game.stats.pv=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "chrono":
@@ -3271,25 +3402,25 @@ function loopAnimation() {
 						game.stats.time=0;
 						game.mainevent="gameover";
 						game.event="end";
-						game.timer=100;
+						game.timer=1666;
 					}
 					if (game.stats.timer<=0 && game.stats.maxtimer>0) {
 						game.stats.timer=0;
 						game.mainevent="gameover";
 						game.event="end";
-						game.timer=100;
+						game.timer=1666;
 					}
 					if (game.stats.pv<=0 && game.stats.maxpv>0) {
 						game.stats.pv=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					if (game.stats.vies<=0 && game.stats.maxvies>0) {
 						game.stats.vies=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "lesson":
@@ -3297,7 +3428,7 @@ function loopAnimation() {
 						game.stats.vies=0;
 						game.mainevent="gameover";
 						game.event="begin";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				default:
@@ -3308,15 +3439,7 @@ function loopAnimation() {
 					game.event="calc";
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "wait":
@@ -3326,35 +3449,24 @@ function loopAnimation() {
 				switch(game.event){
 				case "calc":
 					pass =validatePuzzlelvl()
-					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
-					c.font = '40px monospace';
-					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					game.event="wait";
-					game.timer=20;
+					game.timer=333;
 					break;
 				case "wait":
 					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
-					c.font = '40px monospace';
-					c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					c.font = '26px monospace';
 					if (pass) c.fillText("+ "+game.battle.score,Cw*0.2,Ch*0.7);
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
 						input=0;
-						generatePuzzleModelvl()
+						generatePuzzleModelvl(pass,false)
 					}
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "pause":
@@ -3365,7 +3477,7 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.textAlign="center";
 				c.font = '38px monospace';
-				c.fillText("PAUSE",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"PAUSE",40,true,"black",5)
 				if (game.inputType=="keyboard") {
 					c.font = '24px monospace';
 					c.fillText("Appuyez sur [Espace] pour reprendre",Cw*0.5,Ch*0.7)
@@ -3378,13 +3490,13 @@ function loopAnimation() {
 					c.fillText("Toucher l'écran pour reprendre",Cw*0.5,Ch*0.7)
 					c.fillText("Quitter la partie",Cw*0.5,Ch*0.85)
 				}
-				if ((key.space||key.p)&& game.timer==0) {
+				if ((key.space||key.p)&& game.timer<=0) {
 					game.mainevent=game.prevevent;
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					key.p=false;
 					key.space=false;
-					key.pausecooldown=420
+					key.pausecooldown=7000
 				}
 				if (key.d) {
 					game.mainevent="exit";
@@ -3427,7 +3539,7 @@ function loopAnimation() {
 					case 2:
 						game.mainevent="exitgame";
 						game.event="transition";
-						game.timer=50;
+						game.timer=833;
 						break;
 					default:
 						break;
@@ -3451,24 +3563,24 @@ function loopAnimation() {
 				switch (game.event){
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha=1-game.timer/50;
+					c.globalAlpha=1-game.timer/833;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="wait";
-						game.timer=20;
+						game.timer=333;
 					}
 					break;
 				case "wait":
 					c.fillStyle="black";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						resetStats()
 						setmenu(levels[1].nblvl,"lr",0,0,0,0,game.level.stage);
 						game.screen="level-select";
 						game.mainevent="map";
 						game.event="fadeout";
-						anim.lvltransition.time=50;
+						anim.lvltransition.time=833;
 					}
 					break;
 				default:
@@ -3482,68 +3594,74 @@ function loopAnimation() {
 				drawPuzzle()
 				c.shadowColor="black";
 				c.shadowBlur=3;
-				c.fillText("Fin de partie !",Cw*0.5,Ch*0.5)
-				c.fillStyle="white";
-				c.fillText("Fin de partie !",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"FIN DE PARTIE!",32,true,"white",5)
 				c.shadowColor="";
 				c.shadowBlur=0;
 				switch (game.event){
 				case "begin":
-					if (game.battle.dmg>20) game.battle.dmg--;
+					if (game.battle.dmg>20) game.battle.dmg-=2;
 					if (game.battle.dmg>0) game.battle.dmg--;
-					pass ? c.fillStyle ="green": c.fillStyle="red";
-					c.font = '40px monospace';
-					c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					if (game.battle.dmg<=0 && game.timer<=0) {
 						game.event="transition";
-						game.timer=15;
+						game.timer=266;
 					}
 					break;
 				case "end":
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="transition";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha = 0.92*(1-game.timer/50);
+					c.globalAlpha = 0.92*(1-game.timer/833);
 					c.fillRect(0,0,canvas.width,canvas.height)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
-						game.timer=20;
-						setmenu(3,"lr",0.11,0.82,0.25,0);
+						game.timer=333;
+						setmenu(3,"lr",0.11,0.83,0.26,0);
 					}
 					break;
 				case "finpop":
+				case "transition1":
 				case "transition2":
 				case "transition3":
 					c.fillStyle="black";
 					c.globalAlpha = 0.92;
 					c.fillRect(0,0,canvas.width,canvas.height)
 					c.fillStyle="white";
-					c.globalAlpha = 1-game.timer/20;
+					switch(game.event){
+					case "finpop":
+						c.globalAlpha=1;
+						break;
+					case "transition1":
+						c.globalAlpha = 1-game.timer/333;
+						break;
+					case "transition2":
+					case "transition3":
+						c.globalAlpha = game.timer/833;
+						break;
+					}
 					c.textAlign="center";
-					c.font = '38px monospace';
-					c.fillText("Vous avez perdu !",Cw*0.5,Ch*0.18)
+					textfillplace(Cw*0.5,Ch*0.09,"DEFAITE",50,true,"black",5)
 					c.font = '30px monospace';
 					c.fillText("Niveau "+game.level.world+"-"+game.level.stage,Cw*0.5,Ch*0.3)
 					c.textAlign="start";
-					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
-					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
-					c.fillText("Continuer",Cw*0.4,Ch*0.86)
-					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
+					textfillplace(Cw*0.25,Ch*0.83,"REJOUER",24,true,"white",5)
+					textfillplace(Cw*0.51,Ch*0.83,"SUIVANT",24,true,"white",5)
+					textfillplace(Cw*0.75,Ch*0.83,"STATS",24,true,"white",5)
 					break;
 				}
 				switch (game.event){
 				case "finpop":
 					if (game.inputType=="phone") {
-						c.globalAlpha = 0.15*(1-game.timer/20);
-						c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
-						c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
-						c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
+						c.globalAlpha = 0.15;
+						c.fillRect(Cw*0.13,Ch*0.79,Cw*0.24,Ch*0.125)
+						c.fillRect(Cw*0.38,Ch*0.79,Cw*0.26,Ch*0.125)
+						c.fillRect(Cw*0.65,Ch*0.79,Cw*0.24,Ch*0.125)
 					}
 					else {
 						movemenu()
@@ -3554,11 +3672,11 @@ function loopAnimation() {
 								resetStats()
 								game.mainevent="starting";
 								game.event="set";
-								game.timer=20;
+								game.timer=333;
 								break;
 							case 2:
 								game.event="transition2";
-								game.timer=50;
+								game.timer=833;
 								break;
 							case 3:
 								game.prevevent="gameover";
@@ -3573,24 +3691,24 @@ function loopAnimation() {
 					break;
 				case "transition2":
 					c.fillStyle="black";
-					c.globalAlpha=1-game.timer/50;
+					c.globalAlpha=1-game.timer/833;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						resetStats()
 						game.event="transition3";
-						game.timer=20;
+						game.timer=333;
 					}
 					break;
 				case "transition3":
 					c.fillStyle="black";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						setmenu(levels[1].nblvl,"lr",0,0,0,0,game.level.stage);
 						game.screen="level-select";
 						game.mainevent="map";
 						game.event="fadeout";
-						anim.lvltransition.time=50;
+						anim.lvltransition.time=833;
 					}
 					break;
 				default:
@@ -3601,59 +3719,76 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.textAlign="center";
 				c.font = '32px monospace';
-				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
-				c.globalAlpha=anim.perfect.globalOp;
-				if (anim.perfect.layer1pos>=90) c.globalAlpha=0;
-				c.drawImage(txt_perfect1,Cw*0.5-(352*anim.perfect.ratio/2)+352*(anim.perfect.layer1pos/100),Ch*(0.65-(anim.perfect.ratio-1)/4)+0.5,26*anim.perfect.ratio,47*anim.perfect.ratio)
-				c.globalAlpha=anim.perfect.transition*anim.perfect.globalOp;
-				c.fillRect(Cw*0.5-(352*anim.perfect.ratio/2)+5,Ch*(0.65-(anim.perfect.ratio-1)/4)+2,342*anim.perfect.ratio,45*anim.perfect.ratio)
-				c.globalAlpha=anim.perfect.globalOp;
-				c.drawImage(txt_perfect,Cw*0.5-(352*anim.perfect.ratio/2),Ch*(0.65-(anim.perfect.ratio-1)/4),352*anim.perfect.ratio,48*anim.perfect.ratio)
-				c.globalAlpha=anim.perfect.layer2opacity*anim.perfect.globalOp;
-				c.drawImage(txt_perfect2,Cw*0.5-(352*anim.perfect.ratio/2),Ch*(0.65-(anim.perfect.ratio-1)/4),352*anim.perfect.ratio,48*anim.perfect.ratio)
-				c.globalAlpha=anim.perfect.whitescreen/10;
+				c.shadowColor="black";
+				c.shadowBlur=3;
+				textfillplace(Cw*0.5,Ch*0.45,"TERMINE!",32,true,"white",5)
+				c.shadowColor="";
+				c.shadowBlur=0;
+				c.globalAlpha=anim.perfect.globalOp/3000;
+				c.fillRect(0,Ch*0.45,Cw*anim.perfect.wline/500,Ch*0.15*anim.perfect.ratio)
+				c.shadowColor="black";
+				c.shadowBlur=3;
+				textfillplace(Cw*0.49+Cw*0.02*(anim.perfect.posx2/1000),Ch*0.475-anim.perfect.posy,"PARFAIT",anim.perfect.txtsize*anim.perfect.ratio,true,(anim.perfect.phase==1?"gold":"black"),1)
+				c.shadowColor="";
+				c.shadowBlur=0;
+				c.globalAlpha=anim.perfect.whitescreen/500;
 				c.fillRect(0,0,Cw*1,Ch*1)
 				switch (game.event){
 				case "init":
-					anim.perfect.globalOp=1;
-					anim.perfect.whitescreen=10;
-					anim.perfect.layer1pos=0;
-					anim.perfect.layer2opacity=0;
+					anim.perfect.globalOp=3000;
+					anim.perfect.whitescreen=0;
+					anim.perfect.txtsize=348;
+					anim.perfect.posy=500;
+					anim.perfect.posx=0;
+					anim.perfect.posx2=0;
+					anim.perfect.wline=0;
+					anim.perfect.phase=0;
 					anim.perfect.transition=0;
 					anim.perfect.ratio=1;
 					game.event="phase1"
 					break;
 				case "phase1":
-					anim.perfect.whitescreen--;
-					if (anim.perfect.whitescreen<=0) game.event="phase2";
+					anim.perfect.wline+=msPassed;
+					anim.perfect.posy-=msPassed;
+					anim.perfect.txtsize=48+300*(1-anim.perfect.wline/500);
+					if (anim.perfect.wline>=500) {
+						anim.perfect.wline=500;
+						anim.perfect.posy=0;
+						anim.perfect.txtsize=48;
+						game.event="phase2";
+					}
 					break;
 				case "phase2":
-					anim.perfect.ratio+=0.0007;
-					anim.perfect.layer1pos+=3;
-					if (anim.perfect.layer1pos>=90) game.event="phase3";
+					c.globalAlpha=1;
+					c.drawImage(txt_perfect1,Cw*0.1+Cw*0.8*(anim.perfect.posx/1000),Ch*0.452,32,66)
+					anim.perfect.posx+=msPassed;
+					anim.perfect.posx2+=msPassed/2;
+					if (anim.perfect.posx>=1000) {
+						anim.perfect.posx=1000;
+						anim.perfect.posx2=500;
+						anim.perfect.phase=1;
+						anim.perfect.whitescreen=500;
+						anim.perfect.ratio=1.25;
+						game.event="phase3";
+					}
 					break;
 				case "phase3":
-					anim.perfect.ratio+=0.0007;
-					anim.perfect.layer2opacity+=0.01;
-					anim.perfect.transition+=0.1;
-					if (anim.perfect.transition>=1) {anim.perfect.layer2opacity=1; game.event="phase4";}
+					anim.perfect.whitescreen-=msPassed;
+					anim.perfect.posx2+=msPassed/4;
+					if (anim.perfect.whitescreen<=0) {
+						anim.perfect.whitescreen=0;
+						game.event="phase4";
+					}
 					break;
 				case "phase4":
-					anim.perfect.ratio+=0.0007;
-					anim.perfect.transition-=0.05;
-					if (anim.perfect.transition<=0){anim.perfect.transition=0; game.event="phase5";}
-					break;
-				case "phase5":
-					anim.perfect.ratio+=0.0007;
-					if (anim.perfect.ratio>=1.1) game.event="phase6";
-					break;
-				case "phase6":
-					anim.perfect.ratio+=0.0005;
-					anim.perfect.globalOp-=0.015;
+					anim.perfect.globalOp-=msPassed;
+					anim.perfect.posx2+=msPassed/4;
 					if (anim.perfect.globalOp<=0) {
+						anim.perfect.globalOp=0;
+						game.prevevent="perfect";
 						game.mainevent="finish";
 						game.event="transition";
-						game.timer=15;
+						game.timer=833;
 					}
 					break;
 				default:
@@ -3665,7 +3800,7 @@ function loopAnimation() {
 				c.font = '32px monospace';
 				c.shadowColor="black";
 				c.shadowBlur=3;
-				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"TERMINE!",32,true,"white",5)
 				c.shadowColor="";
 				c.shadowBlur=0;
 				switch (game.event){
@@ -3680,11 +3815,13 @@ function loopAnimation() {
 						saves.levels[game.level.world][game.level.stage].clear=true;
 						registerScore(game.stats.score)
 						game.event="end";
-						game.timer=15;
+						game.timer=266;
 					}
 					break;
 				case "end":
-					if (game.timer==0) {
+					if (game.timer<=0) {
+						anim.entity.phase=6;
+						anim.burst.phase=1;
 						if ((game.stats.maxvies>0&&game.stats.vies==game.stats.maxvies)||(game.stats.maxpv>0&&game.stats.pv==game.stats.maxpv)&&game.stats.miss==0) {
 							saves.levels[game.level.world][game.level.stage].perfect=true;
 							saveUpdate()
@@ -3692,21 +3829,27 @@ function loopAnimation() {
 							game.event="init"
 						}
 						else {
-							game.event="transition";
-							game.timer=50
+							game.event="transition0";
+							game.timer=1300
 						}
+					}
+					break;
+				case "transition0":
+					if (game.timer<=0) {
+						game.event="transition";
+						game.timer=833
 					}
 					break;
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha = 0.92*(1-game.timer/50);
+					c.globalAlpha = 0.92*(1-game.timer/833);
 					c.fillRect(0,0,canvas.width,canvas.height)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
-						game.timer=20;
-						setmenu(3,"lr",0.11,0.82,0.25,0);
+						game.timer=333;
+						setmenu(3,"lr",0.11,0.83,0.26,0);
 					}
 					break;
 				case "finpop":
@@ -3716,25 +3859,33 @@ function loopAnimation() {
 					c.globalAlpha = 0.92;
 					c.fillRect(0,0,canvas.width,canvas.height)
 					c.fillStyle="white";
-					c.globalAlpha = 1-game.timer/20;
+					switch(game.event){
+					case "finpop":
+						c.globalAlpha=1-game.timer/333;
+						break;
+					case "transition2":
+					case "transition3":
+						c.globalAlpha = game.timer/833;
+						break;
+					}
+					game.prevevent=="perfect"?textfillplace(Cw*0.5,Ch*0.09,"PARFAIT!",50,true,"gold",5) :textfillplace(Cw*0.5,Ch*0.09,"VICTOIRE!",50,true,"white",5);
+					c.font = '30px monospace';
 					c.textAlign="center";
-					c.font = '38px monospace';
-					c.fillText("Vous avez gagné(e) !",Cw*0.5,Ch*0.18)
-					c.font = '30px monospace';
 					c.fillText("Niveau "+game.level.world+"-"+game.level.stage,Cw*0.5,Ch*0.28)
+					textfillplace(Cw*0.13,Ch*0.32,"SCORE",36,false,"black",5)
+					numfillplace(Cw*0.38,Ch*0.325,game.stats.score,32,"start",5)
+					textfillplace(Cw*0.13,Ch*0.41,"COMBO",32,false,"black",5)
+					textfillplace(Cw*0.34,Ch*0.42,"MAX",26,false,"black",5)
+					numfillplace(Cw*0.46,Ch*0.405,game.stats.maxcombo,32,"start",5)
 					c.textAlign="start";
-					c.font = '36px monospace';
-					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
-					c.font = '30px monospace';
-					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.46)
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.54)
 					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
 					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+"sec",Cw*0.13,Ch*0.68)
 					c.fillText("Durée de la partie : "+ShowTimerRes(game.stats.timeTot)+"sec",Cw*0.13,Ch*0.75)
-					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
-					c.fillText("Continuer",Cw*0.4,Ch*0.86)
-					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
+					textfillplace(Cw*0.25,Ch*0.83,"REJOUER",24,true,"white",5)
+					textfillplace(Cw*0.51,Ch*0.83,"SUIVANT",24,true,"white",5)
+					textfillplace(Cw*0.75,Ch*0.83,"STATS",24,true,"white",5)
 					break;
 				default:
 					errormsg("event error !")
@@ -3742,10 +3893,10 @@ function loopAnimation() {
 				switch (game.event){
 				case "finpop":
 					if (game.inputType=="phone") {
-						c.globalAlpha = 0.15*(1-game.timer/20);
-						c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
-						c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
-						c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
+						c.globalAlpha = 0.15*(1-game.timer/333);
+						c.fillRect(Cw*0.13,Ch*0.79,Cw*0.24,Ch*0.125)
+						c.fillRect(Cw*0.38,Ch*0.79,Cw*0.26,Ch*0.125)
+						c.fillRect(Cw*0.65,Ch*0.79,Cw*0.24,Ch*0.125)
 					}
 					else {
 						movemenu()
@@ -3756,11 +3907,11 @@ function loopAnimation() {
 								resetStats()
 								game.mainevent="starting";
 								game.event="set";
-								game.timer=20;
+								game.timer=333;
 								break;
 							case 2:
 								game.event="transition2";
-								game.timer=50;
+								game.timer=833;
 								break;
 							case 3:
 								game.prevevent="finish";
@@ -3775,9 +3926,9 @@ function loopAnimation() {
 					break;
 				case "transition2":
 					c.fillStyle="black";
-					c.globalAlpha=1-game.timer/50;
+					c.globalAlpha=1-game.timer/833;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						resetStats()
 						game.event="transition3";
 						game.timer=20;
@@ -3787,12 +3938,13 @@ function loopAnimation() {
 					c.fillStyle="black";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						setmenu(levels[1].nblvl,"lr",0,0,0,0,game.level.stage);
 						game.screen="level-select";
+						game.prevevent="";
 						game.mainevent="map";
 						game.event="fadeout";
-						anim.lvltransition.time=50;
+						anim.lvltransition.time=833;
 					}
 					break;
 				default:
@@ -3829,7 +3981,7 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<       Global   >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_op,Cw*0.375,Ch*0.16,40,40)
+					showicons(Cw*0.4,Ch*0.195,40,"lt",6,0)
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.textAlign="start";
 					c.fillText("N°    Opération        Résultat       Temps",Cw*0.07,Ch*0.3)
@@ -3848,7 +4000,7 @@ function loopAnimation() {
 								c.fillStyle="white";
 								if (!game.stats.level[i].valide) {
 									c.textAlign="start";
-									c.fillText("->  "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
+									c.fillText("-> "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
 								}
 								c.textAlign="end";
 								c.fillText(Math.floor(game.stats.level[i].timeResp*100)/100+"s",Cw*0.95,Ch*0.43+Ch*0.055*(i-game.menu.target))
@@ -3875,7 +4027,7 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<        Vies    >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_life,Cw*0.375,Ch*0.16,40,40)
+					showicons(Cw*0.4,Ch*0.195,40,"lt",3,0)
 					let maxHP=get_maxhp(game.stats.maxvies,game.stats.maxpv);
 					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
 						anim.graph.init--;
@@ -3952,8 +4104,8 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<       Temps    >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_time,Cw*0.375,Ch*0.16,40,40)
-					let maxTimer=game.stats.maxtimer/60;
+					showicons(Cw*0.4,Ch*0.195,40,"lt",4,0)
+					let maxTimer=game.stats.maxtimer/1000;
 					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
 						anim.graph.init--;
 					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
@@ -4071,7 +4223,7 @@ function loopAnimation() {
 				if (key.d) {
 					game.prevevent=="finish"?game.mainevent="finish":game.mainevent="gameover";
 					game.event="finpop";
-					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+					setmenu(3,"lr",0.11,0.83,0.26,0);
 				}
 				break;
 			default:
@@ -4087,81 +4239,83 @@ function loopAnimation() {
 		case "arcade":
 			showbackground()
 			RTAtimer()
-			anim.operation.invert ? anim.operation.time++:anim.operation.time--;
-			if (anim.operation.time==0||anim.operation.time==60) anim.operation.invert=!anim.operation.invert;
+			drawEntity()
+			anim.combocolor=(anim.combocolor+msPassed/10)%360;
+			anim.operation.invert ? anim.operation.time+=msPassed:anim.operation.time-=msPassed;
+			if(anim.operation.time<0)anim.operation.time=0;
+			if(anim.operation.time>2000)anim.operation.time=2000;
+			if ((anim.operation.time<=0&&!anim.operation.invert)||(anim.operation.time>=2000&&anim.operation.invert)) anim.operation.invert=!anim.operation.invert;
 			if (anim.decaybar.mode=="alt") {
-				anim.decaybar.invert ? anim.decaybar.time++:anim.decaybar.time--;
+				anim.decaybar.invert ? anim.decaybar.time+=msPassed:anim.decaybar.time-=msPassed;
+				if (anim.decaybar.time>800) anim.decaybar.time=800;
+				if (anim.decaybar.time<0) anim.decaybar.time=0;
 			}else {
-				anim.decaybar.time=40;
+				anim.decaybar.time=666;
 			}
-			if (anim.decaybar.time==0||anim.decaybar.time==40) anim.decaybar.invert=!anim.decaybar.invert;
+			if ((anim.decaybar.time<=0&&!anim.decaybar.invert)||(anim.decaybar.time>=666&&anim.decaybar.invert)) anim.decaybar.invert=!anim.decaybar.invert;
 			if (game.stats.timer<=game.stats.maxtimer*0.2 && anim.lowtimer.mode=="alt") {
-				anim.lowtimer.time>0 ? anim.lowtimer.time--:anim.lowtimer.time=30;
+				anim.lowtimer.time>0 ? anim.lowtimer.time-=msPassed:anim.lowtimer.time=500;
 			}else {
-				anim.lowtimer.time=30;
+				anim.lowtimer.time=500;
 			}
+			if (anim.pause.opa>0) anim.pause.opa-=msPassed;
+			if (anim.pause.opa<0) anim.pause.opa=0;
 
 			if (anim.regenbar.mode=="alt") {
-				anim.regenbar.invert ? anim.regenbar.time++:anim.regenbar.time--;
+				anim.regenbar.invert ? anim.regenbar.time+=msPassed:anim.regenbar.time-=msPassed;
+				if(anim.regenbar.time<0)anim.regenbar.time=0;
+				if(anim.regenbar.time>833)anim.regenbar.time=833;
 			}else {
-				anim.regenbar.time=50;
+				anim.regenbar.time=833;
 			}
-			if (anim.regenbar.time==0||anim.regenbar.time==50) anim.regenbar.invert=!anim.regenbar.invert;
-
-			if (anim.pause.opa>0) anim.pause.opa--;
+			if ((anim.regenbar.time<=0&&!anim.regenbar.invert)||(anim.regenbar.time>=833&&anim.regenbar.invert)) anim.regenbar.invert=!anim.regenbar.invert;
 			c.fillStyle="white";
 			c.globalAlpha=1;
-			c.font = '26px monospace';
-			c.textAlign="start";
-			c.fillText("Score :",Cw*0.03,Ch*0.77)
-			c.font = '20px monospace';
-			c.textAlign="center";
-			game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
-			game.battle.arcade.phase=="normal"?c.fillText("Correct",Cw*0.5,Ch*0.08):c.fillText("Bonus",Cw*0.5,Ch*0.08);
-			c.globalAlpha=0.15+anim.pause.opa/50;
-			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/420))+","+(255*(1-key.pausecooldown/420))+")";
-			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/420),40);
+			game.battle.arcade.phase=="normal"?textfillplace(Cw*0.5,Ch*0.04,"CORRECT",22,true,"black",5):textfillplace(Cw*0.5,Ch*0.04,"BONUS",22,true,"lblue",5);
+			c.globalAlpha=0.15+anim.pause.opa/833;
+			c.fillStyle="rgb(255,"+(255*(1-key.pausecooldown/7000))+","+(255*(1-key.pausecooldown/7000))+")";
+			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/7000),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
-			c.globalAlpha=0.6+anim.pause.opa/50;
-			c.font = '26px monospace';
-			c.fillText("Pause",Cw*0.125,Ch*0.94)
+			c.globalAlpha=0.6+anim.pause.opa/833;
+			key.pausecooldown==0?textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"black",5):textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"red",5);
 			c.globalAlpha=1;
 			c.font = '40px monospace';
-			game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
-			game.battle.arcade.phase=="normal"?c.fillText(game.stats.clear,Cw*0.5,Ch*0.17):c.fillText(game.battle.arcade.clear,Cw*0.5,Ch*0.17);
+			game.battle.arcade.phase=="normal"?numfillplace(Cw*0.5,Ch*0.12,game.stats.clear,40,"center",6,"brillant"):numfillplace(Cw*0.5,Ch*0.12,game.battle.arcade.clear,40,"center",6,"lblue");
 			c.font = '30px monospace';
 			c.textAlign="start";
 			if (game.stats.maxtimer>0) {
 				c.drawImage(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.stats.timer/game.stats.maxtimer),ui_timerbarprogress.height,Cw*0.119,Ch*0.096,Cw*0.293*(game.stats.timer/game.stats.maxtimer),Ch*0.117)
 				c.fillStyle="red";
-				c.globalAlpha=0.3+anim.decaybar.time/80;
-				if (game.battle.decaystep>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
+				c.globalAlpha=0.3+anim.decaybar.time/1333;
+				if (game.stats.timerDecay>0) c.fillRect(Cw*0.413-Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.1,Cw*0.295*(game.stats.timerDecay/game.stats.maxtimer),Ch*0.072);
 				if (game.stats.timer<=game.stats.maxtimer*0.2 && game.mainevent!="starting" && anim.lowtimer.mode!="none") {
-					c.globalAlpha=0.2+anim.lowtimer.time/50;
+					c.globalAlpha=0.2+anim.lowtimer.time/833;
 					c.fillRect(Cw*0.119,Ch*0.1,Cw*0.295*(game.stats.timer/game.stats.maxtimer),Ch*0.113)
 				}
 				c.globalAlpha=1;
 				c.fillStyle="white";
-				c.drawImage(ui_timer,Cw*0.01,Ch*0.09,60,60)
+				showicons(Cw*0.055,Ch*0.16,60,"ui",2,0)
 				c.drawImage(ui_timerbar,Cw*0.11,Ch*0.09,202,72)
 			}
 			game.battle.arcade.phase=="normal"?mirrorDraw(ui_timerbarprogress,0,0,ui_timerbarprogress.width*(game.battle.arcade.clear/game.battle.arcade.maxclear),ui_timerbarprogress.height,Cw*0.88,Ch*0.096,Cw*0.293*(game.battle.arcade.clear/game.battle.arcade.maxclear),Ch*0.117):mirrorDraw(ui_timerbarprogress,0,0,ui_timerbarprogress.width,ui_timerbarprogress.height,Cw*0.88,Ch*0.096,Cw*0.293,Ch*0.117);
 			c.globalAlpha=1;
 			c.fillStyle="white";
-			c.drawImage(ui_regen,Cw*0.9,Ch*0.09,60,60)
+			showicons(Cw*0.94,Ch*0.16,60,"ui",4,0)
 			mirrorDraw(ui_timerbar,0,0,ui_timerbar.width,ui_timerbar.height,Cw*0.89,Ch*0.09,202,72)
-			c.fillText("Niv.:"+(game.battle.arcade.level+1),Cw*0.585,Ch*0.226);
+			game.battle.arcade.phase=="normal"?textfillplace(Cw*0.59,Ch*0.18,"NIV",24,false,"black",5):textfillplace(Cw*0.59,Ch*0.18,"NIV",24,false,"lblue",5);
+			game.battle.arcade.phase=="normal"?numfillplace(Cw*0.73,Ch*0.18,(game.battle.arcade.level+1),24,"end",3,"brillant"):numfillplace(Cw*0.73,Ch*0.18,(game.battle.arcade.level+1),24,"end",3,"lblue");
 			c.textAlign="end";
-			if (game.stats.maxtimer>0) c.fillText(ShowTimer(game.stats.timer),Cw*0.4,Ch*0.226);
-			c.globalAlpha = 0.2;
-			c.fillText("00000000",Cw*0.225,Ch*0.83)
+			if (game.stats.maxtimer>0) numfillplace(Cw*0.4,Ch*0.18,ShowTimer(game.stats.timer),24,"end",3);
+			textfillplace(Cw*0.02,Ch*0.74,"SCORE",26,false,"black",5)
+			c.globalAlpha = 0.3;
+			numfillplace(Cw*0.26,Ch*0.8,"00000000",26,"end",6)
 			c.globalAlpha = 1;
-			c.fillText(game.stats.score,Cw*0.225,Ch*0.83)
+			numfillplace(Cw*0.26,Ch*0.8,game.stats.score,26,"end",6)
 			c.textAlign="start";
 			c.globalAlpha=1;
 			if (game.stats.maxvies>0) {
 				if (game.battle.arcade.phase=="regen") {
-					c.globalAlpha=0.4+anim.regenbar.time/100;
+					c.globalAlpha=0.4+anim.regenbar.time/1666;
 					c.fillStyle ="rgb(75, 214, 71)"
 					c.fillRect(Cw*0.268,Ch*0.867,Cw*0.474*((game.stats.vies+game.battle.arcade.regen/10)/game.stats.maxvies),Ch*0.08)
 				}
@@ -4191,19 +4345,17 @@ function loopAnimation() {
 					c.drawImage(ui_lifebar20,Cw*0.255,Ch*0.75,Cw*0.5,94)
 					break;
 				}
-				c.textAlign="center";
-				game.battle.arcade.phase=="regen"?c.fillStyle="rgb(38, 183, 255)":c.fillStyle="white";
-				c.fillText(Math.floor(game.stats.vies),Cw*0.5,Ch*0.848)
+				game.battle.arcade.phase=="regen"?numfillplace(Cw*0.5,Ch*0.8,Math.floor(game.stats.vies),26,"center",5,"lblue"):numfillplace(Cw*0.5,Ch*0.8,Math.floor(game.stats.vies),26,"center",5);
 			}
 			c.fillStyle="white";
 			c.font = '28px monospace';
 			c.textAlign="start";
-			if (game.stats.combo>4) c.fillText("COMBO "+game.stats.combo,Cw*0.11,Ch*0.35);
-
+			if (game.stats.combo>4) {textfillplace(Cw*0.03,Ch*0.325,"COMBO",30,false,colorCombo(game.stats.combo),5);numfillplace(Cw*0.225,Ch*0.325,game.stats.combo,30,"start",7,colorCombo(game.stats.combo));}
 			switch (game.mainevent){
 			case "starting":
 				switch (game.event){
 				case "set":
+					anim.entity.phase=0;
 					c.fillStyle="rgb(240,240,240)";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
@@ -4212,22 +4364,22 @@ function loopAnimation() {
 					switch (game.setbtl.dif){
 					case 2:
 						game.stats.maxvies=5;
-						game.stats.maxtimer=960;
+						game.stats.maxtimer=16000;
 						game.battle.arcade.level=0;
 						break;
 					case 1.5:
 						game.stats.maxvies=5;
-						game.stats.maxtimer=840;
+						game.stats.maxtimer=14000;
 						game.battle.arcade.level=0;
 						break;
 					case 1:
 						game.stats.maxvies=5;
-						game.stats.maxtimer=720;
+						game.stats.maxtimer=12000;
 						game.battle.arcade.level=1;
 						break;
 					case 0.7:
 						game.stats.maxvies=5;
-						game.stats.maxtimer=720;
+						game.stats.maxtimer=12000;
 						game.battle.arcade.level=2;
 						break;
 					}
@@ -4235,70 +4387,91 @@ function loopAnimation() {
 					game.battle.arcade.phase="normal";
 					game.battle.arcade.maxclear=arcade[game.battle.arcade.level].maxclear;
 					game.battle.arcade.clear=0;
-					game.battle.arcade.gaintimer=40;
+					game.battle.arcade.gaintimer=666;
 					game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.level].level))
 					game.event="fadeout";
 					break;
 				case "fadeout":
-					anim.lvltransition.time--;
-					c.fillStyle="rgb(240,240,240)";
-					c.globalAlpha=anim.lvltransition.time/100;
-					c.fillRect(0,0,Cw,Ch)
+					anim.lvltransition.time-=msPassed;
 					if (anim.lvltransition.time<=0) {
+						anim.lvltransition.time=0;
 						game.event="transition";
-						game.timer=20
+						game.timer=333;
+						anim.entity.phase=1
 					}
+					c.fillStyle="rgb(240,240,240)";
+					c.globalAlpha=anim.lvltransition.time/1666;
+					c.fillRect(0,0,Cw,Ch)
 					break;
 				case "transition":
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						if (game.stats.vies<game.stats.maxvies) {
-							game.stats.vies+=game.stats.maxvies/40;
+							game.stats.vies+=game.stats.maxvies/30;
 							if (game.stats.vies>game.stats.maxvies) game.stats.vies=game.stats.maxvies;
 						}
 						if (game.stats.timer<game.stats.maxtimer) {
-							game.stats.timer+=game.stats.maxtimer/40;
+							game.stats.timer+=game.stats.maxtimer/30;
 							if (game.stats.timer>game.stats.maxtimer) game.stats.timer=game.stats.maxtimer;
 						}
-						if (game.stats.pv==game.stats.maxpv&&game.stats.vies==game.stats.maxvies&&game.stats.timer==game.stats.maxtimer) {
+						if (game.stats.vies==game.stats.maxvies&&game.stats.timer==game.stats.maxtimer) {
 							game.battle.dmg=0;
 							game.event="attention";
-							game.timer=20
+							game.timer=333;
+							anim.entity.phase=2
 						}
 					}
 					break;
 				case "attention":
 					c.textAlign="center";
 					c.font = '30px monospace';
-					c.fillText("Prêt ?",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
-					if (game.timer==0) {
-						game.timer=50;
-						game.event="pret"
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*0.5*(1-game.timer/333),Ch*0.45,"PRET?",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=0) {
+						game.timer=1166;
+						game.event="pret";
+						anim.entity.phase=3
 					}
 					break;
 				case "pret":
 					c.textAlign="center";
 					c.font = '30px monospace';
-					c.fillText("Prêt ?",Cw*0.5,Ch*0.5)
-					if (game.timer==0) {
-						game.timer=20;
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*0.5,Ch*0.45,"PRET?",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=300) anim.entity.phase=4;
+					if (game.timer<=0) {
+						game.timer=266;
 						game.event="partez"
 					}
 					break;
 				case "partez":
 					c.textAlign="center";
 					c.font = '30px monospace';
-					c.fillText("Prêt ?",Cw*(0.5+0.6*(1-game.timer/20)),Ch*0.5)
-					c.fillText("PARTEZ !",Cw*(0.5*(1-game.timer/20)),Ch*0.5)
-					if (game.timer==0) {
-						game.timer=20;
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*(0.5+0.6*(1-game.timer/266)),Ch*0.45,"PRET?",36,true,"white",5)
+					textfillplace(Cw*(0.5*(1-game.timer/266)),Ch*0.45,"PARTEZ!",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=0) {
+						game.timer=500;
 						game.event="start"
 					}
 					break;
 				case "start":
 					c.textAlign="center";
 					c.font = '30px monospace';
-					c.fillText("PARTEZ !",Cw*0.5,Ch*0.5)
-					if (game.timer==0) {
+					c.shadowColor="black";
+					c.shadowBlur=3;
+					textfillplace(Cw*0.5,Ch*0.45,"PARTEZ!",36,true,"white",5)
+					c.shadowColor="";
+					c.shadowBlur=0;
+					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
 						generatePuzzleArcade()
@@ -4309,40 +4482,33 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "switchmode":
 				switch(game.event){
 				case "toregen":
 					game.battle.arcade.phase="regen";
-					anim.background.type=9;
-					anim.lvltransition.time=100;
+					anim.background.type=9+Math.floor(Math.random()*2);
+					anim.lvltransition.time=1666;
 					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
 					game.battle.arcade.clear=0;
 					game.battle.arcade.maxclear=999;
 					game.battle.arcade.regen=0;
-					game.battle.arcade.regenlvl=game.battle.arcade.level-2;
+					game.battle.arcade.regenlvl=game.battle.arcade.level-1;
 					if (game.battle.arcade.regenlvl<0) game.battle.arcade.regenlvl=0;
-					game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.level].level))
+					game.level.encounter=JSON.parse(JSON.stringify(arcade[game.battle.arcade.regenlvl].level))
 					game.event="fadeout";
 					break;
 				case "tonormal":
 					game.battle.arcade.phase="normal";
 					anim.background.type=Math.floor(Math.random()*4);
-					anim.lvltransition.time=60;
+					anim.lvltransition.time=1000;
 					if (anim.background.stock.length>0) anim.background.stock.splice(0,anim.background.stock.length);
 					game.battle.arcade.clear=0;
 					game.battle.arcade.regen=0;
 					game.battle.arcade.level++;
+					if (game.battle.arcade.level>9) game.battle.arcade.level=9;
 					game.battle.arcade.gaintimer+=5;
 					game.stats.timerDecay=0;
 					game.stats.timer=Math.floor(game.stats.maxtimer*0.8);
@@ -4351,71 +4517,53 @@ function loopAnimation() {
 					game.event="fadeout";
 					break;
 				case "fadeout":
-					anim.lvltransition.time--;
-					c.fillStyle="rgb(240,240,240)";
-					c.globalAlpha=anim.lvltransition.time/60;
-					c.fillRect(0,0,Cw,Ch)
+					anim.lvltransition.time-=msPassed;
 					if (anim.lvltransition.time<=0) {
+						anim.lvltransition.time=0;
 						game.event="";
 						game.mainevent="play";
 						input=0;
 						generatePuzzleArcade()
 					}
+					c.fillStyle="rgb(240,240,240)";
+					c.globalAlpha=anim.lvltransition.time/1000;
+					c.fillRect(0,0,Cw,Ch)
 					break;
 				default:
 					errormsg("event error !")
 					break;
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "play":
 				if (game.battle.dmg>0) game.battle.dmg--;
-				if (game.stats.timer>0) game.stats.timer--;
-				if (game.stats.time>0) game.stats.time--;
-				game.stats.timeRep++;
-				c.textAlign="center";
-				c.font = '32px monospace';
+				if (game.stats.timer>0) game.stats.timer-=msPassed;
+				if (game.stats.time>0) game.stats.time-=msPassed;
+				game.stats.timeRep+=msPassed;
 				c.fillStyle="white";
-				c.font = '40px monospace';
-				game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+				game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
 				drawPuzzle()
 				inputPlayer()
 				if (game.stats.timer<=0) {
 					game.stats.timer=0;
 					game.mainevent="wait";
 					game.event="calc";
-					game.timer=25;
+					game.timer=400;
 				}
 				if (game.stats.vies<=0) {
 					game.stats.vies=0;
 					game.mainevent="gameover";
 					game.event="begin";
-					game.timer=100;
+					game.timer=1600;
 				}
 				if (key.space&&game.mainevent!="gameover"&&game.mainevent!="wait") {
 					game.mainevent="wait";
 					game.event="calc";
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "wait":
@@ -4425,19 +4573,16 @@ function loopAnimation() {
 				switch(game.event){
 				case "calc":
 					pass =validatePuzzleArcade()
-					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
-					c.font = '40px monospace';
-					game.battle.negat ? c.fillText("-"+input,Cw*0.5,Ch*0.72):c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					game.event=="calc"?game.event="wait":null;
-					game.timer=20;
+					game.timer=333;
 					break;
 				case "wait":
 					pass ? c.fillStyle ="rgb(75, 214, 71)": c.fillStyle="rgb(217, 38, 22)";
-					c.font = '40px monospace';
-					c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					c.font = '26px monospace';
 					if (pass) c.fillText("+ "+game.battle.score,Cw*0.2,Ch*0.7);
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
 						input=0;
@@ -4449,15 +4594,7 @@ function loopAnimation() {
 					break;
 				}
 				if (key.p) {
-					if (key.pausecooldown==0) {
-						game.prevevent=game.mainevent;
-						game.mainevent="pause";
-						game.prevtimer=game.timer;
-						game.timer=40;
-					}
-					else {
-						anim.pause.opa=20;
-					}
+					pauseGame()
 				}
 				break;
 			case "pause":
@@ -4467,8 +4604,7 @@ function loopAnimation() {
 				c.globalAlpha=1;
 				c.fillStyle="white";
 				c.textAlign="center";
-				c.font = '38px monospace';
-				c.fillText("PAUSE",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"PAUSE",40,true,"black",5)
 				if (game.inputType=="keyboard") {
 					c.font = '24px monospace';
 					c.fillText("Appuyez sur [Espace] pour reprendre",Cw*0.5,Ch*0.7)
@@ -4481,13 +4617,13 @@ function loopAnimation() {
 					c.fillText("Toucher l'écran pour reprendre",Cw*0.5,Ch*0.7)
 					c.fillText("Quitter la partie",Cw*0.5,Ch*0.85)
 				}
-				if ((key.space||key.p)&& game.timer==0) {
+				if ((key.space||key.p)&& game.timer<=0) {
 					game.mainevent=game.prevevent;
 					game.timer = game.prevtimer;
 					game.prevevent="";
 					key.p=false;
 					key.space=false
-					key.pausecooldown=420;
+					key.pausecooldown=7000;
 				}
 				if (key.d) {
 					game.mainevent="exit";
@@ -4530,7 +4666,7 @@ function loopAnimation() {
 					case 2:
 						game.mainevent="exitgame";
 						game.event="transition";
-						game.timer=50;
+						game.timer=833;
 						break;
 					default:
 						break;
@@ -4554,24 +4690,24 @@ function loopAnimation() {
 				switch (game.event){
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha=1-game.timer/50;
+					c.globalAlpha=1-game.timer/833;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="wait";
-						game.timer=20;
+						game.timer=333;
 					}
 					break;
 				case "wait":
 					c.fillStyle="black";
 					c.globalAlpha=1;
 					c.fillRect(0,0,Cw,Ch)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						resetStats()
 						setmenu(5,"lr",0,0,0,0,2);
 						game.screen="hub";
 						game.mainevent="";
 						game.event="fadeout";
-						anim.lvltransition.time=50;
+						anim.lvltransition.time=1600;
 					}
 					break;
 				default:
@@ -4585,39 +4721,36 @@ function loopAnimation() {
 				drawPuzzle()
 				c.shadowColor="black";
 				c.shadowBlur=3;
-				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
-				c.fillStyle="white";
-				c.fillText("TERMINE !",Cw*0.5,Ch*0.5)
+				textfillplace(Cw*0.5,Ch*0.45,"FIN DE PARTIE!",32,true,"white",5)
 				c.shadowColor="";
 				c.shadowBlur=0;
 				switch (game.event){
 				case "begin":
-					if (game.battle.dmg>20) game.battle.dmg--;
+					if (game.battle.dmg>20) game.battle.dmg-=2;
 					if (game.battle.dmg>0) game.battle.dmg--;
 					pass ? c.fillStyle ="green": c.fillStyle="red";
-					c.font = '40px monospace';
-					c.fillText(input,Cw*0.5,Ch*0.72);
+					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					if (game.battle.dmg==0 && game.timer<=0) {
 						game.event="transition";
-						game.timer=15;
+						game.timer=266;
 					}
 					break;
 				case "end":
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						game.event="transition";
-						game.timer=50;
+						game.timer=833;
 					}
 					break;
 				case "transition":
 					c.fillStyle="black";
-					c.globalAlpha = 0.92*(1-game.timer/50);
+					c.globalAlpha = 0.92*(1-game.timer/833);
 					c.fillRect(0,0,canvas.width,canvas.height)
-					if (game.timer==0) {
+					if (game.timer<=0) {
 						if (game.stats.combo>game.stats.maxcombo) game.stats.maxcombo=game.stats.combo;
 						game.stats.avgrep=calcAvgTResp(game.stats.inputT)
 						game.event="finpop";
-						game.timer=20;
-						setmenu(3,"lr",0.11,0.82,0.25,0);
+						game.timer=333;
+						setmenu(3,"lr",0.11,0.83,0.26,0);
 					}
 					break;
 				case "finpop":
@@ -4627,33 +4760,53 @@ function loopAnimation() {
 					c.globalAlpha = 0.92;
 					c.fillRect(0,0,canvas.width,canvas.height)
 					c.fillStyle="white";
-					c.globalAlpha = 1-game.timer/20;
-					c.textAlign="center";
-					c.font = '38px monospace';
-					c.fillText("Fin de la partie !",Cw*0.5,Ch*0.18)
+					switch(game.event){
+						case "finpop":
+							c.globalAlpha = 1-game.timer/333;
+							break;
+						case "transition2":
+						case "transition3":
+							c.globalAlpha = game.timer/833;
+							break;
+					}
+					textfillplace(Cw*0.5,Ch*0.1,"FIN DE PARTIE!",40,true,"black",5)
 					c.font = '30px monospace';
-					c.textAlign="start";
-					c.fillText("Mode: Arcade "+returnMode(),Cw*0.13,Ch*0.28)
-					c.font = '36px monospace';
-					c.fillText("Score : "+game.stats.score,Cw*0.13,Ch*0.37)
-					c.font = '30px monospace';
-					c.fillText("Combo max : "+game.stats.maxcombo,Cw*0.13,Ch*0.445)
+					
+					textfillplace(Cw*0.13,Ch*0.23,"ARCADE MODE",30,false,"black",7)
+					switch (game.setbtl.dif) {
+					case 2:
+						textfillplace(Cw*0.54,Ch*0.23,"TRES FACILE",30,false,"black",7)
+						break;
+					case 1.5:
+						textfillplace(Cw*0.54,Ch*0.23,"FACILE",30,false,"black",7)
+						break;
+					case 1:
+						textfillplace(Cw*0.54,Ch*0.23,"NORMAL",30,false,"black",7)
+						break;
+					case 0.7:
+						textfillplace(Cw*0.54,Ch*0.23,"DIFFICILE",30,false,"black",7)
+						break;
+					}
+					textfillplace(Cw*0.13,Ch*0.32,"SCORE",34,false,"black",5)
+					numfillplace(Cw*0.38,Ch*0.325,game.stats.score,30,"start",5)
+					textfillplace(Cw*0.13,Ch*0.415,"NIVEAU ATTEINT",28,false,"black",5)
+					numfillplace(Cw*0.65,Ch*0.41,game.battle.arcade.level+1,32,"start",5)
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
-					c.fillText("Niveau atteint : "+game.battle.arcade.level,Cw*0.13,Ch*0.51)
-					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.57)
-					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.63)
-					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+" sec",Cw*0.13,Ch*0.69)
+					c.textAlign="start";
+					c.fillText("Bonnes réponses : "+game.stats.clear,Cw*0.13,Ch*0.54)
+					c.fillText("Mauvaise réponses : "+game.stats.miss,Cw*0.13,Ch*0.61)
+					c.fillText("Temps de réponse moyen : "+(Math.floor(game.stats.avgrep*100)/100)+" sec",Cw*0.13,Ch*0.68)
 					c.fillText("Durée de la partie : "+ShowTimerRes(game.stats.timeTot)+" sec",Cw*0.13,Ch*0.75)
-					c.fillText("Rejouer",Cw*0.16,Ch*0.86)
-					c.fillText("Continuer",Cw*0.4,Ch*0.86)
-					c.fillText("Statistiques",Cw*0.655,Ch*0.86)
+					textfillplace(Cw*0.25,Ch*0.83,"REJOUER",24,true,"white",5)
+					textfillplace(Cw*0.51,Ch*0.83,"SUIVANT",24,true,"white",5)
+					textfillplace(Cw*0.75,Ch*0.83,"STATS",24,true,"white",5)
 					switch (game.event){
 					case "finpop":
 						if (game.inputType=="phone") {
-							c.globalAlpha = 0.15*(1-game.timer/20);
-							c.fillRect(Cw*0.12,Ch*0.785,Cw*0.21,Ch*0.12)
-							c.fillRect(Cw*0.365,Ch*0.785,Cw*0.24,Ch*0.12)
-							c.fillRect(Cw*0.63,Ch*0.785,Cw*0.27,Ch*0.12)
+							c.globalAlpha = 0.15*(1-game.timer/333);
+							c.fillRect(Cw*0.13,Ch*0.79,Cw*0.24,Ch*0.125)
+							c.fillRect(Cw*0.38,Ch*0.79,Cw*0.26,Ch*0.125)
+							c.fillRect(Cw*0.65,Ch*0.79,Cw*0.24,Ch*0.125)
 						}
 						else {
 							movemenu()
@@ -4664,11 +4817,11 @@ function loopAnimation() {
 									resetStats()
 									game.mainevent="starting";
 									game.event="set";
-									game.timer=20;
+									game.timer=333;
 									break;
 								case 2:
 									game.event="transition2";
-									game.timer=50;
+									game.timer=833;
 									break;
 								case 3:
 									game.mainevent="stats";
@@ -4682,24 +4835,24 @@ function loopAnimation() {
 						break;
 					case "transition2":
 						c.fillStyle="black";
-						c.globalAlpha=1-game.timer/50;
+						c.globalAlpha=1-game.timer/833;
 						c.fillRect(0,0,Cw,Ch)
-						if (game.timer==0) {
+						if (game.timer<=0) {
 							resetStats()
 							game.event="transition3";
-							game.timer=20;
+							game.timer=333;
 						}
 						break;
 					case "transition3":
 						c.fillStyle="black";
 						c.globalAlpha=1;
 						c.fillRect(0,0,Cw,Ch)
-						if (game.timer==0) {
+						if (game.timer<=0) {
 							setmenu(5,"lr",0,0,0,0,2);
 							game.screen="hub";
 							game.mainevent="";
 							game.event="fadeout";
-							anim.lvltransition.time=50;
+							anim.lvltransition.time=1600;
 						}
 						break;
 					default:
@@ -4741,7 +4894,7 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<       Global   >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_op,Cw*0.375,Ch*0.16,40,40)
+					showicons(Cw*0.4,Ch*0.195,40,"lt",6,0)
 					game.inputType=="phone" ? c.font = '22px monospace': c.font = '24px monospace';
 					c.textAlign="start";
 					c.fillText("N°    Opération        Résultat       Temps",Cw*0.07,Ch*0.3)
@@ -4760,7 +4913,7 @@ function loopAnimation() {
 								c.fillStyle="white";
 								if (!game.stats.level[i].valide) {
 									c.textAlign="start";
-									c.fillText("->  "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
+									c.fillText("-> "+game.stats.level[i].result,Cw*0.61,Ch*0.43+Ch*0.055*(i-game.menu.target))
 								}
 								c.textAlign="end";
 								c.fillText(Math.floor(game.stats.level[i].timeResp*100)/100+"s",Cw*0.95,Ch*0.43+Ch*0.055*(i-game.menu.target))
@@ -4787,7 +4940,7 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<        Vies    >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_life,Cw*0.375,Ch*0.16,40,40)
+					showicons(Cw*0.4,Ch*0.195,40,"lt",3,0)
 					let maxHP=get_maxhp(game.stats.maxvies,game.stats.maxpv);
 					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
 						anim.graph.init--;
@@ -4864,8 +5017,8 @@ function loopAnimation() {
 					c.font = '26px monospace';
 					c.textAlign="center";
 					c.fillText("<       Temps    >",Cw*0.5,Ch*0.22)
-					c.drawImage(icon_lt_time,Cw*0.375,Ch*0.16,40,40)
-					let maxTimer=game.stats.maxtimer/60;
+					showicons(Cw*0.4,Ch*0.195,40,"lt",4,0)
+					let maxTimer=game.stats.maxtimer/1000;
 					if (game.menu.target<anim.graph.init+2&&anim.graph.init>0) {
 						anim.graph.init--;
 					} else if (game.menu.target>anim.graph.init+anim.graph.step-2&&anim.graph.init<game.menu.options) {
@@ -4983,7 +5136,7 @@ function loopAnimation() {
 				if (key.d) {
 					game.mainevent="gameover";
 					game.event="finpop";
-					setmenu(3,"lr",0.11,0.82,0.25,0,3);
+					setmenu(3,"lr",0.11,0.83,0.26,0,3);
 				}
 				break;
 			default:
@@ -5000,6 +5153,14 @@ function loopAnimation() {
 			errormsg("screenevent error !")
 			break;
 	}
+	frames++
+	t=Date.now()
+	if (t-tstart>=1000) {
+		frameRate=frames;
+		frames=0;
+		tstart=Date.now()
+	}
+
 	c.globalAlpha=0.5;
 	c.font = '12px monospace';
 	c.fillStyle = "white";
@@ -5007,8 +5168,10 @@ function loopAnimation() {
 	c.fillText("Réalisé par @Yenseng3", Cw*0.01, Ch*0.99);
 	c.textAlign="end";
 	c.fillText("Version "+version, Cw*0.99, Ch*0.99);
-
-	requestAnimationFrame(loopAnimation)
+	c.globalAlpha=0.8;
+	c.font = '14px monospace';
+	if (game.option.showfps) c.fillText("FPS "+frameRate, Cw*0.99, Ch*0.03);
+	
 }
 loopAnimation()
 

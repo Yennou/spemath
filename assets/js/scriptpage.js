@@ -1,4 +1,5 @@
-let fullscreen=false;
+const page=document.getElementById("paragraphe");
+let autoscale=true;
 function show(source) {
 	const from=source.parentNode;
 	const action=from.parentNode.querySelector(".sm-article-game-3");
@@ -13,22 +14,24 @@ function hide(source) {
 
 
 const btngamemenu = () =>{
-
 	const btnmenu = document.querySelector('.btn-game-menu');
 	const nav = document.querySelector('.btn-game-box');
 	
 	if (btnmenu!=null) {
 		btnmenu.addEventListener('click',()=>{
 			imgmenu()
+			unshowall()
 			btnmenu.classList.toggle('btn-game-menu-active');
 			nav.classList.toggle('btn-game-box-fs-active');
-			
+			page.removeAttribute('class','activ-layer-menu')
 		});
 		window.addEventListener('keydown', function(event){
-			if (event.keyCode==222 && fullscreen) {
+			if (event.keyCode==222) {
 				imgmenu()
+				unshowall()
 				btnmenu.classList.toggle('btn-game-menu-active');
 				nav.classList.toggle('btn-game-box-fs-active');
+				page.removeAttribute('class','activ-layer-menu')
 			}
 		});
 	}
@@ -46,70 +49,26 @@ function imgmenu(){
 		document.getElementById("game-menu-btn").src="assets/img/menu.png";
 	}
 }
-function zoomin() {
-	if (zoom==zoommin) {
-		document.getElementById("zoomout").classList.toggle("btn-game-disable");
-		document.getElementById("zoomout").classList.toggle("btn-game-off");
-		document.getElementById("zoomout").removeAttribute("disabled");
-	}
-	zoom+=0.25;
-	var target=document.getElementById("canvas1")
-	var width=target.width;
-	var height=target.height;
-	width*=zoom/2;
-	height*=zoom/2;
-	target.style.width=width+"px";
-	target.style.height=height+"px";
-	if (zoom==zoommax) {
-		document.getElementById("zoomin").classList.toggle("btn-game-disable");
-		document.getElementById("zoomin").classList.toggle("btn-game-off");
-		document.getElementById("zoomin").setAttribute("disabled","");
-	}
-}
 
-function zoomout() {
-	if (zoom==zoommax) {
-		document.getElementById("zoomin").classList.toggle("btn-game-disable");
-		document.getElementById("zoomin").classList.toggle("btn-game-off");
-		document.getElementById("zoomin").removeAttribute("disabled");
-	}
-	zoom-=0.25;
-	var target=document.getElementById("canvas1")
-	var width=target.width;
-	var height=target.height;	
-	width*=zoom/2;
-	height*=zoom/2;
-	target.style.width=width+"px";
-	target.style.height=height+"px";
-	if (zoom==zoommin) {
-		document.getElementById("zoomout").classList.toggle("btn-game-disable");
-		document.getElementById("zoomout").classList.toggle("btn-game-off");
-		document.getElementById("zoomout").setAttribute("disabled","");
-	}
-}
-function lock(btn) {
-	btn.classList.toggle('btn-game-on')
-	document.querySelector('.btn-game-box').classList.toggle('btn-game-box-fs');
-	document.getElementById("game").classList.toggle("game-lock")
-	let locked=document.querySelector("body");
-
-	if (fullscreen) {
-		fullscreen=false;
-		locked.removeAttribute('class','overflowhide');
-	}
-	else {
-		fullscreen=true;
-		locked.setAttribute('class','overflowhide');
-	}	
-	window.addEventListener('keydown', function(event){
-		if (event.key=="Escape" && fullscreen) {
-			btn.classList.toggle('btn-game-on')
-			document.querySelector('.btn-game-box').classList.toggle('btn-game-box-fs')
-			document.getElementById("game").classList.toggle("game-lock")
-			locked.removeAttribute('class','overflowhide');
-			fullscreen=false;
+function rescale(){
+	if (autoscale) {
+		var target=document.getElementById("canvas1")
+		var w=window.innerWidth/target.width;
+		var h=window.innerHeight/target.height;
+		var width, height;
+		if (w<=h) {
+			width=target.width*w;
+			height=target.height*w;
 		}
-	});
+		else {
+			width=target.width*h;
+			height=target.height*h;
+		}
+		
+		target.style.width=width+"px";
+		target.style.height=height+"px";
+		setTimeout(rescale,5);
+	}
 }
 function phone(btn) {
 	btn.classList.toggle('btn-game-on')
@@ -125,6 +84,37 @@ function phone(btn) {
 	}
 }
 
+function showHideDescription(btn){
+	let Description=document.getElementById("Description");
+
+	unshowall()
+	Description.style.display="block";
+	page.setAttribute('class','activ-layer-menu')
+}
+function showHideChangelog(btn){
+	let Changelog=document.getElementById("Changelog");
+
+	unshowall()
+	Changelog.style.display="block";
+	page.setAttribute('class','activ-layer-menu')
+}
+function showHideReseaux(){
+	let Reseaux=document.getElementById("Reseaux");
+
+	unshowall()
+	Reseaux.style.display="block";
+	page.setAttribute('class','activ-layer-menu')
+}
+
+function unshowall(){
+	let Description=document.getElementById("Description");
+	let Reseaux=document.getElementById("Reseaux");
+	let Changelog=document.getElementById("Changelog");
+	Description.style.display="none";
+	Changelog.style.display="none";
+	Reseaux.style.display="none";
+}
+
 function hideErrorMsg(){
 	document.getElementById("game-error").style.display="none";
 }
@@ -135,3 +125,4 @@ function setErrorMsg(txt){
 	document.getElementById("game-error").innerHTML=txt;
 	showErrorMsg()
 }
+rescale()

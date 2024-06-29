@@ -216,6 +216,7 @@ canvas.addEventListener("touchend", function(event){
 		if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
 	}
 })
+
 function clicEvent(){
 	switch(game.screen){
 		case "init":
@@ -285,13 +286,13 @@ function clicEvent(){
 			}
 			break;
 		case "hub":
-			if (mouse.x >= Cw*0.18 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.18+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
+			if (mouse.x >= Cw*0.08 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.08+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
 				game.menu.target==1 ? game.menu.target=5:game.menu.target--;
 			}
-			if (mouse.x >= Cw*0.68 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.68+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
+			if (mouse.x >= Cw*0.78 && mouse.y >= Ch*0.39 && mouse.x <= Cw*0.78+Cw*0.14 && mouse.y <= Ch*0.39+Ch*0.2) {
 				game.menu.target==5 ? game.menu.target=1:game.menu.target++;
 			}
-			if (mouse.x >= Cw*0.34 && mouse.y >= Ch*0.47 && mouse.x <= Cw*0.34+Cw*0.32 && mouse.y <= Ch*0.47+Ch*0.11) {
+			if (mouse.x >= Cw*0.24 && mouse.y >= Ch*0.42 && mouse.x <= Cw*0.24+Cw*0.52 && mouse.y <= Ch*0.42+Ch*0.17) {
 				switch (game.menu.target){
 				case 1:
 					setmenu(levels[1].nblvl,"lr",0,0,0,0,game.level.stage);
@@ -319,7 +320,7 @@ function clicEvent(){
 					if (game.battle.mult) {game.battle.mult=false;game.battle.symbnum--}
 					break;
 				case 5:
-					setmenu(4,"ud",0.045,0.46,0,0.1,4);
+					setmenu(5,"ud",0.045,0.46,0,0.1,5);
 					game.screen="options";
 					game.mainevent="menu";
 					game.event="back";
@@ -330,17 +331,17 @@ function clicEvent(){
 		case "options":
 			switch (game.mainevent){
 			case "menu":
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.44+Ch*0.08) {
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.24+Ch*0.08) {
 					setmenu(11,"lr",0,0,0,0,game.option.inputOpacity/10+1);
 					game.mainevent="select";
 					game.event="opa.input";
 				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.54 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.54+Ch*0.08) {
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.34 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.34+Ch*0.08) {
 					setmenu(11,"lr",0,0,0,0,game.option.bckgrndOpacity/10+1);
 					game.mainevent="select";
 					game.event="opa.bckgrnd";
 				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.64 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.64+Ch*0.08) {
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.44+Ch*0.08) {
 					switch(anim.lowtimer.mode){
 					case "alt":
 						setmenu(2,"lr",0,0,0,0,2);
@@ -352,6 +353,36 @@ function clicEvent(){
 					game.mainevent="select";
 					game.event="animchrono";
 				}
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.54 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.54+Ch*0.08) {
+					switch(game.option.font){
+					case "none":
+						setmenu(4,"lr",0,0,0,0,1);
+						break;
+					case "num":
+						setmenu(4,"lr",0,0,0,0,2);
+						break;
+					case "txt":
+						setmenu(4,"lr",0,0,0,0,3);
+						break;
+					case "all":
+						setmenu(4,"lr",0,0,0,0,4);
+						break;
+					}
+					game.mainevent="select";
+					game.event="customtext";
+				}
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.64 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.64+Ch*0.08) {
+					switch(game.option.showfps){
+					case true:
+						setmenu(2,"lr",0,0,0,0,2);
+						break;
+					case false:
+						setmenu(2,"lr",0,0,0,0,1);
+						break;
+					}
+					game.mainevent="select";
+					game.event="fps";
+				}
 				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.74 && mouse.x <= Cw*0.07+Cw*0.2 && mouse.y <= Ch*0.74+Ch*0.08) {
 					setmenu(5,"lr",0,0,0,0,6);
 					game.screen="hub";
@@ -361,36 +392,38 @@ function clicEvent(){
 				}
 				break;
 			case "select":
-				if (mouse.x >= Cw*0.54 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.54+Cw*0.08 && mouse.y <= Ch*0.44+Ch*0.4) {
+				if (mouse.x >= Cw*0.54 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.54+Cw*0.08 && mouse.y <= Ch*0.24+Ch*0.5) {
 					game.menu.target--;
 				}
-				if (mouse.x >= Cw*0.86 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.86+Cw*0.08 && mouse.y <= Ch*0.44+Ch*0.4) {
+				if (mouse.x >= Cw*0.86 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.86+Cw*0.08 && mouse.y <= Ch*0.24+Ch*0.5) {
 					game.menu.target++;
 				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.44+Ch*0.4) {
-					setmenu(4,"ud",0.045,0.46,0,0.1,4);
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.24+Ch*0.5) {
+					setmenu(6,"ud",0.045,0.26,0,0.1,6);
 					game.mainevent="menu";
 					game.event="back"
 				}
 				switch (game.event) {
 				case "opa.input":
-					if (game.menu.target>11) game.menu.target=1;
-					if (game.menu.target<1) game.menu.target=11;
-					break;
 				case "opa.bckgrnd":
 					if (game.menu.target>11) game.menu.target=1;
 					if (game.menu.target<1) game.menu.target=11;
 					break;
 				case "animchrono":
+				case "fps":
 					if (game.menu.target>2) game.menu.target=1;
 					if (game.menu.target<1) game.menu.target=2;
+					break;
+				case "customtext":
+					if (game.menu.target>4) game.menu.target=1;
+					if (game.menu.target<1) game.menu.target=4;
 					break;
 				}
 				break; 
 			}
 			break;
 		case "modeArcade":
-			if (mouse.x >= Cw*0.01 && mouse.y >= Ch*0.02 && mouse.x <= Cw*0.02+Cw*0.285 && mouse.y <= Ch*0.02+Ch*0.1) {
+			if (mouse.x >= Cw*0.005 && mouse.y >= Ch*0.007 && mouse.x <= Cw*0.005+Cw*0.4 && mouse.y <= Ch*0.007+Ch*0.08) {
 				setmenu(5,"lr",0,0,0,0,2);
 				game.screen="hub";
 				game.mainevent="";
@@ -398,13 +431,13 @@ function clicEvent(){
 			}
 			switch(game.mainevent){
 			case "first":
-				if (mouse.x >= Cw*0.25 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.25+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.195 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.195+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==1 ? game.menu.target=4:game.menu.target--;
 				}
-				if (mouse.x >= Cw*0.64 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.64+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.695 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.695+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==4 ? game.menu.target=1:game.menu.target++;
 				}
-				if (mouse.x >= Cw*0.76 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.76+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.352 && mouse.y >= Ch*0.645 && mouse.x <= Cw*0.352+Cw*0.3 && mouse.y <= Ch*0.645+Ch*0.12) {
 					setmenu(2,"lr",0.05,0.605,0.31,0,2);
 					game.mainevent="second";
 					game.event="ready";
@@ -428,7 +461,7 @@ function clicEvent(){
 			}
 			break;
 		case "mode1":
-			if (mouse.x >= Cw*0.01 && mouse.y >= Ch*0.02 && mouse.x <= Cw*0.02+Cw*0.285 && mouse.y <= Ch*0.02+Ch*0.1) {
+			if (mouse.x >= Cw*0.005 && mouse.y >= Ch*0.007 && mouse.x <= Cw*0.005+Cw*0.4 && mouse.y <= Ch*0.007+Ch*0.08) {
 				setmenu(5,"lr",0,0,0,0,3);
 				game.screen="hub";
 				game.mainevent="";
@@ -451,7 +484,7 @@ function clicEvent(){
 					game.battle.mult ? game.battle.symbnum++ : game.battle.symbnum--;
 					key.space=false;
 				}
-				if (mouse.x >= Cw*0.4 && mouse.y >= Ch*0.645 && mouse.x <= Cw*0.4+130 && mouse.y <= Ch*0.645+50) {
+				if (mouse.x >= Cw*0.35 && mouse.y >= Ch*0.645 && mouse.x <= Cw*0.35+Cw*0.305 && mouse.y <= Ch*0.645+Ch*0.12) {
 					if (game.battle.symbnum>0) {
 						setmenu(4,"lr",0.3,0.56,0,0,game.battle.numopp);
 						game.mainevent="second"
@@ -459,33 +492,33 @@ function clicEvent(){
 				}
 				break;
 			case "second":
-				if (mouse.x >= Cw*0.25 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.25+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.205 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.205+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==1 ? game.menu.target=4:game.menu.target--;
 				}
-				if (mouse.x >= Cw*0.64 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.64+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.685 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.685+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==4 ? game.menu.target=1:game.menu.target++;
 				}
-				if (mouse.x >= Cw*0.04 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.04+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.675 && mouse.x <= Cw*0.07+Cw*0.23 && mouse.y <= Ch*0.675+Ch*0.1) {
 					setmenu(4,"lr",0.065,0.43,0.23,0);
 					game.mainevent="first";
 				}
-				if (mouse.x >= Cw*0.76 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.76+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.35 && mouse.y >= Ch*0.655 && mouse.x <= Cw*0.35+Cw*0.305 && mouse.y <= Ch*0.655+Ch*0.12) {
 					setmenu(4,"lr",0.3,0.71,0,0);
 					game.mainevent="third";
 				}
 				break;
 			case "third":
-				if (mouse.x >= Cw*0.25 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.25+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.205 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.205+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==1 ? game.menu.target=4:game.menu.target--;
 				}
-				if (mouse.x >= Cw*0.64 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.64+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.685 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.685+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==4 ? game.menu.target=1:game.menu.target++;
 				}
-				if (mouse.x >= Cw*0.04 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.04+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.675 && mouse.x <= Cw*0.07+Cw*0.23 && mouse.y <= Ch*0.675+Ch*0.1) {
 					setmenu(4,"lr",0.3,0.56,0,0,game.battle.numopp);
 					game.mainevent="second"
 				}
-				if (mouse.x >= Cw*0.76 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.76+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.35 && mouse.y >= Ch*0.655 && mouse.x <= Cw*0.35+Cw*0.305 && mouse.y <= Ch*0.655+Ch*0.12) {
 					setmenu(2,"lr",0.05,0.605,0.31,0,2);
 					game.mainevent="fourth";
 					game.event="ready";
@@ -509,7 +542,7 @@ function clicEvent(){
 			}
 			break;
 		case "mode2":
-			if (mouse.x >= Cw*0.01 && mouse.y >= Ch*0.02 && mouse.x <= Cw*0.02+Cw*0.285 && mouse.y <= Ch*0.02+Ch*0.1) {
+			if (mouse.x >= Cw*0.005 && mouse.y >= Ch*0.007 && mouse.x <= Cw*0.005+Cw*0.4 && mouse.y <= Ch*0.007+Ch*0.08) {
 				setmenu(5,"lr",0,0,0,0,4);
 				game.screen="hub";
 				game.mainevent="";
@@ -527,7 +560,7 @@ function clicEvent(){
 					game.battle.sub ? game.battle.symbnum++ : game.battle.symbnum--;
 					key.space=false;
 				}
-				if (mouse.x >= Cw*0.4 && mouse.y >= Ch*0.645 && mouse.x <= Cw*0.4+130 && mouse.y <= Ch*0.645+50) {
+				if (mouse.x >= Cw*0.35 && mouse.y >= Ch*0.645 && mouse.x <= Cw*0.35+Cw*0.305 && mouse.y <= Ch*0.645+Ch*0.12) {
 					if (game.battle.symbnum>0) {
 						setmenu(4,"lr",0.3,0.56,0,0,game.battle.numopp);
 						game.mainevent="second"
@@ -535,17 +568,17 @@ function clicEvent(){
 				}
 				break;
 			case "second":
-				if (mouse.x >= Cw*0.25 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.25+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.205 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.205+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==1 ? game.menu.target=4:game.menu.target--;
 				}
-				if (mouse.x >= Cw*0.64 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.64+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
+				if (mouse.x >= Cw*0.685 && mouse.y >= Ch*0.49 && mouse.x <= Cw*0.685+Cw*0.11 && mouse.y <= Ch*0.49+Ch*0.17) {
 					game.menu.target==4 ? game.menu.target=1:game.menu.target++;
 				}
-				if (mouse.x >= Cw*0.04 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.04+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.675 && mouse.x <= Cw*0.07+Cw*0.23 && mouse.y <= Ch*0.675+Ch*0.1) {
 					setmenu(4,"lr",0.065,0.43,0.23,0);
 					game.mainevent="first";
 				}
-				if (mouse.x >= Cw*0.76 && mouse.y >= Ch*0.535 && mouse.x <= Cw*0.76+Cw*0.2 && mouse.y <= Ch*0.535+Ch*0.1) {
+				if (mouse.x >= Cw*0.35 && mouse.y >= Ch*0.655 && mouse.x <= Cw*0.35+Cw*0.305 && mouse.y <= Ch*0.655+Ch*0.12) {
 					setmenu(2,"lr",0.05,0.605,0.31,0,2);
 					game.mainevent="third";
 					game.event="ready";
@@ -575,12 +608,12 @@ function clicEvent(){
 				case "select":
 				case "selected":
 					game.event="select";
-					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.81 && mouse.x <= Cw*0.07+Cw*0.22 && mouse.y <= Ch*0.81+Ch*0.13){
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.825 && mouse.x <= Cw*0.07+Cw*0.23 && mouse.y <= Ch*0.825+Ch*0.13){
 						setmenu(5,"lr",0,0,0,0);
 						game.screen="hub";
 						game.event=""
 					}
-					if (mouse.x >= Cw*0.34 && mouse.y >= Ch*0.82 && mouse.x <= Cw*0.34+Cw*0.32 && mouse.y <= Ch*0.82+Ch*0.14){
+					if (mouse.x >= Cw*0.345 && mouse.y >= Ch*0.825 && mouse.x <= Cw*0.345+Cw*0.32 && mouse.y <= Ch*0.825+Ch*0.13){
 						game.event="transition";
 						game.timer=7;
 					}
@@ -644,7 +677,7 @@ function clicEvent(){
 			case "gameover":
 				switch(game.event){
 				case "finpop":
-					if (mouse.x >= Cw*0.12 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.12+Cw*0.21 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.13 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.13+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						resetStats()
 						switch (game.battle.gamemode) {
 						case "survival-timer":
@@ -659,11 +692,11 @@ function clicEvent(){
 							break;
 						}
 					}
-					if (mouse.x >= Cw*0.365 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.365+Cw*0.24 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.38 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.38+Cw*0.26 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.event="transition2";
 						game.timer=50;
 					}
-					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.65+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="stats";
 						game.event="global";
 						setmenu(game.stats.level.length,"ud",0,0,0,0);
@@ -765,17 +798,17 @@ function clicEvent(){
 			case "gameover":
 				switch(game.event){
 				case "finpop":
-					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
+					if (mouse.x >= Cw*0.13 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.13+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="starting";
 						game.event="set";
 						game.timer=20;
 						resetStats()
 					}
-					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
+					if (mouse.x >= Cw*0.38 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.38+Cw*0.26 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.event="transition2";
 						game.timer=50;
 					}
-					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.65+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="stats";
 						game.prevevent="gameover";
 						game.event="global";
@@ -832,17 +865,17 @@ function clicEvent(){
 			case "finish":
 				switch(game.event){
 				case "finpop":
-					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
+					if (mouse.x >= Cw*0.13 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.13+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="starting";
 						game.event="set";
 						game.timer=20;
 						resetStats()
 					}
-					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
+					if (mouse.x >= Cw*0.38 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.38+Cw*0.26 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.event="transition2";
 						game.timer=50;
 					}
-					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.65+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="stats";
 						game.prevevent="finish";
 						game.event="global";
@@ -903,17 +936,17 @@ function clicEvent(){
 			case "gameover":
 				switch(game.event){
 				case "finpop":
-					if (mouse.x >= Cw*0.185 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.185+Cw*0.21 && mouse.y <= Ch*0.785+Ch*0.12) {
+					if (mouse.x >= Cw*0.13 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.13+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="starting";
 						game.event="set";
 						game.timer=20;
 						resetStats()
 					}
-					if (mouse.x >= Cw*0.46 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.46+Cw*0.34 && mouse.y <= Ch*0.785+Ch*0.12) {
+					if (mouse.x >= Cw*0.38 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.38+Cw*0.26 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.event="transition2";
 						game.timer=50;
 					}
-					if (mouse.x >= Cw*0.63 && mouse.y >= Ch*0.785 && mouse.x <= Cw*0.63+Cw*0.27 && mouse.y <= Ch*0.785+50) {
+					if (mouse.x >= Cw*0.65 && mouse.y >= Ch*0.79 && mouse.x <= Cw*0.65+Cw*0.24 && mouse.y <= Ch*0.79+Ch*0.125) {
 						game.mainevent="stats";
 						game.prevevent="gameover";
 						game.event="global";

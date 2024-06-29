@@ -6,14 +6,6 @@
 html {
 	scroll-behavior: smooth
 }
-body {
-	margin:0;
-	background: rgb(255,255,255);
-	background: -moz-linear-gradient(top,  rgb(255,255,255) 0%, rgb(0,0,0) 100%);
-	background: -webkit-linear-gradient(top,  rgb(255,255,255) 0%,rgb(0,0,0) 100%);
-	background: linear-gradient(to bottom,  rgb(255,255,255) 0%,rgb(0,0,0) 100%);
-	/*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#000000',GradientType=0 )*/
-}
 .overflowhide {
 	overflow: hidden !important;
 }
@@ -26,45 +18,7 @@ header {
 	width: 100%;
 	z-index: 19;
 }
-nav {
-	z-index: 20;
-	position: fixed;
-	left: 0;
-	top:0;
-	padding-top : 5vh;
-	width: 100%;
-	height: 100vh;
-	flex-flow: column nowrap;
-	align-items: center;
-	transform: translateX(-100%);
-	background-color: rgba(16,42,42,0.8);
-}
-nav>div>p{
-	margin: 15px;
-	color: white;
-	font-size: 30px;
-	font-weight: bold;
-	padding-left: 85px;
-}
-nav>ul {
-	margin: 0;
-	list-style: square;
-	display:flex;
-	flex-flow: column;
-}
-nav>ul>li {
-	padding: 0.5rem 1.5rem;
-}
-nav>ul>li::marker {
-	color: white;
-}
-nav>ul>li>a {
-	color: white;
-	font-size: 20px;
-}
-nav>ul>li:hover {
-	background-color: rgba(255,255,255,0.2);
-}
+
 .nav-active {
 	transform: translateX(0);
 	transition: transform 0.3s ease-in-out;
@@ -87,37 +41,12 @@ nav>ul>li:hover {
 .nav-isactive{
 	overflow: hidden;
 }
-.quicknav {
-	display: flex;
-	flex-flow: column nowrap;
-	margin: 0 0 0 3rem;
-	border: solid 2px rgba(200,200,200,0.1);
-	text-align: left;
-	font-size: 14px;
-	color: rgb(200,200,200);
-	padding: 0.4rem 0.4rem 0 0.4rem;
-}
-.quicknav div {
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: flex-start;
-}
-.quicknav a {
-	border: solid 2px rgba(200,200,200,0.8);
-	padding: 0.3rem;
-	color: rgb(200,200,200);
-}
-.quicknav a:hover {
-	border: solid 2px rgba(250,250,250,0.9);
-	padding: 0.3rem;
-}
-.quicknav p {
-	margin: 0.1rem;
-}
+
 h1 {
 	margin: 0;
+	text-align: center;
 	padding: 30px;
-	font-size: 35px;
+	font-size: 45px;
 	font-family: Arial
 }
 h2 {
@@ -135,6 +64,12 @@ h3 {
 hr {
 	margin: 1rem 3rem 0rem 3rem
 }
+li {
+	margin:0.4rem;
+}
+
+
+
 .fmaj{
 	text-transform: uppercase;
 }
@@ -247,179 +182,35 @@ footer ul li a {
 	padding: 10px;
 }
 
-/* ----------- ARTICLE JEUX ---------- */
-
-.article-game {
-	display: block;
-	margin: 0.5rem auto;
-	width: 850px;
-	height: 400px;
-}
-
-.background-article-game {
-	display: grid;
-	grid-template-rows: 400px;
-	grid-template-columns: repeat(3, 1fr); 
-}
-
-.grid-article-game-1 {
-	display: flex;
-	flex-flow: column nowrap;
-	justify-content: space-around;
-	align-items: flex-start;
-	padding-top: 2rem;
-	padding-left: 1rem;
-	padding-right: 3rem;
-	opacity: 0%;
-
-	color: white;
-	
-	background: -moz-linear-gradient(left,  rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
-	background: -webkit-linear-gradient(left,  rgba(0,0,0,1) 0%,rgba(0,0,0,0) 100%);
-	background: linear-gradient(to right,  rgba(0,0,0,1) 0%,rgba(0,0,0,0) 100%);
-	/*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 );*/
-
-	grid-row-start: 1;
-	grid-row-end: 2;
-	grid-column-start: 1;
-	grid-column-end: 3;
-
-	transition-duration: 0.3s;
-}
-.grid-article-game-1:hover {
-	padding-left: 2rem;
-	padding-right: 2rem;
-	opacity: 100%;
-}
-.grid-article-game-1 p {
-	text-shadow: 0px 0px 5px #000000f0;
-}
-.grid-article-game-1 div {
-	display: flex;
-	flex-flow: row wrap;
-}
-.grid-article-game-1 div span {
-	margin: 0.5rem 0.1rem; 
-	padding: 0.2rem 1rem;
-	font-size: 15px;
-	background-color: rgba(0,0,0,0.4);
-	color: white;
-	border: solid white 1px;
-	border-radius: 5px;
-}
-.grid-article-game-2 {
-	display: flex;
-	flex-flow: column wrap;
-	justify-content: center;
-	align-items: center;
-
-	grid-row-start: 1;
-	grid-row-end: 2;
-	grid-column-start: 3;
-	grid-column-end: 4;
-}
-.grid-article-game-2 h2 {
-	font-size: 30px;
-	color: white;
-}
-
-/* ----------- ARTICLE JEUX mobile ---------- */
-
-.sm-article-game {
-	display: flex;
-	position: relative;
-	flex-flow: column nowrap;
-	justify-content: space-between;
-	margin: 0.5rem auto;
-	height: 270px;
-	padding: 0 0;
-	overflow: hidden;
-	max-width: 550px;
-}
-
-.sm-article-game-1 div {
-	display: flex;
-	flex-flow: row wrap; 
-	padding: 0 10px;
-}
-.sm-article-game-1 h3 {
-	margin: 0;
-	text-align: start;
-	text-shadow: 0px 0px 5px #000000f0;
-	background-color: rgba(0,0,0,0.4);
-}
-.sm-article-game-1 div span {
-	margin: 0.5rem 0.1rem; 
-	padding: 0.2rem 1rem;
-	font-size: 15px;
-	background-color: rgba(0,0,0,0.4);
-	color: white;
-	border: solid white 1px;
-	border-radius: 5px;
-}
-.sm-article-game-2 {
-	display: flex;
-	justify-content: space-between;
-	width: 100%;
-	padding: 0 20px;
-}
-.sm-article-game-3 {
-	display: flex;
-	position: absolute;
-	top: 350px;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	flex-flow: column nowrap;
-	justify-content: space-around;
-	align-items: flex-start;
-	padding-left: 1rem;
-	padding-right: 1rem;
-	color: white;
-	background: -moz-linear-gradient(bottom,  rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 100%);
-	background: -webkit-linear-gradient(bottom,  rgba(0,0,0,1) 0%,rgba(0,0,0,0.6) 100%);
-	background: linear-gradient(to top,  rgba(0,0,0,1) 0%,rgba(0,0,0,0.6) 100%);
-	/*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 );*/
-
-	transition-duration: 0.3s;
-}
-.sm-article-game-3 p{
-	font-size: 15px;
-	text-shadow: 0px 0px 5px #000000f0;
-}
-.sm-article-game-3.active {
-	top:0;
-}
-.betatest {
-	border: 1.5px gold solid !important;
-	background-color: rgba(0, 0, 200, 0.4) !important;
-}
-
 /* ----------- BUTTON GAME OPTIONS ---------- */
 .btn-game-box {
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: center;
 	margin: auto;
+	width: 100%;
+	font-size: 24px;
 }
 .btn-game-box-fs {
 	position: absolute;
 	justify-content: center;
 	border : white solid 1px;
+	padding: 1rem 0;
 	margin: auto;
-	bottom: -156px;
+	bottom: -245px;
 	transition: bottom 0.3s;
+	background-color: rgba(0, 0, 0, 0.7);
 }
 .btn-game-box div{
 	display: none;
 }
 .btn-game-box button{
-	font-size: 30px;
+	font-size: 24px;
 	border: 1px solid rgb(220,220,220);
 	border-radius: 1.15rem; 
-	width: 6rem;
-	height: 2.8rem;
-	margin: 1rem;
+	width: 100%;
+	height: 2.3rem;
+	margin: 0.5rem;
 }
 .btn-game-box button img{
 	width: 40px;
@@ -436,7 +227,7 @@ footer ul li a {
 	padding:11px 0 0 7px;
 	font-size: 24px;
 	font-weight: bolder;
-	bottom: 156px;
+	bottom: 244px;
 	width: 50px;
 	opacity: 60%;
 	height: 50px;
@@ -448,7 +239,7 @@ footer ul li a {
 	opacity: 100%;
 }
 .btn-game-menu-active {
-	bottom:156px;
+	bottom:244px;
 	opacity: 100%;
 	background-color: rgba(255, 255, 255, 0.3);
 }
@@ -465,6 +256,7 @@ footer ul li a {
 .btn-game-disable {
 	background-color: rgba(0,0,0,0.1);
 	color: rgb(150,150,150);
+	opacity:0.7;
 }
 .btn-game-off:hover {
 	background-color: rgba(100,100,100,0.6);
@@ -480,7 +272,6 @@ footer ul li a {
 	position: fixed;
 	top: 0;
 	left: 0;
-	padding-top: 0.2%;
 	height: 100%;
 	margin: auto;
 	width: 100%;
@@ -514,56 +305,31 @@ footer ul li a {
 .btn-game-controller-ghost {
 	opacity: 0;
 }
-/* ----------- ARRANGEMENT ARTICLES ---------- */
-.armoire{
-	display: flex;
-	flex-flow: column;
-	justify-content: center;
+
+/* ----------- AUTRES ---------- */
+
+.activ-layer {
+	bottom:0px !important;
 }
-.armoire a{
+.texte {
+	position:relative;
+	bottom: -50vh;
+	padding: 1rem;
+	background-color: rgba(0,0,0,0.9);
+	color: rgb(255,255,255);
+	overflow-y: scroll;
+	height: 50vh;
+	display: none;
+}
+#paragraphe {
+	position:absolute;
+	bottom:0px;
 	width: 100%;
-} 
-.tirroir{
-	margin: 2px 0;
-	padding: 10px;
-	background-color: rgba(255,255,255,0.3);
-	display: flex;
-	flex-flow: column nowrap;
-	align-items: center;
 }
-.tirroir p{
-	padding: 3px;
-	margin: 5px 0;
-	color : white;
-	text-align: center;
-}
-.cadre img{
-	border-radius: 10px;
-	border: 3px solid gold;
-	width: 150px;
+.activ-layer-menu {
+	bottom: 50vh !important;
 }
 
-.desc-game {
-	display: block;
-	padding: 1rem 1rem;
-}
-.desc-game h2 {
-	text-align: center;
-}
-.desc-game h3 {
-	text-align: left;
-	padding-left: 2rem;
-}
-.desc-game h4 {
-	margin: 0.5rem 0;
-}
-.desc-game img{
-	width: 100%;
-}
-.desc-game li {
-	padding: 0.3rem 0;
-}
-/* ----------- AUTRES ---------- */
 .discord-room {
 	background-color: rgb(61, 66, 112);
 	color: rgb(201,203,247);
@@ -637,9 +403,9 @@ footer ul li a {
 		font-size: 22px;
 		border: 1px solid rgb(220,220,220);
 		border-radius: 1rem; 
-		width: 5rem;
+		width: 40%;
 		height: 2.6rem;
-		margin: 1rem;
+		margin: 0.5rem;
 	}
 }
 
@@ -649,7 +415,8 @@ footer ul li a {
 		justify-content: center;
 		border : white solid 1px;
 		margin: auto;
-		bottom: -71px;
+		bottom: -140px;
+		width: 100%;
 		transition: bottom 0.3s;
 	}
 	.btn-game-menu {
@@ -657,7 +424,8 @@ footer ul li a {
 		padding:11px 0 0 7px;
 		font-size: 24px;
 		font-weight: bolder;
-		bottom: 71px;
+		bottom: 140px;
+		left:0;
 		width: 50px;
 		height: 50px;
 		border: white solid 2px;
@@ -674,12 +442,43 @@ footer ul li a {
 		font-size: 22px;
 		border: 1px solid rgb(220,220,220);
 		border-radius: 1rem; 
-		width: 5rem;
+		max-width: 22%;
+		min-width: 175px;
 		height: 2.3rem;
-		margin: 1rem;
+		margin: 0.5rem;
 	}
 	.btn-game-box button img{
 		width: 33px;
+	}
+}
+@media (min-width: 765px){
+	.btn-game-box-fs {
+		position: absolute;
+		justify-content: center;
+		border : white solid 1px;
+		margin: auto;
+		bottom: -87px;
+		width: 100%;
+		transition: bottom 0.3s;
+	}
+	.btn-game-box-fs-active {
+		bottom: 0px;
+	}
+	.btn-game-menu {
+		bottom: 87px;
+		left:0;
+	}
+	.texte {
+		position:relative;
+		bottom: -50vh;
+		padding: 1rem 5rem;
+	}
+}
+@media (min-width: 992px){
+	.texte {
+		position:relative;
+		bottom: -50vh;
+		padding: 1rem 12rem;
 	}
 }
 @media (min-width: 576px){
@@ -789,19 +588,19 @@ footer ul li a {
 	h1 {
 		margin: 0;
 		padding: 30px;
-		font-size: 46px;
-		font-family: Arial
+		font-size: 60px;
+		font-family: Arial;
 	}
 	h2 {
 		margin: 30px;
-		font-size: 40px;
-		font-family: monospace
+		font-size: 42px;
+		font-family: monospace;
 	}
 	h3 {
 		margin: 30px;
 		text-align: center;
 		font-size: 30px;
-		font-family: monospace
+		font-family: monospace;
 	}
 	.md-hide{
 		display: block;

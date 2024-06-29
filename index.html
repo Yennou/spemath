@@ -11,260 +11,202 @@
 		let chargement=0;
 	</script>
 </head>
-<body style="background-color: black;">
-	<main>
-		<h1>Spé Maths</h1>
-		<div class="quicknav">
-			<p>Navigation rapide :</p>
-			<div>
-				<a href="#Description">Description</a>
-				<a href="#CommentJouer">Comment jouer</a>
-				<a href="#retour">Laisser un avis</a>
-				<a href="#changelog">Changelog</a>
+<body style="background-color: black;" class="overflowhide">
+	<div id="game" class="game-lock">
+		<canvas id="canvas1"></canvas>
+		<p class="error" id="game-error">ERREUR 0 : Une option de votre navigateur semble bloquer l'execution de fichier Javascript.</p>
+		<div class="btn-game-controler-box" id="controler">
+			<div class="btn-game-controler-row">
+				<button onclick="inputPlayerPhone(7)"> 7 </button>
+				<button onclick="inputPlayerPhone(8)"> 8 </button>
+				<button onclick="inputPlayerPhone(9)"> 9 </button>
+				<button onclick="inputPlayerPhone('p')"> <img src="assets/game/assets/btn_pause.png" width="40px"> </button>
+			</div>
+			<div class="btn-game-controler-row">
+				<button onclick="inputPlayerPhone(4)"> 4 </button>
+				<button onclick="inputPlayerPhone(5)"> 5 </button>
+				<button onclick="inputPlayerPhone(6)"> 6 </button>
+				<button onclick="inputPlayerPhone('Retour')"><img src="assets/game/assets/btn_return.png" width="40px"> </button>
+			</div>
+			<div class="btn-game-controler-row">
+				<button onclick="inputPlayerPhone(1)"> 1 </button>
+				<button onclick="inputPlayerPhone(2)"> 2 </button>
+				<button onclick="inputPlayerPhone(3)"> 3 </button>
+				<button onclick="inputPlayerPhone('Negat')"><img src="assets/game/assets/btn_plusmoins.png" width="40px"></button>
+			</div>
+			<div class="btn-game-controler-row">
+				<button onclick="inputPlayerPhone(0)"> 0 </button>
+				<button class="btn-game-controller-ghost" disabled>   </button>
+				<button class="btn-game-controller-ghost" disabled>   </button>
+				<button onclick="inputPlayerPhone('Enter')"> <img src="assets/game/assets/btn_enter.png" width="40px"> </button>
 			</div>
 		</div>
-		<div id="game">
-			<canvas id="canvas1"></canvas>
-			<p class="error" id="game-error">ERREUR 0 : Une option de votre navigateur semble bloquer l'execution de fichier Javascript.</p>
-			<div class="btn-game-controler-box" id="controler">
-				<div class="btn-game-controler-row">
-					<button onclick="inputPlayerPhone(7)"> 7 </button>
-					<button onclick="inputPlayerPhone(8)"> 8 </button>
-					<button onclick="inputPlayerPhone(9)"> 9 </button>
-					<button onclick="inputPlayerPhone('p')"> <img src="assets/game/assets/btn_pause.png" width="40px"> </button>
-				</div>
-				<div class="btn-game-controler-row">
-					<button onclick="inputPlayerPhone(4)"> 4 </button>
-					<button onclick="inputPlayerPhone(5)"> 5 </button>
-					<button onclick="inputPlayerPhone(6)"> 6 </button>
-					<button onclick="inputPlayerPhone('Retour')"><img src="assets/game/assets/btn_return.png" width="40px"> </button>
-				</div>
-				<div class="btn-game-controler-row">
-					<button onclick="inputPlayerPhone(1)"> 1 </button>
-					<button onclick="inputPlayerPhone(2)"> 2 </button>
-					<button onclick="inputPlayerPhone(3)"> 3 </button>
-					<button onclick="inputPlayerPhone('Negat')"><img src="assets/game/assets/btn_plusmoins.png" width="40px"></button>
-				</div>
-				<div class="btn-game-controler-row">
-					<button onclick="inputPlayerPhone(0)"> 0 </button>
-					<button class="btn-game-controller-ghost" disabled>   </button>
-					<button class="btn-game-controller-ghost" disabled>   </button>
-					<button onclick="inputPlayerPhone('Enter')"> <img src="assets/game/assets/btn_enter.png" width="40px"> </button>
-				</div>
-			</div>
-			<div class="btn-game-box">
-				<button class="btn-game-off" id="zoomin" onclick="zoomin()" title="Agrandir la fenêtre de jeu"><img src="assets/img/zoomup.png" width="35px"></button>
-				<button class="btn-game-off" id="zoomout" onclick="zoomout()" title="Retrécir la fenêtre de jeu"><img src="assets/img/zoomdown.png" width="35px"></button>
+		<div id="paragraphe">
+			<div class="btn-game-box btn-game-box-fs">
 				<button class="btn-game-off" onclick="phone(this)" title="Afficher les contrôles en mode portable"><img src="assets/img/modephone.png" width="35px"></button>
-				<button class="btn-game-off" onclick="lock(this)" title="Vérrouiller la fenêtre de jeu"><img src="assets/img/fullscreen.png" width="35px"></button>
+				<button class="btn-game-off" onclick="showHideDescription(this)" title="Afficher les contrôles en mode portable">Description</button>
+				<button class="btn-game-off" onclick="showHideReseaux(this)" title="Afficher les contrôles en mode portable">Réseaux</button>
+				<button class="btn-game-off" onclick="showHideChangelog(this)" title="Afficher les contrôles en mode portable">Changelog</button>
 				<div class="btn-game-menu"><img src="assets/img/menu.png" width="32px" id="game-menu-btn"></div>
 			</div>
-		</div>
-		<script type="text/javascript" src="assets/js/scriptpage.js"></script>
-		<script src="assets/game/game.js"></script>
-		<script src="assets/game/game-levels.js"></script>
-		<script src="assets/game/game-function.js"></script>
-		<script src="assets/game/game-event.js"></script>
-		<script>
-			const zoommax=6;
-			const zoommin=0.75;
-		</script>
-		<hr>
-		<article class="desc-game" id="Description">
-			<h2>Description</h2>
-			<p>Marre de se taper des sales notes en Mathématique ? Voilà la solution ! Venez vous entrainer quand vous voulez en calcul mental avec ce jeu !
-				<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7...</p>
-			<p>Créez vos programmes d'entrainement personnalisé ou jouez niveaux à thème et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre record ?</p>
-			<br>
-		</article>
-		<article class="desc-game" id="CommentJouer">
-			<h2>Comment jouer ?</h2>
-			<p>Avant de commencer, il est important de verrouiller la fenêtre de jeu en appuyant sur le bouton comme indiqué sur l'image ci-dessous afin d'éviter que la page bouge pendant que vous jouez.</p>
-			<img src="assets/img/tuto1.png" loading="lazy">
-			<p>Si vous jouez sur un <b>smartphone</b> ou une <b>tablette</b>, cliquez sur le bouton comme indiqué sur l'image ci-dessous pour afficher les contrôles tactiles.</p>
-			<img src="assets/img/tuto1-2.png" loading="lazy">
-
-			<h3>Les commandes</h3>
-			<img src="assets/img/controles.png" loading="lazy">
-			<p>Précision : la touche <b>Q</b> permet d'alterner entre une entrée <i>positif</i> et <i>négatif</i> pendant l'opération en cours. Il repasse automatiquement en positif à la prochaine opération !</p>
-
-			<h3>Créer son programme d'entraînement</h3>
-			<img src="assets/img/tuto2.png" loading="lazy">
-			<ul>
-				<li><h4>1. Choisir ses modes</h4><span>Dans cette première section vous allez pouvoir choisir les différentes opérations que vous souhaitez avoir dans votre entraînement. Vous devez en sélectionner au moins 1 pour passer à l'étape suivante.</span></li>
-				<li><h4>2. Format</h4><span>Dans cette deuxième section, vous allez définir le nombre de chiffre qui composeront les calculs qui apparaitront pendant votre session de jeu.</span></li>
-				<li><h4>3. Difficulté</h4><span>Ici, vous choisirez la difficulté de l'entrainement qui jouera grandement sur le <b>temps maximum</b> qui vous sera donner pour effectuer vos opérations.</span></li>
-			</ul>
-			<img src="assets/img/tuto2-2.png" loading="lazy">
-			<p>Vous aurez également la possibilité de vous mesurer à  des niveaux à thème et tenter de réaliser des <b>Sans-Fautes</b> sur tous les niveaux proposés</p>
-			<h3>Ecran de jeu</h3>
-			<img src="assets/img/tuto3.png" loading="lazy">
-			<ul>
-				<li>
-					<h4>1. Mode / Niveau</h4>
-					<span>Indique le mode de jeu ou le niveau que vous jouez sur cette partie.</span>
-				</li>
-				<li>
-					<h4>2. Chronomètre</h4>
-					<span>Ce chronomètre indique le temps restant pour donner une réponse avant de subir un contrecoup. S'il atteint zéro il peut soit vous mettre hors jeu soit vous faire perdre des points de vies en fonction du mode de jeu.</span>
-				</li>
-				<li>
-					<h4>3. Sablier</h4>
-					<span>Ce sablier vous indique le temps restant pour finir le niveau, attention ne de pas attendre trop longtemps car il vous fera perdre la partie s'il atteint zéro.</span>
-				</li>
-				<li>
-					<h4>4. Compteur</h4>
-					<span>Indique le nombre d'opérations restantes à effectuer pour terminer le niveau ou le nombre de bonne réponse donné en fonction du mode de jeu choisi.</span>
-				</li>
-				<li>
-					<h4>5. Opération</h4>
-					<span>C'est le coeur du jeu. C'est ici que s'affichera vos opérations à effectuer pour gagner un maximum de score, le fond des opérations vous indique rapidement de quel type d'opération il s'agit, il est un bon indicateur au premier regard, faites-y attention.</span>
-				</li>
-				<li>
-					<h4>6. Saisie</h4>
-					<span>Votre saisie pour cette opération. Lorsque vous taperez des chiffres, ils s'afficheront ici.</span>
-				</li>
-				<li>
-					<h4>7. Score</h4>
-					<span>Indique votre score actuel sur le niveau en cours.</span>
-				</li>
-				<li>
-					<h4>8. Jauge de vie</h4>
-					<span>Indique votre niveau de vie sur le niveau en cours, <b>s'il atteint 0 vous perdez la partie</b>.</span>
-				</li>
-				<li>
-					<h4>9. Combo</h4>
-					<span>Indique le nombre de bonne réponse d'affilé que vous aurez donné, une série de bonnes réponses peut vous conférer un bonus de point Plus votre série de bonne réponse sera grande, plus le bonus donné sera élevé.</span>
-				</li>
-			</ul>
-			<br>
-			<p>Voilà vous avez maintenant toute les clés en main pour jouer à ce jeu. En espérant qu'il vous plaira et que vous vous amuserez dessus !</p>
-		</article>
-		<article class="desc-game" id="retour">
-			<h2>Laisser un avis</h2>
-			<p>Bon vu qu'il ne s'agit que d'une simple page GitHub dans le but de présenter le projet (et que j'ai eu la flemme de faire un quelconque formulaire) vous pouvez toujours me laisser votre avis sur mon <b>Discord</b> dans la section <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math </a> </p>
-			<p>Sinon vous pouvez toujours me suivre sur :</p>
-			<a href="https://twitter.com/Yenseng3" target="_blank" class="twitter">Twitter</a>
-			<a href="https://www.youtube.com/channel/UCZDcdxTOk54EYf5yQXkz46w" target="_blank" class="youtube">Youtube</a>
-			<a href="https://discord.gg/js3aJtBxdn" target="_blank" class="discord">Discord </a>
-		</article>
-
-		<article class="desc-game" id="changelog">
-			<h2>Changelog</h2>
-			<h3>BETA 1.4.2 - 21/12/2023</h3>
-			<ul>
-				<li>Ajustement dans le mode arcade des points données, retrait des bonus de score lié aux combos et du temps minimum donné en cas de mauvaise réponse.</li>
-				<li>Bug majeur corrigé dans le mode survi temps qui empêche de réintialiser la partie lorsque l'on sélectionne le bouton "rejouer" sur la version téléphone</li>
-				<li>Bug corrigé d'une option qui n'était pas reconnu par le jeu. (n'affecte pas la sauvegarde)</li>
-				<li>Bug corrigé de l'animation du bouton pause dans les niveaux et les modes survies.</li>
-				<li>Bug corrigé de l'écran de fin du mode survi temps et survi PV qui ramène au menu principale avec une option vide en trop.</li>
-			</ul>
-			<h3>BETA 1.4.1 - 06/12/2023</h3>
-			<ul>
-				<li>Ajout de 6 Nouveaux niveaux difficile.</li>
-				<li>Ajout d'un bouton de réinitialisation de sauvegarde dans le menu principale.</li>
-				<li>Ajout d'un temps de recharge (7s) pour le bouton pause pour prévenir d'une utilisation abusive.</li>
-				<li>Bug corrigé de l'écran de statistique qui faisait planter le jeu dans certaines conditions.</li>
-				<li>Bug corrigé d'affichage du temps maximum dans la page Statistiques qui affichait le temps maximum de l'action suivante.</li> 
-				<li>Bug corrigé du défilement des graphiques sur la page Statistique de fin de niveau sur la version téléphone.</li> 
-				<li>Bug corrigé de l'écran de fin du mode arcade qui ramène au menu principale avec une option vide en trop.</li>
-			</ul>
-			<h3>BETA 1.4 - 24/11/2023</h3>
-			<ul>
-				<li><h4>Sauvegarde disponnible !</h4> Vos scores sur les niveaux sont désormais sauvegarder pour pouvoir vous la pêté pendant la pause en montrant tout les <b>PARFAIT</b> que vous avez réalisé.</li>
-				<li><h4>NOUVEAU MODE : mode Arcade !</h4> Vous pouvez vous mesurer au plus grand défi du jeu !<br>Montrez l'étendu de votre puissance en calcul mental dans ce défi infini de plus en plus difficile, faites exploser le compteur de score en enchainant les bonnes réponses ! Bonne chance à vous.</li>
-				<li>Ajout d'un écran de statistique à la fin de chaque niveau et survie pour analyser vos performances.</li>
-				<li>Modification de la prise en compte des entrées faites en mode tactile. L'entrée est comptée uniquement lorsque le joueur relâche l'écran tactile pour empêcher d'éventuelles erreur de manipulation.</li>
-				<li>Modification des niveaux 5 et 11.</li>
-				<li>Modification de certaines images déjà existante.</li>
-				<li>Modification du placement de certaines image sur lécran de jeu.</li>
-				<li>Bug corrigé permettant de jouer une partie sans aucune opération en mode survie.</li>
-				<li>Bug corrigé empechant le script de fin de partie de se déclancher en maintenant la touche espace.</li>
-			</ul>
-			<h3>BETA 1.3.2 - 23/09/2023</h3>
-			<ul>
-				<li>Ajout de 5 Nouveaux niveaux.</li>
-				<li>Ajout des opérations à 4 chiffres en mode survis temps.</li>
-				<li>Ajout de transition entre les niveaux et les menus.</li>
-				<li><h4>Ajout de fonds animés.</h4><span>Cet ajout semble minime mais il est un bon indicateur de la progression dans le développement du jeu. Evidement si des problèmes sont a noter sur les fonds animés (gène au niveau du gameplay ou bug visuel), merci de m'en faire part sur le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math</a> du discord.</span></li>
-				<li><h4>Equilibrage sur le temps gagné pour chaque bonne réponse en mode survie temps.</h4><span>Après avoir corrigé un bug majeur à propos de l'écoulement du temps, la plupart des formules de gain de temps en mode survis était devenu obselete. Cette nouvelle formule est en phase de test donc <b>si jamais vous trouver que le temps gagné en mode survie temps n'est pas très équilibré</b>, merci d'en témoigner sur le discord. Bon test à vous</span></li>
-				<li>Modification des interfaces des modes survies pour les rendre plus facile d'utilisation dans la version smartphone et tablette.</li>
-				<li>Modification de plusieurs textures.</li>
-				<li>Bug majeur corrigé du temps qui ne s'écoulait pas à la même vitesse suivant la configuration des appareils.</li>
-				<li>Bug corrigé affichant plus de 2 décimal au chrono pendant l'initialisation de la partie.</li>
-				<li>Bug corrigé en mode "survie vies" affichant le symboles "x" pendant la partie s'il a été sélectionné en mode "survie temps" précédemment (n'affecte pas la partie).</li>
-				<li>Bug corrigé de l'affichage de la barre du sablier ne correspondant pas au temps restant.</li>
-				<li>Bug corrigé de l'animation du sablier lorsque le temps restant est inférieur à 20% du temps maximum.</li>
-				<li>Bug corrigé du menu de sélection des niveaux dans la version smartphone.</li>
-				<li>Bug corrigé du menu Options qui avait une option vide et qui est remplacé maintenant par le réglage de l'opacité des fonds.</li>
-				<li>Correction de certains textes.</li>
-			</ul>
-			<h3>BETA 1.3.1 - 09/09/2023</h3>
-			<ul>
-				<li>5 Nouveaux niveaux ajoutés.</li>
-				<li>Bug corrigé empechant le joueur de perdre une partie dans un niveau type leçons.</li>
-				<li>Bug corrigé ne réinitialisant pas correctement les statistiques du joueur s'il appuyait sur "rejouer" en mode "survi PV".</li>
-				<li>Correction de certains textes.</li>
-			</ul>
-			<h3>BETA 1.3 - 06/09/2023</h3>
-			<ul>
-				<li><h4>NOUVEAU MODE : mode niveaux ! </h4><span> Dans ce mode vous trouverez plusieurs enchainements d'opération thématique, le but étant de vous aider à développer vos propres méthodes de calculs mentaux.<br> Il y aura peu de défis pour cette mise à jour, j'attendrais vos retours sur les différents défis proposé pour les améliorer et en créer de nouveaux.</span></li>
-				<li><h4>Refonte visuelle !</h4><span> De tout nouveaux sprites pour vos yeux et augmentation de la résolution des anciens sprites pour éviter qu'ils apparaissent flous à l'écran</span></li>
-				<li>Nouveaux icons pour le menu de commande de la fenêtre de jeu.</li>
-				<li>Ajustement du CSS.</li>
-			</ul>
-			<h3>BETA 1.2.1 - 09/08/2023</h3>
-			<ul>
-				<li><b>Fix de la touche "-" sur la pavé numérique qui permet maintenant de mettre le signe moins</b></li>
-				<li>Ajustement du texte pour la version mobile. Certains textes étaient rogné</li>
-			</ul>
-			<h3>BETA 1.2 - 07/08/2023</h3>
-			<ul>
-				<li><h4>NOUVEAU MODE : mode vies !</h4> Vous devrez enchainer les bonnes réponses sans vous tromper mais attention, une erreur peut vous coûter la partie entière. Les dégâts que vous subissez sont égaux à <b>la différence entre votre résultat et le résultat attendu</b>. Si le chrono tombe à 0, vous subirez également des dégâts <b>proportionnellement à la difficulté</b> choisie mais ne mettra pas fin à votre partie <i>(sauf si vous n'avez plus de vies)</i>.
-				<br>Attention à ne pas perdre le fil car <b>les résultats se cumulent entre eux !</b><br>Bon jeu, bonne chance et n'hésitez pas à nous faire part de vos retours sur le discord dans le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math</a> !</li>
-				<li><h4>Nouveau menu principal</h4> Il est temps d'ajouter un peu de vie à ce jeu en y ajoutant des icons et autres menu de personnalisation. Vous avez maintenant accès à un <b>écran des options</b> pour modifier l'affichage de certains éléments en jeu. N'hésitez pas à nous donner des idées d'options à ajouter !</li>
-				<li><h4>Equilibrage des opérations</h4> Dans le mode temps, il était possible de tomber sur des opérations vraiment trop simple pour les modes de difficultés élevé. Ceux-ci ont été modifié pour que les opérations collent mieux avec la difficulté choisie et le nombre d'opération sélectionné dans le menu.</li>
-				<li>Ajout d'un ombrage sur les opérations pour augmenter leurs visibilités lorsqu'elles sortent du cadre à cause du grand nombre de caractère qui le compose.</li>
-				<li>Ajustement du CSS pour la version téléphone.</li>
-			</ul>
-			<h3>BETA 1.1.1 - 26/07/2023</h3>
-			<ul>
-				<li><h4>Equilibrage des points</h4> <b>Avant ce Patch</b>, il fallait réalisé une opération en <b>moins de 3 secondes</b> pour obtenir plus du minimum de point peu importe la difficulté.<br> <b>Maintenant plus la difficulté sera élevée</b> (nombre de chiffre dans l'opération, mode de difficulté, type d'opération) <b>plus vous aurez de temps pour répondre correctement</b> et obtenir plus du minimum de point.<br><br><i>Par exemple : Dans la difficulté la plus élevé, avec 3 chiffres par opération et les 3 types d'opérations, vous avez 11 secondes pour répondre correctement pour avoir plus du minimum de point.</i></li>
-				<li><h4>Modification de l'écran de fin</h4> L'écran de fin <b>affiche le mode dans lequel vous avez joué</b>.<br>L'opacité de l'écran a été augmentée.</li>
-				<li>Ajout d'icons pour types d'opérations.</li>
-				<li>Ajustement du CSS</li>
-			</ul>
-			<h3>BETA 1.1 - 20/07/2023</h3>
-			<ul>
-				<li><h4>COMPATIBILITE Smartphone et Tablette</h4> Appuyez sur le bouton <b>[phone]</b> dans le menu sous le jeu.</li>
-			</ul>
-			<h3>BETA 1.0.2 - 20/07/2023</h3>
-			<ul>
-				<li>Correction de l'espacement des textes et de l'opacité de l'écran de fin de partie pour que ce soit plus lisible.</li>
-				<li>Ajustement du CSS.</li>
-			</ul>
-			<h3>BETA 1.0.1 - 20/07/2023</h3>
-			<ul>
-				<li>Ajout de la touche "Shift" pour mettre le signe ( - ).</li>
-				<li>Ajout des Changelog sur la page.</li>
-			</ul>
-			<h3>BETA 1.0.0 - 19/07/2023</h3>
-			<ul>
-				<li>Sortie du jeu dans sa version BETA.</li>
-			</ul>
-		</article>
-
-		<div class="quicknav">
-			<p>Navigation rapide :</p>
-			<div>
-				<a href="#Description">Description</a>
-				<a href="#CommentJouer">Comment jouer</a>
-				<a href="#retour">Laisser un avis</a>
-				<a href="#changelog">Changelog</a>
+			<div id="Description" class="texte">
+				<h1>Spé Maths</h1>
+				<h2>Description</h2>
+				<p>Marre de se taper des sales notes en Mathématique ? Voilà la solution ! Venez vous entrainer quand vous voulez en calcul mental avec ce jeu !
+					<br>Additions, soustractions, multiplications. Tout y est pour vous entrainer et flex comme un pro quand on vous demandera combien font 6x7...</p>
+				<p>Créez vos programmes d'entrainement personnalisé ou jouez des niveaux à thème et enchaînez le plus d'opération possible dans un temps limité. Plus vous répondrez rapidement, plus votre score augmentera. Quel sera votre record ?</p>
+				<br>
+				<hr>
 			</div>
-		</div>
-		<hr>
-	</main>
-	
+			<div id="Reseaux" class="texte">
+				<h2>Réseaux</h2>
+				<p>Bon vu qu'il ne s'agit que d'une simple page GitHub dans le but de présenter le projet (et que j'ai eu la flemme de faire un quelconque formulaire) vous pouvez toujours me laisser votre avis sur mon <b>Discord</b> dans la section <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math </a> </p>
+				<p>Sinon vous pouvez toujours me suivre sur :</p>
+				<a href="https://twitter.com/Yenseng3" target="_blank" class="twitter">Twitter</a>
+				<a href="https://www.youtube.com/channel/UCZDcdxTOk54EYf5yQXkz46w" target="_blank" class="youtube">Youtube</a>
+				<a href="https://discord.gg/js3aJtBxdn" target="_blank" class="discord">Discord </a>
+				<hr>
+			</div>
+			<div id="Changelog" class="texte">
+				<h2>Changelog</h2>
+				<h3>BETA 1.5.0 - 29/06/2024</h3>
+				<ul>
+					<li><b>Ajout d'une polices d'écriture au jeu.</b> Vous pouvez la changer dans le menu des Options.</li>
+					<li>Changement intégrale de la page web pour ne laisser que le jeu au premier plan.</li>
+					<li>Changement du calcul du temps, avant basé sur les frames, maintenant sur le temps écoulé entre chaque frame</li>
+					<li>Mise à l'échelle auto de la fenêtre de jeu.</li>
+					<li>Equilibrage du mode Arcade pour avoir une courbe de difficulté moins abrupte.</li>
+					<li>Changement de l'animation lorsque l'on réalise un "PARFAIT" sur un niveau.</li>
+					<li>Correction de multiple bug et problèmes d'animation de fin de niveau.</li>
+					<li>Modification de certains sprites en jeu.</li>
+					<li>Modification du temps de certaines animations.</li>
+					<li>Optimisation des fichiers du jeu.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.4.2 - 21/12/2023</h3>
+				<ul>
+					<li>Ajustement dans le mode arcade des points données, retrait des bonus de score lié aux combos et du temps minimum donné en cas de mauvaise réponse.</li>
+					<li>Bug majeur corrigé dans le mode survi temps qui empêche de réintialiser la partie lorsque l'on sélectionne le bouton "rejouer" sur la version téléphone</li>
+					<li>Bug corrigé d'une option qui n'était pas reconnu par le jeu. (n'affecte pas la sauvegarde)</li>
+					<li>Bug corrigé de l'animation du bouton pause dans les niveaux et les modes survies.</li>
+					<li>Bug corrigé de l'écran de fin du mode survi temps et survi PV qui ramène au menu principale avec une option vide en trop.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.4.1 - 06/12/2023</h3>
+				<ul>
+					<li>Ajout de 6 Nouveaux niveaux difficile.</li>
+					<li>Ajout d'un bouton de réinitialisation de sauvegarde dans le menu principale.</li>
+					<li>Ajout d'un temps de recharge (7s) pour le bouton pause pour prévenir d'une utilisation abusive.</li>
+					<li>Bug corrigé de l'écran de statistique qui faisait planter le jeu dans certaines conditions.</li>
+					<li>Bug corrigé d'affichage du temps maximum dans la page Statistiques qui affichait le temps maximum de l'action suivante.</li> 
+					<li>Bug corrigé du défilement des graphiques sur la page Statistique de fin de niveau sur la version téléphone.</li> 
+					<li>Bug corrigé de l'écran de fin du mode arcade qui ramène au menu principale avec une option vide en trop.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.4 - 24/11/2023</h3>
+				<ul>
+					<li><h4>Sauvegarde disponnible !</h4> Vos scores sur les niveaux sont désormais sauvegarder pour pouvoir vous la pêté pendant la pause en montrant tout les <b>PARFAIT</b> que vous avez réalisé.</li>
+					<li><h4>NOUVEAU MODE : mode Arcade !</h4> Vous pouvez vous mesurer au plus grand défi du jeu !<br>Montrez l'étendu de votre puissance en calcul mental dans ce défi infini de plus en plus difficile, faites exploser le compteur de score en enchainant les bonnes réponses ! Bonne chance à vous.</li>
+					<li>Ajout d'un écran de statistique à la fin de chaque niveau et survie pour analyser vos performances.</li>
+					<li>Modification de la prise en compte des entrées faites en mode tactile. L'entrée est comptée uniquement lorsque le joueur relâche l'écran tactile pour empêcher d'éventuelles erreur de manipulation.</li>
+					<li>Modification des niveaux 5 et 11.</li>
+					<li>Modification de certaines images déjà existante.</li>
+					<li>Modification du placement de certaines image sur lécran de jeu.</li>
+					<li>Bug corrigé permettant de jouer une partie sans aucune opération en mode survie.</li>
+					<li>Bug corrigé empechant le script de fin de partie de se déclancher en maintenant la touche espace.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.3.2 - 23/09/2023</h3>
+				<ul>
+					<li>Ajout de 5 Nouveaux niveaux.</li>
+					<li>Ajout des opérations à 4 chiffres en mode survis temps.</li>
+					<li>Ajout de transition entre les niveaux et les menus.</li>
+					<li><h4>Ajout de fonds animés.</h4><span>Cet ajout semble minime mais il est un bon indicateur de la progression dans le développement du jeu. Evidement si des problèmes sont a noter sur les fonds animés (gène au niveau du gameplay ou bug visuel), merci de m'en faire part sur le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math</a> du discord.</span></li>
+					<li><h4>Equilibrage sur le temps gagné pour chaque bonne réponse en mode survie temps.</h4><span>Après avoir corrigé un bug majeur à propos de l'écoulement du temps, la plupart des formules de gain de temps en mode survis était devenu obselete. Cette nouvelle formule est en phase de test donc <b>si jamais vous trouver que le temps gagné en mode survie temps n'est pas très équilibré</b>, merci d'en témoigner sur le discord. Bon test à vous</span></li>
+					<li>Modification des interfaces des modes survies pour les rendre plus facile d'utilisation dans la version smartphone et tablette.</li>
+					<li>Modification de plusieurs textures.</li>
+					<li>Bug majeur corrigé du temps qui ne s'écoulait pas à la même vitesse suivant la configuration des appareils.</li>
+					<li>Bug corrigé affichant plus de 2 décimal au chrono pendant l'initialisation de la partie.</li>
+					<li>Bug corrigé en mode "survie vies" affichant le symboles "x" pendant la partie s'il a été sélectionné en mode "survie temps" précédemment (n'affecte pas la partie).</li>
+					<li>Bug corrigé de l'affichage de la barre du sablier ne correspondant pas au temps restant.</li>
+					<li>Bug corrigé de l'animation du sablier lorsque le temps restant est inférieur à 20% du temps maximum.</li>
+					<li>Bug corrigé du menu de sélection des niveaux dans la version smartphone.</li>
+					<li>Bug corrigé du menu Options qui avait une option vide et qui est remplacé maintenant par le réglage de l'opacité des fonds.</li>
+					<li>Correction de certains textes.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.3.1 - 09/09/2023</h3>
+				<ul>
+					<li>5 Nouveaux niveaux ajoutés.</li>
+					<li>Bug corrigé empechant le joueur de perdre une partie dans un niveau type leçons.</li>
+					<li>Bug corrigé ne réinitialisant pas correctement les statistiques du joueur s'il appuyait sur "rejouer" en mode "survi PV".</li>
+					<li>Correction de certains textes.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.3 - 06/09/2023</h3>
+				<ul>
+					<li><h4>NOUVEAU MODE : mode niveaux ! </h4><span> Dans ce mode vous trouverez plusieurs enchainements d'opération thématique, le but étant de vous aider à développer vos propres méthodes de calculs mentaux.<br> Il y aura peu de défis pour cette mise à jour, j'attendrais vos retours sur les différents défis proposé pour les améliorer et en créer de nouveaux.</span></li>
+					<li><h4>Refonte visuelle !</h4><span> De tout nouveaux sprites pour vos yeux et augmentation de la résolution des anciens sprites pour éviter qu'ils apparaissent flous à l'écran</span></li>
+					<li>Nouveaux icons pour le menu de commande de la fenêtre de jeu.</li>
+					<li>Ajustement du CSS.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.2.1 - 09/08/2023</h3>
+				<ul>
+					<li><b>Fix de la touche "-" sur la pavé numérique qui permet maintenant de mettre le signe moins</b></li>
+					<li>Ajustement du texte pour la version mobile. Certains textes étaient rogné</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.2 - 07/08/2023</h3>
+				<ul>
+					<li><h4>NOUVEAU MODE : mode vies !</h4> Vous devrez enchainer les bonnes réponses sans vous tromper mais attention, une erreur peut vous coûter la partie entière. Les dégâts que vous subissez sont égaux à <b>la différence entre votre résultat et le résultat attendu</b>. Si le chrono tombe à 0, vous subirez également des dégâts <b>proportionnellement à la difficulté</b> choisie mais ne mettra pas fin à votre partie <i>(sauf si vous n'avez plus de vies)</i>.
+					<br>Attention à ne pas perdre le fil car <b>les résultats se cumulent entre eux !</b><br>Bon jeu, bonne chance et n'hésitez pas à nous faire part de vos retours sur le discord dans le salon <a class="discord-room" href="https://discord.gg/js3aJtBxdn" target="_blank"> #Spe-math</a> !</li>
+					<li><h4>Nouveau menu principal</h4> Il est temps d'ajouter un peu de vie à ce jeu en y ajoutant des icons et autres menu de personnalisation. Vous avez maintenant accès à un <b>écran des options</b> pour modifier l'affichage de certains éléments en jeu. N'hésitez pas à nous donner des idées d'options à ajouter !</li>
+					<li><h4>Equilibrage des opérations</h4> Dans le mode temps, il était possible de tomber sur des opérations vraiment trop simple pour les modes de difficultés élevé. Ceux-ci ont été modifié pour que les opérations collent mieux avec la difficulté choisie et le nombre d'opération sélectionné dans le menu.</li>
+					<li>Ajout d'un ombrage sur les opérations pour augmenter leurs visibilités lorsqu'elles sortent du cadre à cause du grand nombre de caractère qui le compose.</li>
+					<li>Ajustement du CSS pour la version téléphone.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.1.1 - 26/07/2023</h3>
+				<ul>
+					<li><h4>Equilibrage des points</h4> <b>Avant ce Patch</b>, il fallait réalisé une opération en <b>moins de 3 secondes</b> pour obtenir plus du minimum de point peu importe la difficulté.<br> <b>Maintenant plus la difficulté sera élevée</b> (nombre de chiffre dans l'opération, mode de difficulté, type d'opération) <b>plus vous aurez de temps pour répondre correctement</b> et obtenir plus du minimum de point.<br><br><i>Par exemple : Dans la difficulté la plus élevé, avec 3 chiffres par opération et les 3 types d'opérations, vous avez 11 secondes pour répondre correctement pour avoir plus du minimum de point.</i></li>
+					<li><h4>Modification de l'écran de fin</h4> L'écran de fin <b>affiche le mode dans lequel vous avez joué</b>.<br>L'opacité de l'écran a été augmentée.</li>
+					<li>Ajout d'icons pour types d'opérations.</li>
+					<li>Ajustement du CSS</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.1 - 20/07/2023</h3>
+				<ul>
+					<li><h4>COMPATIBILITE Smartphone et Tablette</h4> Appuyez sur le bouton <b>[phone]</b> dans le menu sous le jeu.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.0.2 - 20/07/2023</h3>
+				<ul>
+					<li>Correction de l'espacement des textes et de l'opacité de l'écran de fin de partie pour que ce soit plus lisible.</li>
+					<li>Ajustement du CSS.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.0.1 - 20/07/2023</h3>
+				<ul>
+					<li>Ajout de la touche "Shift" pour mettre le signe ( - ).</li>
+					<li>Ajout des Changelog sur la page.</li>
+				</ul>
+				<hr>
+				<h3>BETA 1.0.0 - 19/07/2023</h3>
+				<ul>
+					<li>Sortie du jeu dans sa version BETA.</li>
+				</ul>
+				<hr>
+			</div>
+		<div>
+	</div>
+	<script type="text/javascript" src="assets/js/scriptpage.js"></script>
+	<script src="assets/game/game.js"></script>
+	<script src="assets/game/game-levels.js"></script>
+	<script src="assets/game/game-function.js"></script>
+	<script src="assets/game/game-event.js"></script>
+	<script>
+		const zoommax=6;
+		const zoommin=0.75;
+	</script>
 </body>
-</html>
