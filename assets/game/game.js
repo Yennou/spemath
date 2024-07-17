@@ -397,8 +397,8 @@ function loopAnimation() {
 			c.fillText("- Mise à jour -",Cw*0.5,Ch*0.14)
 			game.inputType=="phone" ? c.font = '19px monospace': c.font = '21px monospace';
 			c.fillText("Une version plus récente du jeu a été mise en ligne.",Cw*0.5,Ch*0.27)
-			c.fillText("Les données sauvegardé actuelle que vous avez peuvent",Cw*0.5,Ch*0.34)
-			c.fillText("être conserver en ajoutant celle de la mise à jour.",Cw*0.5,Ch*0.41)
+			c.fillText("Les données sauvegardées actuelles que vous avez peuvent",Cw*0.5,Ch*0.34)
+			c.fillText("être conserver en ajoutant celles de la mise à jour.",Cw*0.5,Ch*0.41)
 			c.font = '22px monospace';
 			
 			switch(game.event){
@@ -649,7 +649,7 @@ function loopAnimation() {
 				c.fillStyle="white";
 				c.fillText("Mettez à l'épreuve votre puissance de",Cw*0.05,Ch*0.65)
 				c.fillText("calcul mental dans ce défi très difficile et",Cw*0.05,Ch*0.70)
-				c.fillText("atteignez des records en cumullant un maximum",Cw*0.05,Ch*0.75)
+				c.fillText("atteignez des records en cumulant un maximum",Cw*0.05,Ch*0.75)
 				c.fillText("de points.",Cw*0.05,Ch*0.80)
 				break;
 			case 3:
@@ -658,7 +658,7 @@ function loopAnimation() {
 				c.textAlign="start";
 				c.fillStyle="white";
 				c.fillText("Survivez le plus longtemps possible en",Cw*0.05,Ch*0.65)
-				c.fillText("réalisant le plus d'opérations possible !",Cw*0.05,Ch*0.70)
+				c.fillText("réalisant le plus d'opérations possibles !",Cw*0.05,Ch*0.70)
 				c.fillText("Cumulez du temps supplémentaire et des points",Cw*0.05,Ch*0.77)
 				c.fillText("pour chaque bonne réponse.",Cw*0.05,Ch*0.82)
 				c.fillText("Idéal pour faire une partie personnalisée.",Cw*0.05,Ch*0.89)
