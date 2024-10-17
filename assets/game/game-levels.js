@@ -1328,7 +1328,7 @@ const levels = {
 				["+",[9000,1000],[9000,1000]],
 			],
 			starscond: [
-				["incorrect",5],
+				["incorrect",5],	//première étoile
 				["incorrect",2],
 				["incorrect",0],
 			]
@@ -1378,7 +1378,7 @@ const levels = {
 
 			],
 			starscond: [
-				["incorrect",5],
+				["incorrect",5],	//première étoile
 				["incorrect",2],
 				["incorrect",0],
 			]
@@ -1462,7 +1462,7 @@ const levels = {
 				["x",[7,3],[7,3]],
 			],
 			starscond: [
-				["incorrect",5],
+				["incorrect",5],	//première étoile
 				["incorrect",2],
 				["incorrect",0],
 			]
@@ -1470,11 +1470,11 @@ const levels = {
 		25: {
 			title:"Question de talent",
 			type:"vies",
-			timer:15,
+			timer:16,
 			time:0,
-			life:3,
+			life:5,
 			hp:0,
-			timerdecay:1,
+			timerdecay:0.75,
 			decaystep:10,
 			timerhplose:0,
 			gaintime:0,
@@ -1546,7 +1546,7 @@ const levels = {
 				["x","prevR",[5,5]],
 			],
 			starscond: [
-				["incorrect",5],
+				["incorrect",5],	//première étoile
 				["incorrect",2],
 				["incorrect",0],
 			]
@@ -1554,7 +1554,7 @@ const levels = {
 		26: {
 			title:"Plus ou Moins ça",
 			type:"vies",
-			timer:10,
+			timer:12,
 			time:0,
 			life:3,
 			hp:0,
@@ -1640,11 +1640,45 @@ const levels = {
 				["x",[-40,-10],[-5,-7]],
 			],
 			starscond: [
-				["incorrect",5],
+				["incorrect",5],	//première étoile
 				["incorrect",2],
 				["incorrect",0],
 			]
 		}
+		/*8: {
+			title:"",
+			type:"", 	//vies, pv, boss, chrono, lesson
+			timer:0,		// = 0 pour retirer chrono
+			time:0,			// = 0 pour retirer minuteur
+			life:1,			// > 0 pour le mode Vies
+			hp:0,			// > 0 pour le mode PV
+			timerdecay:0,	// nombre de milisecondes de dégradation
+			decaystep:0, 	// > 0 pour activer la dégradation du temps pour X réponses
+			timerhplose:0,	// PV perdu quand timer arrive à zéro, en mode chrono met direct hors jeu, par défaut retire une vie quand timer = 0
+			gaintime:0,		// = 0 pour le mode chrono
+			boss:0,			// > 100 pour le mode boss
+			skiptonext:false,
+			order:"normal",	// normal, random
+
+			count:10,
+			level:[
+				["-",9,[30,11]],
+				["+",9,[30,11]],
+				["+",9,[30,11]],
+				["+",9,[30,11]],
+				["+",9,[30,11]],
+				["+",[30,11],9],
+				["+",[30,11],9],
+				["+",[30,11],9],
+				["+",[30,11],9],
+				["+",[30,11],9],
+			],
+			starscond: [
+				["incorrect",5],	//première étoile
+				["incorrect",2],
+				["incorrect",0],
+			]
+		}*/
 	}
 }
 const arcade = {
@@ -1792,8 +1826,605 @@ function loadSave(){
 }
 function resetSave(){
 	saves = {};
+	localStorage.removeItem("save")
 	majSave()
 }
+/*const record = {
+	survitimer:{
+		"+":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		},
+		"-":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		},
+		"x":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		},
+		"+-":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		},
+		"+x":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		},
+		"-x":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		},
+		"+-x":{
+			"very-easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"easy":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"normal":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			},
+			"hard":{
+				1:{
+					score:0,
+					clear:0,
+				},
+				2:{
+					score:0,
+					clear:0,
+				},
+				3:{
+					score:0,
+					clear:0,
+				},
+				4:{
+					score:0,
+					clear:0,
+				},
+			}
+		}
+	},
+	survilife:{
+		"+":{
+			"very-easy":{
+				score:0,
+				clear:0,
+			},
+			"easy":{
+				score:0,
+				clear:0,
+			},
+			"normal":{
+				score:0,
+				clear:0,
+			},
+			"hard":{
+				score:0,
+				clear:0,
+			}
+		},
+		"-":{
+			"very-easy":{
+				score:0,
+				clear:0,
+			},
+			"easy":{
+				score:0,
+				clear:0,
+			},
+			"normal":{
+				score:0,
+				clear:0,
+			},
+			"hard":{
+				score:0,
+				clear:0,
+			}
+		},
+		"+-":{
+			"very-easy":{
+				score:0,
+				clear:0,
+			},
+			"easy":{
+				score:0,
+				clear:0,
+			},
+			"normal":{
+				score:0,
+				clear:0,
+			},
+			"hard":{
+				score:0,
+				clear:0,
+			}
+		}
+	},
+	arcade:{
+		"very-easy":{
+			score:0,
+			clear:0,
+		},
+		"easy":{
+			score:0,
+			clear:0,
+		},
+		"normal":{
+			score:0,
+			clear:0,
+		},
+		"hard":{
+			score:0,
+			clear:0,
+		}
+	}
+}*/
 
 function randomNum(range,min=0){
 	return Math.floor(Math.random()*range+min)

@@ -47,52 +47,52 @@ window.addEventListener('keydown', function(event){
 				switch (keypressed) {
 				case"&":
 				case"1":
-					input=input*10+1;
+					game.option.inputDirection?input="1"+input:input=input+"1";
 					break;
 				case"é":
 				case"2":
-					input=input*10+2;
+					game.option.inputDirection?input="2"+input:input=input+"2";
 					break;
 				case"\"":
 				case"3":
-					input=input*10+3;
+					game.option.inputDirection?input="3"+input:input=input+"3";
 					break;
 				case"'":
 				case"4":
-					input=input*10+4;
+					game.option.inputDirection?input="4"+input:input=input+"4";
 					break;
 				case"(":
 				case"5":
-					input=input*10+5;
+					game.option.inputDirection?input="5"+input:input=input+"5";
 					break;
 				case"-":
 				case"6":
 					if (event.keyCode==109) {
 						game.battle.negat ? game.battle.negat=false:game.battle.negat=true;
 					} else {
-						input=input*10+6;
+						game.option.inputDirection?input="6"+input:input=input+"6";
 					}
 					break;
 				case"è":
 				case"7":
-					input=input*10+7;
+					game.option.inputDirection?input="7"+input:input=input+"7";
 					break;
 				case"_":
 				case"8":
-					input=input*10+8;
+					game.option.inputDirection?input="8"+input:input=input+"8";
 					break;
 				case"ç":
 				case"9":
-					input=input*10+9;
+					game.option.inputDirection?input="9"+input:input=input+"9";
 					break;
 				case"à":
 				case"0":
-					input=input*10+0;
+					game.option.inputDirection?input="0"+input:input=input+"0";
 					break;
 				case "d":
 				case "D":
 				case"Backspace":
-					input=Math.floor(input/10);
+					game.option.inputDirection?input=input.substr(1,input.length-1):input=input.slice(0,input.length-1);
 					break;
 				case "q":
 				case "Q":
@@ -217,6 +217,153 @@ canvas.addEventListener("touchend", function(event){
 	}
 })
 
+/*canvas.addEventListener('mousedown', function(event){
+	if (game.inputType=="phone") {
+		mouse.down=true;
+		canvasPosition = canvas.getBoundingClientRect();
+		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
+		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+	}
+});
+canvas.addEventListener('mousemove', function(event){
+	if (game.inputType=="phone"&&mouse.down) {
+		canvasPosition = canvas.getBoundingClientRect();
+		mouse.prex=mouse.x;
+		mouse.prey=mouse.y;
+		mouse.x=Math.floor(Cw*((event.x-canvasPosition.left)/canvasPosition.width));
+		mouse.y=Math.floor(Ch*((event.y-canvasPosition.top)/canvasPosition.height));
+		mouse.hasmove=true;
+		switch(game.screen){
+		case "survival":
+			switch(game.mainevent){
+			case "stats":
+				switch(game.event){
+				case "global":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.975&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prey-mouse.y)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							game.menu.target--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							game.menu.target++;
+						}
+					}
+					break;
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prex-mouse.x)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							anim.graph.init--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							anim.graph.init++;
+						}
+					}
+					if (anim.graph.init<0) {
+						anim.graph.init=0;
+					}
+					else if (anim.graph.init>game.menu.options-1){
+						anim.graph.init=game.menu.options-1
+					}
+					break;
+				}
+				break;
+			}
+			break;
+		case "level":
+			switch(game.mainevent){
+			case "stats":
+				switch(game.event){
+				case "global":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prey-mouse.y)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							game.menu.target--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							game.menu.target++;
+						}
+					}
+					break;
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prex-mouse.x)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							anim.graph.init--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							anim.graph.init++;
+						}
+					}
+					if (anim.graph.init<0) {
+						anim.graph.init=0;
+					}
+					else if (anim.graph.init>game.menu.options-1){
+						anim.graph.init=game.menu.options-1
+					}
+					break;
+				}
+				break;
+			}
+			break;
+		case "arcade":
+			switch(game.mainevent){
+			case "stats":
+				switch(game.event){
+				case "global":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prey-mouse.y)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							game.menu.target--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							game.menu.target++;
+						}
+					}
+					break;
+				case "vies":
+				case "temps":
+					if (mouse.x>=Cw*0.025&&mouse.y>=Ch*0.31&&mouse.x<=Cw*0.955&&mouse.y<=Ch*0.91) {
+						mouse.range+=(mouse.prex-mouse.x)/10;
+						if (mouse.range<-1) {
+							mouse.range++;
+							anim.graph.init--;
+						} else if (mouse.range>1) {
+							mouse.range--;
+							anim.graph.init++;
+						}
+					}
+					if (anim.graph.init<0) {
+						anim.graph.init=0;
+					}
+					else if (anim.graph.init>game.menu.options-1){
+						anim.graph.init=game.menu.options-1
+					}
+					break;
+				}
+				break;
+			}
+			break;
+		}
+	}
+});
+canvas.addEventListener('mouseup', function(event){
+	if (game.inputType=="phone") {
+		mouse.down=false;
+		if (!mouse.hasmove) {clicEvent()}
+		mouse.hasmove=false;
+		mouse.range=0;
+		if (game.menu.target<1) game.menu.target=1;
+		if (game.menu.target>game.menu.options) game.menu.target=game.menu.options;
+	}
+})*/
 function clicEvent(){
 	switch(game.screen){
 		case "init":
@@ -324,6 +471,7 @@ function clicEvent(){
 					game.screen="options";
 					game.mainevent="menu";
 					game.event="back";
+					game.sideevent="page1";
 					break;
 				}
 			}
@@ -331,64 +479,98 @@ function clicEvent(){
 		case "options":
 			switch (game.mainevent){
 			case "menu":
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.24+Ch*0.08) {
-					setmenu(11,"lr",0,0,0,0,game.option.inputOpacity/10+1);
-					game.mainevent="select";
-					game.event="opa.input";
-				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.34 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.34+Ch*0.08) {
-					setmenu(11,"lr",0,0,0,0,game.option.bckgrndOpacity/10+1);
-					game.mainevent="select";
-					game.event="opa.bckgrnd";
-				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.44+Ch*0.08) {
-					switch(anim.lowtimer.mode){
-					case "alt":
-						setmenu(2,"lr",0,0,0,0,2);
-						break;
-					case "fix":
-						setmenu(2,"lr",0,0,0,0,1);
-						break;
+				switch (game.sideevent){
+				case "page1":
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.24+Ch*0.08) {
+						setmenu(11,"lr",0,0,0,0,game.option.inputOpacity/10+1);
+						game.mainevent="select";
+						game.event="opa.input";
 					}
-					game.mainevent="select";
-					game.event="animchrono";
-				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.54 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.54+Ch*0.08) {
-					switch(game.option.font){
-					case "none":
-						setmenu(4,"lr",0,0,0,0,1);
-						break;
-					case "num":
-						setmenu(4,"lr",0,0,0,0,2);
-						break;
-					case "txt":
-						setmenu(4,"lr",0,0,0,0,3);
-						break;
-					case "all":
-						setmenu(4,"lr",0,0,0,0,4);
-						break;
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.34 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.34+Ch*0.08) {
+						setmenu(11,"lr",0,0,0,0,game.option.bckgrndOpacity/10+1);
+						game.mainevent="select";
+						game.event="opa.bckgrnd";
 					}
-					game.mainevent="select";
-					game.event="customtext";
-				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.64 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.64+Ch*0.08) {
-					switch(game.option.showfps){
-					case true:
-						setmenu(2,"lr",0,0,0,0,2);
-						break;
-					case false:
-						setmenu(2,"lr",0,0,0,0,1);
-						break;
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.44+Ch*0.08) {
+						switch(anim.lowtimer.mode){
+						case true:
+							setmenu(2,"lr",0,0,0,0,2);
+							break;
+						case false:
+							setmenu(2,"lr",0,0,0,0,1);
+							break;
+						}
+						game.mainevent="select";
+						game.event="inputdirect";
 					}
-					game.mainevent="select";
-					game.event="fps";
-				}
-				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.74 && mouse.x <= Cw*0.07+Cw*0.2 && mouse.y <= Ch*0.74+Ch*0.08) {
-					setmenu(5,"lr",0,0,0,0,6);
-					game.screen="hub";
-					game.mainevent="";
-					game.event="";
-					optionsUpdate()
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.54 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.54+Ch*0.08) {
+						switch(anim.lowtimer.mode){
+						case "alt":
+							setmenu(2,"lr",0,0,0,0,2);
+							break;
+						case "fix":
+							setmenu(2,"lr",0,0,0,0,1);
+							break;
+						}
+						game.mainevent="select";
+						game.event="animchrono";
+					}
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.64 && mouse.x <= Cw*0.07+Cw*0.2 && mouse.y <= Ch*0.64+Ch*0.08) {
+						setmenu(5,"lr",0,0,0,0,6);
+						game.screen="hub";
+						game.mainevent="";
+						game.event="";
+						game.sideevent="";
+						optionsUpdate()
+					}
+					if (mouse.x >= Cw*0.38 && mouse.y >= Ch*0.74 && mouse.x <= Cw*0.38+Cw*0.24 && mouse.y <= Ch*0.74+Ch*0.08) {
+						game.sideevent="page2";
+					}
+					break;
+				case "page2":
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.24+Ch*0.08) {
+						switch(game.option.font){
+						case "none":
+							setmenu(4,"lr",0,0,0,0,1);
+							break;
+						case "num":
+							setmenu(4,"lr",0,0,0,0,2);
+							break;
+						case "txt":
+							setmenu(4,"lr",0,0,0,0,3);
+							break;
+						case "all":
+							setmenu(4,"lr",0,0,0,0,4);
+							break;
+						}
+						game.mainevent="select";
+						game.event="customtext";
+					}
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.34 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.34+Ch*0.08) {
+						switch(game.option.showfps){
+						case true:
+							setmenu(2,"lr",0,0,0,0,2);
+							break;
+						case false:
+							setmenu(2,"lr",0,0,0,0,1);
+							break;
+						}
+						game.mainevent="select";
+						game.event="fps";
+					}
+					if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.44 && mouse.x <= Cw*0.07+Cw*0.2 && mouse.y <= Ch*0.44+Ch*0.08) {
+						setmenu(5,"lr",0,0,0,0,6);
+						game.screen="hub";
+						game.mainevent="";
+						game.event="";
+						game.sideevent="";
+						optionsUpdate()
+					}
+
+					if (mouse.x >= Cw*0.38 && mouse.y >= Ch*0.74 && mouse.x <= Cw*0.38+Cw*0.24 && mouse.y <= Ch*0.74+Ch*0.08) {
+						game.sideevent="page1";
+					}
+					break;
 				}
 				break;
 			case "select":
@@ -399,7 +581,7 @@ function clicEvent(){
 					game.menu.target++;
 				}
 				if (mouse.x >= Cw*0.07 && mouse.y >= Ch*0.24 && mouse.x <= Cw*0.07+Cw*0.48 && mouse.y <= Ch*0.24+Ch*0.5) {
-					setmenu(6,"ud",0.045,0.26,0,0.1,6);
+					game.sideevent=="page1"?setmenu(5,"ud",0.045,0.26,0,0.1,5):setmenu(3,"ud",0.045,0.26,0,0.1,3);
 					game.mainevent="menu";
 					game.event="back"
 				}
@@ -411,6 +593,7 @@ function clicEvent(){
 					break;
 				case "animchrono":
 				case "fps":
+				case "inputdirect":
 					if (game.menu.target>2) game.menu.target=1;
 					if (game.menu.target<1) game.menu.target=2;
 					break;
@@ -661,7 +844,7 @@ function clicEvent(){
 					RTAtimer()
 					key.p=false;
 					key.space=false;
-					key.pausecooldown=420
+					key.pausecooldown=7000
 				}
 				break;
 			case "exit":
@@ -782,7 +965,7 @@ function clicEvent(){
 					RTAtimer()
 					key.p=false;
 					key.space=false;
-					key.pausecooldown=420
+					key.pausecooldown=7000
 				}
 				break;
 			case "exit":
@@ -920,7 +1103,7 @@ function clicEvent(){
 					RTAtimer()
 					key.p=false;
 					key.space=false;
-					key.pausecooldown=420
+					key.pausecooldown=7000
 				}
 				break;
 			case "exit":

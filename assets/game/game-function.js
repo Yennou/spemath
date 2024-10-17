@@ -1,3 +1,4 @@
+//fonction d'initialisation d'un menu
 function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
 	game.menu.options = numoption;
 	game.menu.direction = direction;
@@ -17,6 +18,7 @@ function setmenu(numoption,direction,initx,inity,padx,pady,defaultpos=1){
 	key.d=false;
 	key.space=false
 }
+//fonction de déplacement dans les menus
 function movemenu(){
 	if (game.menu.direction=="ud"||game.menu.direction=="all") {
 		if (key.up) {game.menu.posy -= game.menu.pady; game.menu.target--;key.up=false}
@@ -40,6 +42,7 @@ function movemenu(){
 function textfillplace(posx,posy,obj,size,center=false,color="black",ecart=0,calc=false){
 	const tw=tile.tw*(size/48);
 	const th=tile.th*(size/48);
+
 	switch(game.option.font){
 	case "none":
 	case "num":
@@ -321,7 +324,7 @@ function inputPlayer(){
 	}
 }
 function inputPlayerPhone(inputP){
-	if ((inputP>=0&&inputP<=9)&&game.mainevent=="play") input=input*10+inputP;
+	if ((inputP>=0&&inputP<=9)&&game.mainevent=="play") game.option.inputDirection?input=inputP+input:input=input+inputP;
 	else {
 		switch (inputP){
 		case "Negat":
@@ -335,7 +338,7 @@ function inputPlayerPhone(inputP){
 			break;
 		case"Retour":
 			if (game.mainevent=="play") {
-				input=Math.floor(input/10);
+				game.option.inputDirection?input=input.substr(1,input.length-1):input=input.slice(0,input.length-1);
 			}else {
 				key.d=true;
 				key.cooldown=key.cooldownmax;
@@ -403,7 +406,7 @@ function resetStats(){
 	game.battle.num2= 0;
 	game.battle.dmg = 0; 
 	game.stats.level= [];
-	input=0;
+	input="";
 	pass=false;
 }
 
@@ -527,11 +530,33 @@ function generatePuzzleMode2() {
 	}
 	game.battle.num2= Math.floor(Math.random()*game.battle.rangemax+game.battle.rangemin);
 	game.battle.symb= tabsymb[Math.floor(Math.random()*tabsymb.length)];
+	/*if (game.battle.symb=="mult"&& game.battle.numopp>=2) {
+		if (game.battle.numopp>=2&&game.battle.mode=="normal"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*20)+5;
+			game.battle.num2= Math.floor(Math.random()*20)+5;
+		}
+		if (game.battle.numopp==2&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*40)+5;
+			game.battle.num2= Math.floor(Math.random()*12)+5;
+		}
+		if (game.battle.numopp==3&&game.battle.mode=="hard"&&game.battle.symbnum==1) {
+			game.battle.num1= Math.floor(Math.random()*70)+5;
+			game.battle.num2= Math.floor(Math.random()*12)+5;
+		}
+		else if (game.battle.numopp==3&&game.battle.mode=="hard") {
+			game.battle.num1= Math.floor(Math.random()*20)+5;
+			game.battle.num2= Math.floor(Math.random()*20)+5;
+		} else {
+			game.battle.num1= Math.floor(Math.random()*12);
+			game.battle.num2= Math.floor(Math.random()*12);
+		}
+	}*/
 	game.battle.negat=false;
 	anim.operation.phase=1;
 }
 function generatePuzzleModelvl(pass=false,starter=true) {
 	anim.operation.phase=1;
+	game.stats.timeRep=0;
 	if (!pass&&!starter&&game.battle.skiptonext) return;
 	let select = 0;
 	prev.num1=game.battle.num1;
@@ -550,7 +575,6 @@ function generatePuzzleModelvl(pass=false,starter=true) {
 	if (pass) game.level.encounter.splice(game.battle.noEncounter,1);
 	if (game.level.encounter.length>0) {
 		if (game.battle.order=="random") select = Math.floor(Math.random()*game.level.encounter.length);
-		game.stats.timeRep=0;
 		switch (game.level.encounter[select][0]){
 		case "+":
 			game.battle.symb= "plus";
@@ -734,7 +758,7 @@ function validatePuzzle() {
 		game.stats.combo=0;
 		game.battle.score=0;
 	}
-	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/1000,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),bonustime/1000,(validate?game.stats.clear:game.stats.clear+1),validate))
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),(validate?result:input),result,game.stats.timeRep/1000,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),bonustime/1000,(validate?game.stats.clear:game.stats.clear+1),validate))
 	anim.operation.phase=4;
 	return validate
 }
@@ -804,11 +828,11 @@ function validatePuzzle2() {
 		game.battle.score=0;
 	}
 	game.stats.timer=game.stats.maxtimer-game.stats.timerDecay;
-	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/1000,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),0,(validate?game.stats.clear:game.stats.clear+1),validate))
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),(validate?result:input),result,game.stats.timeRep/1000,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),0,(validate?game.stats.clear:game.stats.clear+1),validate))
 	anim.operation.phase=4;
 	return validate
 }
-function validatePuzzlelvl() {
+function validatePuzzlelvl() {				//A modifier
 	let validate = false;
 	let maxtimer = get_maxtimerdecay(game.stats.maxtimer,game.stats.timerDecay);
 	let result = 0;
@@ -844,6 +868,8 @@ function validatePuzzlelvl() {
 		if (game.battle.decaystep>0){
 			if (game.stats.clear%game.battle.decaystep==0 && game.stats.timerDecay<game.stats.maxtimer*0.5) game.stats.timerDecay+=game.battle.decaytimer;
 		}
+/*		if (game.stats.clear%game.battle.regenstep==0 && game.stats.pv<game.stats.maxpv) game.stats.pv+=game.battle.regen;
+		if (game.stats.pv>game.stats.maxpv) game.stats.pv=game.stats.maxpv;*/
 		game.battle.rangemin+=game.battle.rangeminstep;
 		game.battle.rangemax+=game.battle.rangemaxstep;
 	} else {
@@ -891,7 +917,7 @@ function validatePuzzlelvl() {
 	}
 	bonustime=game.stats.maxtimer-game.stats.timerDecay;
 	game.stats.timer=bonustime;
-	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),input,result,game.stats.timeRep/1000,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),(game.stats.maxtimer>0?bonustime/1000:-1),(validate?game.stats.clear:game.stats.clear+1),validate))
+	game.stats.level.push(new statsoperation(game.battle.num1,game.battle.num2,get_symb(game.battle.symb),(validate?result:input),result,game.stats.timeRep/1000,dmg*-1,get_hp(game.stats.maxvies,game.stats.maxpv,game.stats.vies,game.stats.pv),maxtimer,timerB,get_timer(game.stats.maxtime,game.stats.maxtimer,game.stats.time,game.stats.timer),(game.stats.maxtimer>0?bonustime/1000:-1),(validate?game.stats.clear:game.stats.clear+1),validate))
 	anim.operation.phase=4;
 	return validate
 }
@@ -971,7 +997,7 @@ function validatePuzzleArcade() {
 		game.battle.num1,
 		game.battle.num2,
 		get_symb(game.battle.symb),
-		input,
+		(validate?result:input),
 		result,
 		game.stats.timeRep/1000,
 		dmg*-1,
@@ -1341,6 +1367,26 @@ function colorCombo(combo){
 		return "combo7"
 	}
 }
+function colorComboArcade(combo){
+	if (combo<10) {
+		return "black"
+	}
+	else if (combo<15) {
+		return "combo2"
+	}
+	else if (combo<30) {
+		return "combo4"
+	}
+	else if (combo<50) {
+		return "combo5"
+	}
+	else if (combo<75) {
+		return "combo6"
+	}
+	else {
+		return "combo7"
+	}
+}
 
 function calcAvgTResp(inputTab){
 	let avg = 0;
@@ -1361,86 +1407,53 @@ function registerScore(score){
 
 function showbackground(){
 	if (game.option.bckgrndOpacity>0) {
-		if (anim.background.timer>0)anim.background.timer--;
+		//réduction du timer avant nouvelle création d'animation de fond
+		if (anim.background.timer>0)anim.background.timer-=msPassed;
+		//création des animations de fond
 		switch(anim.background.type){
 		case 0:
-			if (anim.background.timer==0) {
-				anim.background.timer=Math.floor(Math.random()*50+30)
+			if (anim.background.timer<=0) {
+				anim.background.timer=Math.floor(Math.random()*830+500)
 				anim.background.stock.push(new bckgrnd1(Math.random()*Cw,Math.random()*1+0.2,Math.random()*2+2.5,Math.random()*60+20))
-			}
-			if (anim.background.stock.length>0) {
-				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
-					anim.background.stock[i].update()
-					anim.background.stock[i].show()
-					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
-				}
 			}
 			break;
 		case 1:
-			if (anim.background.timer==0) {
-				anim.background.timer=Math.floor(Math.random()*5+15)
+			if (anim.background.timer<=0) {
+				anim.background.timer=Math.floor(Math.random()*83+250)
 				anim.background.stock.push(new bckgrnd2(Math.random()*Cw*0.9+10,Math.random()*Ch*0.9+5,Math.random()*4+2,Math.random()*50+30))
-			}
-			if (anim.background.stock.length>0) {
-				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
-					anim.background.stock[i].update()
-					anim.background.stock[i].show()
-					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
-				}
 			}
 			break;
 		case 2:
-			if (anim.background.timer==0) {
-				anim.background.timer=Math.floor(Math.random()*30+40)
+			if (anim.background.timer<=0) {
+				anim.background.timer=Math.floor(Math.random()*500+665)
 				anim.background.stock.push(new bckgrnd3(Math.random()*Cw-10,Math.random()*Ch,Math.random()*12+20,Math.random()*10+10))
-			}
-			if (anim.background.stock.length>0) {
-				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
-					anim.background.stock[i].update()
-					anim.background.stock[i].show()
-					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
-				}
 			}
 			break;
 		case 3:
-			if (anim.background.timer==0) {
-				anim.background.timer=Math.floor(Math.random()*10+20)
+			if (anim.background.timer<=0) {
+				anim.background.timer=Math.floor(Math.random()*166+332)
 				anim.background.stock.push(new bckgrnd4(Math.random()*Cw,Math.random()*0.4+0.2,Math.random()*1.5+2,Math.random()*45+45,Math.random()*12+8))
-			}
-			if (anim.background.stock.length>0) {
-				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
-					anim.background.stock[i].update()
-					anim.background.stock[i].show()
-					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
-				}
 			}
 			break;
 		case 9:
-			if (anim.background.timer==0) {
-				anim.background.timer=8;
+			if (anim.background.timer<=0) {
+				anim.background.timer=130;
 				anim.background.stock.push(new bckgrnd10(Math.floor(Math.random()*4),Math.floor(Math.random()*12+14),Math.floor(Math.random()*5+10)))
-			}
-			if (anim.background.stock.length>0) {
-				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
-					anim.background.stock[i].update()
-					anim.background.stock[i].show()
-					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
-				}
 			}
 			break;
 		case 10:
-			if (anim.background.timer==0) {
-				anim.background.timer=Math.floor(Math.random()*20+80);
+			if (anim.background.timer<=0) {
+				anim.background.timer=Math.floor(Math.random()*322+1322);
 				anim.background.stock.push(new bckgrnd11())
 			}
-			if (anim.background.stock.length>0) {
-				for (var i = anim.background.stock.length - 1; i >= 0; i--) {
-					anim.background.stock[i].update()
-					anim.background.stock[i].show()
-					if (anim.background.stock[i].destroy) anim.background.stock.splice(i,1)
-				}
-			}
 			break;
+		}
+		//Update
+		if (anim.background.stock.length>0) {
+			for (var i = anim.background.stock.length - 1; i >= 0; i--) {
+				anim.background.stock[i].update(nbFramePassed)
+				anim.background.stock[i].destroy?anim.background.stock.splice(i,1):anim.background.stock[i].show();
+			}
 		}
 	}
 }
@@ -1454,8 +1467,8 @@ class bckgrnd1{
 		this.opacity=opa;
 		this.destroy=false;
 	}
-	update(){
-		this.posY-=this.speed*anim.background.speed;
+	update(mult){
+		this.posY-=(this.speed*anim.background.speed)*mult;
 		if (this.posY<-10) this.destroy=true;
 	}
 	show(){
@@ -1481,10 +1494,11 @@ class bckgrnd2{
 		this.invert=false;
 		this.destroy=false;
 	}
-	update(){
-		this.invert ? this.opacity-=0.7*anim.background.speed:this.opacity+=0.7*anim.background.speed;
-		this.posY+=0.1*anim.background.speed;
+	update(mult){
+		this.invert ? this.opacity-=0.7*anim.background.speed*mult:this.opacity+=0.7*anim.background.speed*mult;
+		this.posY+=0.1*anim.background.speed*mult;
 		if (this.opacity<0) this.opacity=0;
+		if (this.opacity>100) this.opacity=100;
 		if (this.opacity>=this.MAXopacity) this.invert=true;
 		if (this.opacity<=0&&this.invert) this.destroy=true;
 	}
@@ -1512,11 +1526,12 @@ class bckgrnd3{
 		this.invert=false;
 		this.destroy=false;
 	}
-	update(){
-		if (this.opacity<this.MINopacity&&!this.invert) this.opacity+=0.05*anim.background.speed;
-		this.invert ? this.opacity-=0.1*anim.background.speed:this.opacity+=0.01*anim.background.speed;
-		this.posX+=0.05*anim.background.speed;
+	update(mult){
+		if (this.opacity<this.MINopacity&&!this.invert) this.opacity+=0.05*anim.background.speed*mult;
+		this.invert ? this.opacity-=0.1*anim.background.speed*mult:this.opacity+=0.01*anim.background.speed*mult;
+		this.posX+=0.05*anim.background.speed*mult;
 		if (this.opacity<0) this.opacity=0;
+		if (this.opacity>100) this.opacity=100;
 		if (this.opacity>=this.MAXopacity) this.invert=true;
 		if (this.opacity<=0&&this.invert) this.destroy=true;
 	}
@@ -1536,7 +1551,7 @@ class bckgrnd3{
 class bckgrnd4{
 	constructor(posX,spd,size,opa,offX){
 		this.posX=posX;
-		this.posY=Ch;
+		this.posY=Ch+size;
 		this.speed=spd;
 		this.size=size;
 		this.opacity=opa;
@@ -1546,13 +1561,14 @@ class bckgrnd4{
 		this.decay=false;
 		this.destroy=false;
 	}
-	update(){
-		this.posY-=this.speed*anim.background.speed;
-		this.invert ?this.time-=0.07*anim.background.speed:this.time+=0.07*anim.background.speed;
+	update(mult){
+		this.posY-=this.speed*anim.background.speed*mult;
+		this.invert ?this.time-=0.07*anim.background.speed*mult:this.time+=0.07*anim.background.speed*mult;
 		if (this.time>=180||this.time<=0) this.invert=!this.invert;
 		if (this.posY<Ch*0.6) this.decay=true;
-		if (this.decay) this.opacity--;
+		if (this.decay) this.opacity-=1*mult;
 		if (this.opacity<0) this.opacity=0;
+		if (this.opacity>100) this.opacity=100;
 		if (this.opacity<=0) this.destroy=true;
 	}
 	show(){
@@ -1593,10 +1609,10 @@ class bckgrnd10{
 		this.opacity=50;
 		this.destroy=false;
 	}
-	update(){
-		this.posX+=(Cw/2-this.posX)/(50-this.speed)*anim.background.speed;
-		this.posY+=(Ch*0.43-this.posY)/(50-this.speed)*anim.background.speed;
-		this.size/=1.05*anim.background.speed;
+	update(mult){
+		this.posX+=(Cw/2-this.posX)/(50-this.speed)*anim.background.speed*mult;
+		this.posY+=(Ch*0.43-this.posY)/(50-this.speed)*anim.background.speed*mult;
+		this.size/=1.05*anim.background.speed*mult;
 		if (this.posX>Cw/2-10&&this.posX<Cw/2+10&&this.posY>Ch*0.43-10&&this.posY<Ch*0.43+10) {
 			this.destroy=true;
 		}
@@ -1625,10 +1641,10 @@ class bckgrnd11{
 		this.decay=false;
 		this.destroy=false;
 	}
-	update(){
-		this.size-=Cw*0.005;
-		this.width-=0.2;
-		this.opacity-=0.3;
+	update(mult){
+		this.size-=Cw*0.005*mult;
+		this.width-=0.2*mult;
+		this.opacity-=0.3*mult;
 		if (this.size<Cw*0.01) {
 			this.destroy=true;
 		}
@@ -1687,6 +1703,7 @@ function checkSave(){
 		for (let i = 0;i<count.length;i++){
 			if (count[i]<levels[i+1].nblvl) {
 				let addlvl = levels[i+1].nblvl-count[i];
+				//console.log(addlvl)
 				if (addlvl>0) update=true;
 			}
 		}
@@ -1751,6 +1768,7 @@ function optionsLoad(){
 		game.option=JSON.parse(localStorage.option.toString());
 		if (game.option.showfps==undefined) {
 			game.option.showfps=true;
+			game.option.inputDirection=false;
 			optionsUpdate()
 		}
 		if (game.option.font==undefined) {

@@ -16,7 +16,7 @@ const mouse = {
 	hasmove:false,
 	range:0,
 }
-const key = {
+const key = {		//contrôles
 	q:false,
 	d:false,
 	p:false,
@@ -25,52 +25,58 @@ const key = {
 	right:false,
 	down:false,
 	left:false,
-	cooldown : 0,
-	cooldownmax : 1,
-	pausecooldown : 0
+	cooldown : 0,	//cooldown entre chaque input
+	cooldownmax : 1, //cooldown max entre chaque input
+	pausecooldown : 0 //max 40
 };
 const tile = {
-	tx:141,
-	ty:144,	
-	tw:46,
-	th:48
+	tx:141,		//largeur d'une tile
+	ty:144,		//hauteur d'une tile
+	tw:46,		//taille d'affichage horizontale pour une tile
+	th:48		//taille d'affichage verticale pour une tile
 }
 const tilenum = {
-	tx:188,
-	ty:192,
-	tw:47,
-	th:48
+	tx:188,		//largeur d'une tile
+	ty:192,		//hauteur d'une tile
+	tw:47,		//taille d'affichage horizontale pour une tile
+	th:48		//taille d'affichage verticale pour une tile
 }
 const spritefont = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!","?"];
 const numfont = ["0","1","2","3","4","5","6","7","8","9",".","-","+","x"];
 
-const version="BETA-1.5.0";
+const version="dev_BETA-1.5.1";
 const Cw= canvas.width, Ch= canvas.height;
 
 let msPrev = window.performance.now()
 const game = {
+						//tag pour l'affichage et les événements
 	screen : "loading",
 	mainevent : "mainmenu",
 	event : "",
-	inputType:"keyboard",
+	sideevent :"",
+	inputType:"keyboard", //keyboard, phone
 	prevevent : "",
 	prevtimer : 0,
 	fps:60,
 	msPerFrame: 1000/60,
-	option : {
+
+	option : {			//Options en jeu par défaut
 		music : 100,
 		sound : 100,
 		inputOpacity: 60,
 		bckgrndOpacity: 100,
 		animation:"alt",
 		font:"all",
+		inputDirection:false,
 		showfps:false
 	},
 	nosave:false,
+						//Variables pour menus
 	menu : {
 		options : 3,
 		target : 1,
 		direction : "ud",
+			//En % de l'écran
 		initx : 0.32,
 		inity : 0.54,
 		posx : 0.32,
@@ -79,6 +85,7 @@ const game = {
 		pady : 0.07,
 		select : false
 	},
+					//Statistiques du joueurs
 	stats : {
 		score : 0,
 		clear : 0,
@@ -107,7 +114,7 @@ const game = {
 	},
 	battle : {
 		gamemode: "",
-		mode : "very-easy",
+		mode : "very-easy",		// very-easy, easy, normal, hard
 		add : true,
 		sub : false,
 		mult : false,
@@ -115,11 +122,10 @@ const game = {
 		symbnum : 1,
 		score : 0,
 		negat : false,
-		validate : false,
 		num1:0,
 		num2:0,
 		left:0,
-		symb:"",
+		symb:"", 		//plus, moins, mult, div
 		dmg:0,
 		rangemin:0,
 		rangemax:0,
@@ -134,10 +140,10 @@ const game = {
 		order:"",
 		arcade:{
 			level:0,
-			phase:"normal",
+			phase:"normal", //"normal"; "regen"
 			maxclear:0,
 			clear:0,
-			gaintimer:40,
+			gaintimer:40, //en %
 			regen:0,
 			regenlvl:0
 		}
@@ -153,16 +159,16 @@ const anim = {
 	decaybar: {
 		time:39,
 		invert:false,
-		mode:"alt"
+		mode:"alt"			//"alt" "fix"
 	},
 	lowtimer:{
 		time:30,
-		mode:"alt"
+		mode:"alt"			//"alt" "fix"
 	},
 	regenbar: {
 		time:49,
 		invert:false,
-		mode:"alt"
+		mode:"alt"			//"alt" "fix"
 	},
 	perfect:{
 		globalOp:2000,
@@ -224,7 +230,7 @@ const anim = {
 		timer:0,
 	}
 }
-let input = 0;
+let input = "";
 let prev = {
 	result:0,
 	num1:0,
@@ -244,9 +250,7 @@ const icon_operation= new Image();
 const icons_lt= new Image();
 
 const icons_menu= new Image();
-const txt_perfect= new Image();
 const txt_perfect1= new Image();
-const txt_perfect2= new Image();
 const ui_hpbar= new Image();
 const ui_timerbar= new Image();
 const ui_timerbarprogress= new Image();
@@ -284,9 +288,7 @@ icons_lt.src = directory+"icons_lt.png";
 
 icon_operation.src = directory+"icon_operation.png";
 icons_menu.src = directory+"icons_menu.png";
-txt_perfect.src = directory+"txt_perfect.png";
 txt_perfect1.src = directory+"txt_perfect_layer1.png";
-txt_perfect2.src = directory+"txt_perfect_layer2.png";
 
 ui_hpbar.src = directory+"UI_hpbar.png";
 ui_timerbar.src = directory+"UI_timerbar.png";
@@ -323,20 +325,21 @@ let tstart=Date.now();
 let msPassed=0;
 let t=0;
 let delta=0;
+let nbFramePassed=0;
 
 function loopAnimation() {
 	requestAnimationFrame(loopAnimation)
 	const msNow=window.performance.now()
 	msPassed=msNow-msPrev;
+	//if (msPassed<game.msPerFrame) return
 	const excessTime=msPassed%game.msPerFrame;
 	msPrev=msNow-excessTime;
 	msPassed-=excessTime;
+	nbFramePassed= msPassed/game.msPerFrame;
 
 	if (key.cooldown>0) key.cooldown--;
-	if (game.timer>0) game.timer-=msPassed;
-	if(game.timer<0) game.timer=0;
-	if (key.pausecooldown>0) key.pausecooldown-=msPassed;
-	if (key.pausecooldown<0) key.pausecooldown=0;
+	game.timer>0 ? game.timer-=msPassed : game.timer=0;
+	key.pausecooldown>0 ? key.pausecooldown-=msPassed : key.pausecooldown=0;
 	c.fillStyle="black";
 	c.globalAlpha = 1;
 	c.fillRect(0,0,canvas.width,canvas.height)
@@ -674,6 +677,14 @@ function loopAnimation() {
 				c.fillText("atteignez des sommets avec le cumul des résultats.",Cw*0.05,Ch*0.82)
 				c.fillText("Un bon entrainement pour garder le fil.",Cw*0.05,Ch*0.89)
 				break;
+			/*case 5:
+				c.fillText("Record",Cw*0.5,Ch*0.55)
+				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
+				c.textAlign="start";
+				c.fillStyle="white";
+				c.fillText("Consultez vos records sur les différents modes",Cw*0.05,Ch*0.65)
+				c.fillText("du jeu.",Cw*0.05,Ch*0.70)
+				break;*/
 			case 5:
 				textfillplace(Cw*0.5,Ch*0.48,"OPTIONS",36,true,"black",4)
 				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
@@ -728,10 +739,11 @@ function loopAnimation() {
 						if (game.battle.mult) {game.battle.mult=false;game.battle.symbnum--}
 						break;				
 					case 5:
-						setmenu(6,"ud",0.045,0.26,0,0.1,6);
+						setmenu(5,"ud",0.045,0.26,0,0.1,6);
 						game.screen="options";
 						game.mainevent="menu";
 						game.event="back";
+						game.sideevent="page1";
 						break;
 					}
 				}
@@ -747,52 +759,73 @@ function loopAnimation() {
 			textfillplace(Cw*0.5,Ch*0.12,"OPTIONS",30,true,"black",5)
 			game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 			c.textAlign="start";
-			c.fillText("Opacité Aide",Cw*0.1,Ch*0.3)
-			c.fillText("Opacité fond",Cw*0.1,Ch*0.4)
-			c.fillText("Animations",Cw*0.1,Ch*0.5)
-			c.fillText("Font personnalisé",Cw*0.1,Ch*0.6)
-			c.fillText("Afficher FPS",Cw*0.1,Ch*0.7)
-			c.fillText("Retour",Cw*0.1,Ch*0.8)
-			c.textAlign="center";
-			c.fillRect(Cw*0.628,Ch*0.264,Cw*0.244*(game.option.inputOpacity/100),Ch*0.04)
-			c.drawImage(ui_progressbar,Cw*0.62,Ch*0.261,Cw*0.26,Ch*0.05)
-			c.fillRect(Cw*0.628,Ch*0.364,Cw*0.244*(game.option.bckgrndOpacity/100),Ch*0.04)
-			c.drawImage(ui_progressbar,Cw*0.62,Ch*0.361,Cw*0.26,Ch*0.05)
-			numfillplace(Cw*0.5,Ch*0.26,game.option.inputOpacity,24,"center",0,"black")
-			numfillplace(Cw*0.5,Ch*0.36,game.option.bckgrndOpacity,24,"center",0,"black")
+			if (game.sideevent=="page1") {
+				c.fillText("Opacité Aide",Cw*0.1,Ch*0.3)
+				c.fillText("Opacité fond",Cw*0.1,Ch*0.4)
+				c.fillText("Sens d'écriture",Cw*0.1,Ch*0.5)
+				c.fillText("Animations",Cw*0.1,Ch*0.6)
+				c.fillText("Retour",Cw*0.1,Ch*0.7)
+				c.fillRect(Cw*0.628,Ch*0.264,Cw*0.244*(game.option.inputOpacity/100),Ch*0.04)
+				c.drawImage(ui_progressbar,Cw*0.62,Ch*0.261,Cw*0.26,Ch*0.05)
+				c.fillRect(Cw*0.628,Ch*0.364,Cw*0.244*(game.option.bckgrndOpacity/100),Ch*0.04)
+				c.drawImage(ui_progressbar,Cw*0.62,Ch*0.361,Cw*0.26,Ch*0.05)
+				numfillplace(Cw*0.5,Ch*0.26,game.option.inputOpacity,24,"center",0,"black")
+				numfillplace(Cw*0.5,Ch*0.36,game.option.bckgrndOpacity,24,"center",0,"black")
+				c.textAlign="center";
+				c.fillText("<  Page 1  >",Cw*0.5,Ch*0.8)
+				switch (game.option.inputDirection){
+				case false:
+					c.fillText(">12345>",Cw*0.75,Ch*0.5)
+					break;
+				case true:
+					c.fillText("<54321<",Cw*0.75,Ch*0.5)
+					break;
+				}
+				switch (game.option.animation){
+				case "alt":
+					c.fillText("Alterné",Cw*0.75,Ch*0.6)
+					break;
+				case "fix":
+					c.fillText("Fixe",Cw*0.75,Ch*0.6)
+					break;
+				}
+			}
+			else {
+				c.fillText("Font personnalisé",Cw*0.1,Ch*0.3)
+				c.fillText("Afficher FPS",Cw*0.1,Ch*0.4)
+				c.fillText("Retour",Cw*0.1,Ch*0.5)
+				c.textAlign="center";
+				c.fillText("<  Page 2  >",Cw*0.5,Ch*0.8)
+				switch (game.option.showfps){
+				case false:
+					c.fillText("Non",Cw*0.75,Ch*0.4)
+					break;
+				case true:
+					c.fillText("Oui",Cw*0.75,Ch*0.4)
+					break;
+				}
+
+				switch(game.option.font){
+				case "none":
+					c.fillText("Non",Cw*0.75,Ch*0.3)
+					break;
+				case "num":
+					c.fillText("chiffre seul",Cw*0.75,Ch*0.3)
+					break;
+				case "txt":
+					c.fillText("texte seul",Cw*0.75,Ch*0.3)
+					break;
+				case "all":
+					c.fillText("Tout",Cw*0.75,Ch*0.3)
+					break;
+				}
+			}
+			
 			if (game.inputType=="keyboard") {
 				movemenu()
 			}
-			switch (game.option.animation){
-			case "alt":
-				c.fillText("Alterné",Cw*0.75,Ch*0.5)
-				break;
-			case "fix":
-				c.fillText("Fixe",Cw*0.75,Ch*0.5)
-				break;
-			}
-			switch (game.option.showfps){
-			case false:
-				c.fillText("Non",Cw*0.75,Ch*0.7)
-				break;
-			case true:
-				c.fillText("Oui",Cw*0.75,Ch*0.7)
-				break;
-			}
-			switch(game.option.font){
-			case "none":
-				c.fillText("Non",Cw*0.75,Ch*0.6)
-				break;
-			case "num":
-				c.fillText("chiffre seul",Cw*0.75,Ch*0.6)
-				break;
-			case "txt":
-				c.fillText("texte seul",Cw*0.75,Ch*0.6)
-				break;
-			case "all":
-				c.fillText("Tout",Cw*0.75,Ch*0.6)
-				break;
-			}
+			
+			game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 			switch (game.event) {
 			case "opa.input":
 				numfillplace(Cw*0.5,Ch*0.26,game.option.inputOpacity,24,"center",0,"white")
@@ -809,128 +842,194 @@ function loopAnimation() {
 				c.fillText("Opacité des décors animées en fond.",Cw*0.1,Ch*0.9)
 				c.fillText("",Cw*0.1,Ch*0.95)
 				break;
+			case "inputdirect":
+				c.textAlign="start";
+				c.fillText("Sens d'écriture des entrées du joueur.",Cw*0.1,Ch*0.9)
+				c.fillText("",Cw*0.1,Ch*0.95)
+				break;
 			case "animchrono":
 				c.textAlign="start";
-				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Mode d'affichage des animations du jeu.",Cw*0.1,Ch*0.9)
 				c.fillText("",Cw*0.1,Ch*0.95)
 				break;
 			case "customtext":
 				c.fillStyle="white";
 				c.textAlign="start";
-				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Choix d'affichage de la police d'écriture",Cw*0.1,Ch*0.9)
 				c.fillText("créé pour le jeu.",Cw*0.1,Ch*0.95)
 				break;
 			case "fps":
 				c.fillStyle="white";
 				c.textAlign="start";
-				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
 				c.fillText("Affichage du nombre d'image par secondes.",Cw*0.1,Ch*0.9)
 				break;
 			case "back":
 				c.fillStyle="white";
 				c.textAlign="start";
-				game.inputType=="phone" ? c.font = '20px monospace': c.font = '22px monospace';
+				
 				c.fillText("Retour au menu principal.",Cw*0.1,Ch*0.9)
 				break;
 			}
 			switch (game.mainevent){
 			case "menu":
-				if (game.inputType=="phone") {
-					c.globalAlpha=0.15;
-					c.fillRect(Cw*0.07,Ch*0.24,Cw*0.48,Ch*0.08)
-					c.fillRect(Cw*0.07,Ch*0.34,Cw*0.48,Ch*0.08)
-					c.fillRect(Cw*0.07,Ch*0.44,Cw*0.48,Ch*0.08)
-					c.fillRect(Cw*0.07,Ch*0.54,Cw*0.48,Ch*0.08)
-					c.fillRect(Cw*0.07,Ch*0.64,Cw*0.48,Ch*0.08)
-					c.fillRect(Cw*0.07,Ch*0.74,Cw*0.2,Ch*0.08)
-				} else {
-					showcursor()
-				}
-				switch (game.menu.target) {
-				case 1:
-					game.event="opa.input";
-					break;
-				case 2:
-					game.event="opa.bckgrnd";
-					break;
-				case 3:
-					game.event="animchrono";
-					break;
-				case 4:
-					game.event="customtext";
-					break;
-				case 5:
-					game.event="fps";
-					break;
-				case 6:
-					game.event="back";
-					break;
-				}
-				if (key.space) {
+				
+				switch (game.sideevent){
+				case "page1":
 					switch (game.menu.target) {
 					case 1:
-						setmenu(11,"lr",0,0,0,0,game.option.inputOpacity/10+1);
-						game.mainevent="select";
+						game.event="opa.input";
 						break;
 					case 2:
-						setmenu(11,"lr",0,0,0,0,game.option.bckgrndOpacity/10+1);
-						game.mainevent="select";
+						game.event="opa.bckgrnd";
 						break;
 					case 3:
-						switch(anim.lowtimer.mode){
-						case "alt":
-							setmenu(2,"lr",0,0,0,0,2);
-							break;
-						case "fix":
-							setmenu(2,"lr",0,0,0,0,1);
-							break;
-						}
-						game.mainevent="select";
+						game.event="inputdirect";
 						break;
 					case 4:
-						switch(game.option.font){
-						case "none":
-							setmenu(4,"lr",0,0,0,0,1);
-							break;
-						case "num":
-							setmenu(4,"lr",0,0,0,0,2);
-							break;
-						case "txt":
-							setmenu(4,"lr",0,0,0,0,3);
-							break;
-						case "all":
-							setmenu(4,"lr",0,0,0,0,4);
-							break;
-						}
-						game.mainevent="select";
+						game.event="animchrono";
 						break;
 					case 5:
-						switch(game.option.showfps){
-						case true:
-							setmenu(2,"lr",0,0,0,0,2);
-							break;
-						case false:
-							setmenu(2,"lr",0,0,0,0,1);
-							break;
-						}
-						game.mainevent="select";
-						break;
-					case 6:
-						setmenu(5,"lr",0,0,0,0,5);
-						game.screen="hub";
-						game.mainevent="";
-						game.event="";
-						optionsUpdate()
+						game.event="back";
 						break;
 					}
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.24,Cw*0.48,Ch*0.08)
+						c.fillRect(Cw*0.07,Ch*0.34,Cw*0.48,Ch*0.08)
+						c.fillRect(Cw*0.07,Ch*0.44,Cw*0.48,Ch*0.08)
+						c.fillRect(Cw*0.07,Ch*0.54,Cw*0.48,Ch*0.08)
+						c.fillRect(Cw*0.07,Ch*0.64,Cw*0.2,Ch*0.08)
+						c.fillRect(Cw*0.38,Ch*0.74,Cw*0.24,Ch*0.08)
+					} else {
+						showcursor()
+					}
+					break;
+				case "page2":
+					switch (game.menu.target) {
+					case 1:
+						game.event="customtext";
+						break;
+					case 2:
+						game.event="fps";
+						break;
+					case 3:
+						game.event="back";
+						break;
+					}
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.24,Cw*0.48,Ch*0.08)
+						c.fillRect(Cw*0.07,Ch*0.34,Cw*0.48,Ch*0.08)
+						c.fillRect(Cw*0.07,Ch*0.44,Cw*0.2,Ch*0.08)
+						c.fillRect(Cw*0.38,Ch*0.74,Cw*0.24,Ch*0.08)
+					} else {
+						showcursor()
+					}
+					break;
+				}
+				if (key.left||key.right) {
+					if(game.sideevent=="page1"){
+						game.sideevent="page2"
+						setmenu(3,"ud",0.045,0.26,0,0.1,3);
+					}
+					else {
+						game.sideevent="page1";
+						setmenu(5,"ud",0.045,0.26,0,0.1,5);
+					}
+					key.left=false;
+					key.right=false;
+				}
+				if (key.space) {
+					switch (game.sideevent){
+					case "page1":
+						switch (game.menu.target) {
+						case 1:
+							setmenu(11,"lr",0,0,0,0,game.option.inputOpacity/10+1);
+							game.mainevent="select";
+							break;
+						case 2:
+							setmenu(11,"lr",0,0,0,0,game.option.bckgrndOpacity/10+1);
+							game.mainevent="select";
+							break;
+						case 3:
+							switch(game.option.inputDirection){
+							case false:
+								setmenu(2,"lr",0,0,0,0,1);
+								break;
+							case true:
+								setmenu(2,"lr",0,0,0,0,2);
+								break;
+							}
+							game.mainevent="select";
+							break;
+						case 4:
+							switch(anim.lowtimer.mode){
+							case "alt":
+								setmenu(2,"lr",0,0,0,0,2);
+								break;
+							case "fix":
+								setmenu(2,"lr",0,0,0,0,1);
+								break;
+							}
+							game.mainevent="select";
+							break;
+						case 5:
+							setmenu(5,"lr",0,0,0,0,5);
+							game.screen="hub";
+							game.mainevent="";
+							game.event="";
+							optionsUpdate()
+							break;
+						}
+						break;
+					case "page2":
+						switch (game.menu.target){
+							case 1:
+							switch(game.option.font){
+							case "none":
+								setmenu(4,"lr",0,0,0,0,1);
+								break;
+							case "num":
+								setmenu(4,"lr",0,0,0,0,2);
+								break;
+							case "txt":
+								setmenu(4,"lr",0,0,0,0,3);
+								break;
+							case "all":
+								setmenu(4,"lr",0,0,0,0,4);
+								break;
+							}
+							game.mainevent="select";
+							break;
+						case 2:
+							switch(game.option.showfps){
+							case true:
+								setmenu(2,"lr",0,0,0,0,2);
+								break;
+							case false:
+								setmenu(2,"lr",0,0,0,0,1);
+								break;
+							}
+							game.mainevent="select";
+							break;
+						case 3:
+							setmenu(5,"lr",0,0,0,0,5);
+							game.screen="hub";
+							game.mainevent="";
+							game.event="";
+							optionsUpdate()
+							break;
+						}
+						break;
+					}
+					
 				}
 				if (key.d) {
 					setmenu(5,"lr",0,0,0,0,5);
 					game.screen="hub";
 					game.mainevent="";
 					game.event="";
+					game.sideevent="";
 					optionsUpdate()
 				}
 				break;
@@ -951,7 +1050,7 @@ function loopAnimation() {
 					}
 					game.option.inputOpacity=(game.menu.target-1)*10;
 					if (key.d||key.space) {
-						setmenu(6,"ud",0.045,0.26,0,0.1,1);
+						setmenu(5,"ud",0.045,0.26,0,0.1,1);
 						game.mainevent="menu";
 					}
 					break;
@@ -966,11 +1065,11 @@ function loopAnimation() {
 					}
 					game.option.bckgrndOpacity=(game.menu.target-1)*10;
 					if (key.d||key.space) {
-						setmenu(6,"ud",0.045,0.26,0,0.1,2);
+						setmenu(5,"ud",0.045,0.26,0,0.1,2);
 						game.mainevent="menu";
 					}
 					break;
-				case "animchrono":
+				case "inputdirect":
 					c.fillText("<",Cw*0.59,Ch*0.505)
 					c.fillText(">",Cw*0.91,Ch*0.505)
 					if (game.inputType=="phone") {
@@ -978,6 +1077,29 @@ function loopAnimation() {
 						c.fillRect(Cw*0.07,Ch*0.44,Cw*0.47,Ch*0.1)
 						c.fillRect(Cw*0.55,Ch*0.44,Cw*0.075,Ch*0.1)
 						c.fillRect(Cw*0.875,Ch*0.44,Cw*0.075,Ch*0.1)
+					}
+					switch (game.menu.target) {
+					case 1:
+						game.option.inputDirection=false;
+						break;
+					case 2:
+						game.option.inputDirection=true;
+						
+						break;
+					}
+					if (key.d||key.space) {
+						setmenu(5,"ud",0.045,0.26,0,0.1,3);
+						game.mainevent="menu";
+					}
+					break;
+				case "animchrono":
+					c.fillText("<",Cw*0.59,Ch*0.605)
+					c.fillText(">",Cw*0.91,Ch*0.605)
+					if (game.inputType=="phone") {
+						c.globalAlpha=0.15;
+						c.fillRect(Cw*0.07,Ch*0.54,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.54,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.54,Cw*0.075,Ch*0.1)
 					}
 					switch (game.menu.target) {
 					case 1:
@@ -990,18 +1112,18 @@ function loopAnimation() {
 						break;
 					}
 					if (key.d||key.space) {
-						setmenu(6,"ud",0.045,0.26,0,0.1,3);
+						setmenu(5,"ud",0.045,0.26,0,0.1,4);
 						game.mainevent="menu";
 					}
 					break;
 				case "customtext":
-					c.fillText("<",Cw*0.59,Ch*0.605)
-					c.fillText(">",Cw*0.91,Ch*0.605)
+					c.fillText("<",Cw*0.59,Ch*0.305)
+					c.fillText(">",Cw*0.91,Ch*0.305)
 					if (game.inputType=="phone") {
 						c.globalAlpha=0.15;
-						c.fillRect(Cw*0.07,Ch*0.54,Cw*0.47,Ch*0.1)
-						c.fillRect(Cw*0.55,Ch*0.54,Cw*0.075,Ch*0.1)
-						c.fillRect(Cw*0.875,Ch*0.54,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.07,Ch*0.24,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.24,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.24,Cw*0.075,Ch*0.1)
 					}
 					switch (game.menu.target) {
 					case 1:
@@ -1018,18 +1140,18 @@ function loopAnimation() {
 						break;
 					}
 					if (key.d||key.space) {
-						setmenu(6,"ud",0.045,0.26,0,0.1,4);
+						setmenu(3,"ud",0.045,0.26,0,0.1,1);
 						game.mainevent="menu";
 					}
 					break;
 				case "fps":
-					c.fillText("<",Cw*0.59,Ch*0.705)
-					c.fillText(">",Cw*0.91,Ch*0.705)
+					c.fillText("<",Cw*0.59,Ch*0.405)
+					c.fillText(">",Cw*0.91,Ch*0.405)
 					if (game.inputType=="phone") {
 						c.globalAlpha=0.15;
-						c.fillRect(Cw*0.07,Ch*0.64,Cw*0.47,Ch*0.1)
-						c.fillRect(Cw*0.55,Ch*0.64,Cw*0.075,Ch*0.1)
-						c.fillRect(Cw*0.875,Ch*0.64,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.07,Ch*0.34,Cw*0.47,Ch*0.1)
+						c.fillRect(Cw*0.55,Ch*0.34,Cw*0.075,Ch*0.1)
+						c.fillRect(Cw*0.875,Ch*0.34,Cw*0.075,Ch*0.1)
 					}
 					switch (game.menu.target) {
 					case 1:
@@ -1040,7 +1162,7 @@ function loopAnimation() {
 						break;
 					}
 					if (key.d||key.space) {
-						setmenu(6,"ud",0.045,0.26,0,0.1,5);
+						setmenu(3,"ud",0.045,0.26,0,0.1,2);
 						game.mainevent="menu";
 					}
 					break;
@@ -1050,6 +1172,9 @@ function loopAnimation() {
 				errormsg("Mainevent error !")
 				break;
 			}
+			break;
+		case "scoreboard":
+
 			break;
 		case "modeArcade":
 			showbackground()
@@ -1930,6 +2055,7 @@ function loopAnimation() {
 				c.globalAlpha=0.15;
 				c.fillRect(Cw*0.07,Ch*0.825,Cw*0.23,Ch*0.13)
 				c.fillRect(Cw*0.34,Ch*0.825,Cw*0.32,Ch*0.13)
+				//c.fillRect(Cw*0.7,Ch*0.81,Cw*0.23,Ch*0.13)
 				if (game.menu.target>1) {
 					c.fillRect(Cw*0.25,Ch*0.34,Cw*0.12,Ch*0.2)
 				}
@@ -1939,6 +2065,7 @@ function loopAnimation() {
 			}
 			c.globalAlpha = 1;
 			c.textAlign="center";
+			//c.fillText("Détails",Cw*0.82,Ch*0.9)
 			textfillplace(Cw*0.5,Ch*0.85,"JOUER",36,true,"white",6)
 			textfillplace(Cw*0.18,Ch*0.86,"RETOUR",26,true,"white",6)
 			textfillplace(Cw*0.02,Ch*0.6,"RECORD",28,false,(saves.levels[game.level.world][game.level.stage].perfect?"gold":"black"),5)
@@ -2166,8 +2293,7 @@ function loopAnimation() {
 			}else {
 				anim.lowtimer.time=500;
 			}
-			if (anim.pause.opa>0) anim.pause.opa-=msPassed;
-			if (anim.pause.opa<0) anim.pause.opa=0;
+			anim.pause.opa>0 ? anim.pause.opa-=msPassed : anim.pause.opa=0;
 			c.fillStyle="white";
 			c.globalAlpha=1;
 			textfillplace(Cw*0.5,Ch*0.04,"CORRECT",22,true,"black",6)
@@ -2176,7 +2302,7 @@ function loopAnimation() {
 			if(key.pausecooldown>0)c.fillRect(Cw*0.035,Ch*0.875,120*(1-key.pausecooldown/7000),40);
 			c.fillRect(Cw*0.035,Ch*0.875,120,40)
 			c.globalAlpha=0.6+anim.pause.opa/833;
-			key.pausecooldown==0?textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"black",5):textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"red",5);
+			key.pausecooldown==0 ? textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"black",5) : textfillplace(Cw*0.125,Ch*0.895,"PAUSE",26,true,"red",5);
 			c.globalAlpha=1;
 			numfillplace(Cw*0.5,Ch*0.12,game.stats.clear,40,"center",6,"brillant")
 			c.font = '30px monospace';
@@ -2237,7 +2363,7 @@ function loopAnimation() {
 					game.stats.timer=0;
 					if (game.battle.gamemode=="survival-life") {
 						switch (game.setbtl.dif){
-						case 2:
+						case 2: 			//très facile
 							game.stats.maxpv=100;
 							game.stats.maxtimer=10000;
 							game.battle.rangemin=3;
@@ -2249,7 +2375,7 @@ function loopAnimation() {
 							game.battle.decaystep=20;
 							game.battle.timerhplose=25;
 							break;
-						case 1.5:
+						case 1.5: 			//facile
 							game.stats.maxpv=100;
 							game.stats.maxtimer=10000;
 							game.battle.rangemin=5;
@@ -2261,7 +2387,7 @@ function loopAnimation() {
 							game.battle.decaystep=20;
 							game.battle.timerhplose=25;
 							break;
-						case 1:
+						case 1: 			//normal
 							game.stats.maxpv=100;
 							game.stats.maxtimer=9000;
 							game.battle.rangemin=7;
@@ -2273,7 +2399,7 @@ function loopAnimation() {
 							game.battle.decaystep=30;
 							game.battle.timerhplose=50;
 							break;
-						case 0.7:
+						case 0.7: 			//difficile
 							game.stats.maxpv=100;
 							game.stats.maxtimer=8000;
 							game.battle.rangemin=9;
@@ -2403,7 +2529,14 @@ function loopAnimation() {
 				c.font = '32px monospace';
 				c.fillStyle="white";
 				c.font = '40px monospace';
-				game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
+				if(input==""){
+					c.globalAlpha=0.6;
+					game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+0,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,0,40,"center",7);
+				}
+				else {
+					game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
+				}
+				c.globalAlpha=1;
 				drawPuzzle()
 				inputPlayer()
 				switch (game.battle.gamemode){
@@ -2447,9 +2580,11 @@ function loopAnimation() {
 				case "calc":
 					switch (game.battle.gamemode){
 					case "survival-timer":
+						if (input=="") input=0;
 						pass =validatePuzzle()
 						break;
 					case "survival-life":
+						if (input=="") input=0;
 						pass =validatePuzzle2()
 						break;
 					}
@@ -2473,7 +2608,7 @@ function loopAnimation() {
 						else {
 							game.event="";
 							game.mainevent="play";
-							input=0;
+							input="";
 							switch (game.battle.gamemode){
 							case "survival-timer":
 								generatePuzzleMode1()
@@ -2684,7 +2819,7 @@ function loopAnimation() {
 					}
 					switch (game.battle.gamemode) {
 					case "survival-timer":
-						game.battle.add? showicons(Cw*0.6,Ch*0.26,40,"lt",0,1):sshowicons(Cw*0.6,Ch*0.26,40,"lt",0,0);
+						game.battle.add? showicons(Cw*0.6,Ch*0.26,40,"lt",0,1):showicons(Cw*0.6,Ch*0.26,40,"lt",0,0);
 						game.battle.sub? showicons(Cw*0.68,Ch*0.26,40,"lt",1,1):showicons(Cw*0.68,Ch*0.26,40,"lt",1,0);
 						game.battle.mult? showicons(Cw*0.76,Ch*0.26,40,"lt",2,1):showicons(Cw*0.76,Ch*0.26,40,"lt",2,0);
 						switch (game.battle.numopp){
@@ -2703,7 +2838,7 @@ function loopAnimation() {
 						}
 						break;
 					case "survival-life":
-						game.battle.add? showicons(Cw*0.6,Ch*0.26,40,"lt",0,1):sshowicons(Cw*0.6,Ch*0.26,40,"lt",0,0);
+						game.battle.add? showicons(Cw*0.6,Ch*0.26,40,"lt",0,1):showicons(Cw*0.6,Ch*0.26,40,"lt",0,0);
 						game.battle.sub? showicons(Cw*0.68,Ch*0.26,40,"lt",1,1):showicons(Cw*0.68,Ch*0.26,40,"lt",1,0);
 						break;
 					}
@@ -3111,8 +3246,7 @@ function loopAnimation() {
 			}else {
 				anim.lowtimer.time=700;
 			}
-			if (anim.pause.opa>0) anim.pause.opa-=msPassed;
-			if (anim.pause.opa<0) anim.pause.opa=0;
+			anim.pause.opa>0 ? anim.pause.opa-=msPassed : anim.pause.opa=0;
 			c.fillStyle="white";
 			c.globalAlpha=1;
 			textfillplace(Cw*0.5,Ch*0.04,"RESTANT",22,true,"black",6)
@@ -3345,7 +3479,13 @@ function loopAnimation() {
 				c.font = '32px monospace';
 				c.fillStyle="white";
 				c.font = '40px monospace';
-				game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
+				if(input==""){
+					c.globalAlpha=0.6;
+					game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+0,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,0,40,"center",7);
+				}
+				else {
+					game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
+				}
 				drawPuzzle()
 				inputPlayer()
 				switch (game.battle.gamemode){
@@ -3448,6 +3588,7 @@ function loopAnimation() {
 				c.font = '32px monospace';
 				switch(game.event){
 				case "calc":
+					if (input=="") input=0;
 					pass =validatePuzzlelvl()
 					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					game.event="wait";
@@ -3461,7 +3602,7 @@ function loopAnimation() {
 					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
-						input=0;
+						input="";
 						generatePuzzleModelvl(pass,false)
 					}
 				}
@@ -4258,8 +4399,7 @@ function loopAnimation() {
 			}else {
 				anim.lowtimer.time=500;
 			}
-			if (anim.pause.opa>0) anim.pause.opa-=msPassed;
-			if (anim.pause.opa<0) anim.pause.opa=0;
+			anim.pause.opa>0 ? anim.pause.opa-=msPassed : anim.pause.opa=0;
 
 			if (anim.regenbar.mode=="alt") {
 				anim.regenbar.invert ? anim.regenbar.time+=msPassed:anim.regenbar.time-=msPassed;
@@ -4350,7 +4490,7 @@ function loopAnimation() {
 			c.fillStyle="white";
 			c.font = '28px monospace';
 			c.textAlign="start";
-			if (game.stats.combo>4) {textfillplace(Cw*0.03,Ch*0.325,"COMBO",30,false,colorCombo(game.stats.combo),5);numfillplace(Cw*0.225,Ch*0.325,game.stats.combo,30,"start",7,colorCombo(game.stats.combo));}
+			if (game.stats.combo>4) {textfillplace(Cw*0.03,Ch*0.325,"COMBO",30,false,colorComboArcade(game.stats.combo),5);numfillplace(Cw*0.225,Ch*0.325,game.stats.combo,30,"start",7,colorComboArcade(game.stats.combo));}
 			switch (game.mainevent){
 			case "starting":
 				switch (game.event){
@@ -4362,22 +4502,22 @@ function loopAnimation() {
 					game.stats.vies=0;
 					game.stats.timer=0;
 					switch (game.setbtl.dif){
-					case 2:
+					case 2: 			//très facile
 						game.stats.maxvies=5;
 						game.stats.maxtimer=16000;
 						game.battle.arcade.level=0;
 						break;
-					case 1.5:
+					case 1.5: 			//facile
 						game.stats.maxvies=5;
 						game.stats.maxtimer=14000;
 						game.battle.arcade.level=0;
 						break;
-					case 1:
+					case 1: 			//normal
 						game.stats.maxvies=5;
 						game.stats.maxtimer=12000;
 						game.battle.arcade.level=1;
 						break;
-					case 0.7:
+					case 0.7: 			//difficile
 						game.stats.maxvies=5;
 						game.stats.maxtimer=12000;
 						game.battle.arcade.level=2;
@@ -4522,7 +4662,7 @@ function loopAnimation() {
 						anim.lvltransition.time=0;
 						game.event="";
 						game.mainevent="play";
-						input=0;
+						input="";
 						generatePuzzleArcade()
 					}
 					c.fillStyle="rgb(240,240,240)";
@@ -4543,7 +4683,13 @@ function loopAnimation() {
 				if (game.stats.time>0) game.stats.time-=msPassed;
 				game.stats.timeRep+=msPassed;
 				c.fillStyle="white";
-				game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
+				if(input==""){
+					c.globalAlpha=0.6;
+					game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+0,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,0,40,"center",7);
+				}
+				else {
+					game.battle.negat ? numfillplace(Cw*0.5,Ch*0.68,"-"+input,40,"center",7):numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7);
+				}
 				drawPuzzle()
 				inputPlayer()
 				if (game.stats.timer<=0) {
@@ -4572,6 +4718,7 @@ function loopAnimation() {
 				c.font = '32px monospace';
 				switch(game.event){
 				case "calc":
+					if (input=="") input=0;
 					pass =validatePuzzleArcade()
 					numfillplace(Cw*0.5,Ch*0.68,input,40,"center",7,(pass?"green":"red"));
 					game.event=="calc"?game.event="wait":null;
@@ -4585,7 +4732,7 @@ function loopAnimation() {
 					if (game.timer<=0) {
 						game.event="";
 						game.mainevent="play";
-						input=0;
+						input="";
 						generatePuzzleArcade()
 					}
 					break;
@@ -5170,8 +5317,7 @@ function loopAnimation() {
 	c.fillText("Version "+version, Cw*0.99, Ch*0.99);
 	c.globalAlpha=0.8;
 	c.font = '14px monospace';
-	if (game.option.showfps) c.fillText("FPS "+frameRate, Cw*0.99, Ch*0.03);
-	
+	if (game.option.showfps) c.fillText("FPS "+frameRate, Cw*0.99, Ch*0.03);	
 }
 loopAnimation()
 
