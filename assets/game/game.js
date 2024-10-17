@@ -44,7 +44,7 @@ const tilenum = {
 const spritefont = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","!","?"];
 const numfont = ["0","1","2","3","4","5","6","7","8","9",".","-","+","x"];
 
-const version="dev_BETA-1.5.1";
+const version="BETA-1.5.1";
 const Cw= canvas.width, Ch= canvas.height;
 
 let msPrev = window.performance.now()
